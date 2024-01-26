@@ -50,6 +50,7 @@ class HTTPRequestHandler(SimpleHTTPRequestHandler):
             path_parts = url.path.strip('/').split('/')
             query_params = parse_qs(url.query)
             query_params = {k: v[0] for k, v in query_params.items()}
+            headers = dict(self.headers)
 
             for route in self.routes:
                 if route['method'] != method:
@@ -60,10 +61,11 @@ class HTTPRequestHandler(SimpleHTTPRequestHandler):
                     path_params = self.extract_path_params(route_parts, path_parts)
                     func_args = inspect.getfullargspec(route['function']).args
 
-                    # Include 'query_params' only if it's expected by the handler function
                     kwargs = {**path_params, **({'body': body} if 'body' in func_args else {})}
                     if 'query_params' in func_args:
                         kwargs['query_params'] = query_params
+                    if 'headers' in func_args:
+                        kwargs['headers'] = headers  # Add headers to the function arguments
 
                     response_data = route['function'](**kwargs)
                     self.send_response(200)

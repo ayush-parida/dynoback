@@ -3,6 +3,11 @@ from core.server import start_server
 
 config_file_path = './configs.json'
 
+from api.api import api_route
+@api_route('/api/new_route', 'GET')
+def handle_new_route():
+    return {'response': 'API server '}
+
 
 try:
     with open(config_file_path, 'r') as file:
