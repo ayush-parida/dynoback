@@ -1,0 +1,272 @@
+[
+  {
+    "connectionPoolId": "ab12",
+    "id": "4t9nc74bfkytrnj",
+    "name": "user_types",
+    "type": "base",
+    "system": false,
+    "schema": [
+      {
+        "system": false,
+        "id": "vmifhfw5",
+        "name": "name",
+        "type": "text",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "pattern": ""
+        }
+      }
+    ],
+    "indexes": [],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "options": {}
+  },
+  {
+    "connectionPoolId": "ab12",
+    "id": "tskkmru2fvnpzlf",
+    "name": "test",
+    "type": "base",
+    "system": false,
+    "schema": [
+      {
+        "system": false,
+        "id": "44c4ntz0",
+        "name": "field",
+        "type": "text",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "pattern": ""
+        }
+      },
+      {
+        "system": false,
+        "id": "8fsethii",
+        "name": "field1",
+        "type": "editor",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "convertUrls": true
+        }
+      },
+      {
+        "system": false,
+        "id": "gv7vw3ig",
+        "name": "field2",
+        "type": "number",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "noDecimal": false
+        }
+      },
+      {
+        "system": false,
+        "id": "5rhiyabn",
+        "name": "field3",
+        "type": "bool",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {}
+      },
+      {
+        "system": false,
+        "id": "wbrxos8l",
+        "name": "field4",
+        "type": "email",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "exceptDomains": null,
+          "onlyDomains": null
+        }
+      },
+      {
+        "system": false,
+        "id": "qxc4weat",
+        "name": "field5",
+        "type": "url",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "exceptDomains": null,
+          "onlyDomains": null
+        }
+      },
+      {
+        "system": false,
+        "id": "3wftzqgm",
+        "name": "field6",
+        "type": "date",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": "",
+          "max": ""
+        }
+      },
+      {
+        "system": false,
+        "id": "9fi43ihu",
+        "name": "field7",
+        "type": "select",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "maxSelect": 3,
+          "values": ["a", "b", "c"]
+        }
+      },
+      {
+        "system": false,
+        "id": "3pbkboxn",
+        "name": "field8",
+        "type": "file",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "mimeTypes": [],
+          "thumbs": [],
+          "maxSelect": 1,
+          "maxSize": 5242880,
+          "protected": false
+        }
+      },
+      {
+        "system": false,
+        "id": "5la1ztj6",
+        "name": "field9",
+        "type": "json",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "maxSize": 2000000
+        }
+      },
+      {
+        "system": false,
+        "id": "usz8agof",
+        "name": "field10",
+        "type": "relation",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "collectionId": "4t9nc74bfkytrnj",
+          "cascadeDelete": false,
+          "minSelect": null,
+          "maxSelect": 1,
+          "displayFields": null
+        }
+      }
+    ],
+    "indexes": [],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "options": {}
+  },
+  {
+    "connectionPoolId": "ab12",
+    "id": "_pb_users_auth_",
+    "name": "users",
+    "type": "auth",
+    "system": false,
+    "schema": [
+      {
+        "system": false,
+        "id": "users_name",
+        "name": "name",
+        "type": "text",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "pattern": ""
+        }
+      },
+      {
+        "system": false,
+        "id": "users_avatar",
+        "name": "avatar",
+        "type": "file",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "mimeTypes": [
+            "image/jpeg",
+            "image/png",
+            "image/svg+xml",
+            "image/gif",
+            "image/webp"
+          ],
+          "thumbs": null,
+          "maxSelect": 1,
+          "maxSize": 5242880,
+          "protected": false
+        }
+      },
+      {
+        "system": false,
+        "id": "5l6ytffj",
+        "name": "user_type",
+        "type": "relation",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "collectionId": "4t9nc74bfkytrnj",
+          "cascadeDelete": true,
+          "minSelect": null,
+          "maxSelect": null,
+          "displayFields": null
+        }
+      }
+    ],
+    "indexes": [],
+    "listRule": "id = @request.auth.id",
+    "viewRule": "id = @request.auth.id",
+    "createRule": "",
+    "updateRule": "id = @request.auth.id",
+    "deleteRule": "id = @request.auth.id",
+    "options": {
+      "allowEmailAuth": true,
+      "allowOAuth2Auth": true,
+      "allowUsernameAuth": true,
+      "exceptEmailDomains": null,
+      "manageRule": null,
+      "minPasswordLength": 8,
+      "onlyEmailDomains": null,
+      "onlyVerified": false,
+      "requireEmail": false
+    }
+  }
+]

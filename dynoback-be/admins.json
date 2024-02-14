@@ -1,0 +1,43 @@
+{
+  "admins": [
+    {
+      "id": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
+      "isActive": true,
+      "createdBy": "",
+      "isSuper": true,
+      "created": "2024-01-26 20:15:08.418Z",
+      "updated": "2024-01-26 20:15:08.418Z",
+      "email": "admin@sample.com",
+      "password": "changeme",
+      "emailVerified": false,
+      "resetPassword": false,
+      "avatar": 0,
+      "access": {
+        "collections": {
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": true,
+          "import": true,
+          "edit": true
+        },
+        "admins": {
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": true
+        },
+        "application": {
+          "read": true,
+          "update": true
+        },
+        "importSchemas": true,
+        "exportSchemas": true,
+        "tokenManagement": true,
+        "mailManagement": true,
+        "logs": true,
+        "backupManagement": true
+      }
+    }
+  ]
+}

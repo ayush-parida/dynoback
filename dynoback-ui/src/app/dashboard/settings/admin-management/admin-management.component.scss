@@ -1,0 +1,25 @@
+.form-layout .p-field,
+.form-layout .p-field-checkbox,
+.form-layout .p-grid .p-col-12,
+.form-layout .p-formgroup-inline>div {
+  margin-bottom: 1.5rem;
+  /* Adjusts spacing between fields */
+}
+
+.form-layout .p-checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  /* Adjusts spacing between checkboxes */
+}
+
+.form-layout .p-fieldset {
+  margin-top: 2rem;
+  /* Adds spacing above each fieldset for clear section separation */
+  margin-bottom: 2rem;
+  /* Adds spacing below each fieldset for clear section separation */
+}
+
+label {
+  font-weight: bold;
+}

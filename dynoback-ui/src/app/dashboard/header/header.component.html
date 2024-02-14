@@ -1,0 +1,11 @@
+<p-menubar [model]="menubarItems">
+  <ng-template pTemplate="start">
+    <div class="px-3 py-2 font-bold">Dynoback</div>
+  </ng-template>
+  <ng-template pTemplate="end">
+    <span
+      >{{ currentTime | date : "fullDate" }}
+      {{ currentTime | date : "shortTime" }}</span
+    >
+  </ng-template>
+</p-menubar>

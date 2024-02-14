@@ -1,0 +1,48 @@
+{
+  "AppName": "GDP",
+  "ip": "0.0.0.0",
+  "port": 4200,
+  "adminTokenExpiry": 3600,
+  "origins": [
+    "http://127.0.0.1:4200",
+    "http://0.0.0.0:4200",
+    "http://localhost:4200",
+    "None",
+    null
+  ],
+  "avatars": [
+    {
+      "id": 0,
+      "path": "assets/avatars/avatar1.webp"
+    },
+    {
+      "id": 1,
+      "path": "assets/avatars/avatar2.webp"
+    },
+    {
+      "id": 2,
+      "path": "assets/avatars/avatar3.webp"
+    },
+    {
+      "id": 3,
+      "path": "assets/avatars/avatar4.webp"
+    },
+    {
+      "id": 4,
+      "path": "assets/avatars/avatar5.webp"
+    },
+    {
+      "id": 5,
+      "path": "assets/avatars/avatar6.webp"
+    }
+  ],
+  "dbs": [
+    {
+      "name": "dynoback",
+      "user": "infiginiadmin",
+      "password": "infigini123",
+      "host": "43.204.12.237",
+      "port": 5433
+    }
+  ]
+}

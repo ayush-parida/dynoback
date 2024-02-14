@@ -1,0 +1,59 @@
+<p-sidebar
+  [visible]="true"
+  [dismissible]="false"
+  [showCloseIcon]="false"
+  [closeOnEscape]="false"
+  [modal]="false"
+  [transitionOptions]="'0ms cubic-bezier(0, 0, 0.2, 1)'"
+  styleClass="w-5rem relative"
+>
+  <ng-template pTemplate="header">
+    <div
+      class="flex align-items-center justify-content-between pt-3 flex-shrink-0"
+    >
+      <span class="inline-flex align-items-center gap-2">
+        <span class="font-semibold text-3xl text-primary">DB</span>
+      </span>
+      <span> </span>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="content">
+    <ul class="list-none p-0 m-0 overflow-hidden">
+      @for (item of items; track $index) {
+
+      <li class="flex">
+        <a
+          [routerLink]="item.route"
+          [routerLinkActive]="
+            'surface-100 border-rounded border-2 border-black-alpha-70'
+          "
+          pRipple
+          class="flex align-items-center cursor-pointer p-2 my-2 mx-auto border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple text-decoration-none border-rounded border-2 border-transparent"
+        >
+          <i [ngClass]="item.icon" class="pi text-3xl"></i>
+        </a>
+      </li>
+      }
+    </ul>
+  </ng-template>
+  <ng-template pTemplate="footer">
+    <p-divider></p-divider>
+    <a
+      pRipple
+      class="flex align-items-center cursor-pointer p-1 gap-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
+    >
+      <p-avatar
+        image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png"
+        shape="circle"
+      />
+      <!-- <span class="font-bold">Amy Elsner</span> -->
+    </a>
+    <a
+      (click)="logout()"
+      pRipple
+      class="flex align-items-center cursor-pointer p-2 my-2 mx-auto border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple text-decoration-none border-rounded border-2 border-transparent"
+    >
+      <i [ngClass]="'pi-sign-out'" class="pi text-3xl"></i>
+    </a>
+  </ng-template>
+</p-sidebar>

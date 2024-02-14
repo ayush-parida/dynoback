@@ -1,0 +1,111 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AuthService } from '../services/auth.service';
+import { HttpClientModule } from '@angular/common/http';
+import { HeaderComponent } from '../../dashboard/header/header.component';
+import { CheckboxModule } from 'primeng/checkbox';
+import { CardModule } from 'primeng/card';
+import { InputTextModule } from 'primeng/inputtext';
+import { InputMaskModule } from 'primeng/inputmask';
+import { InputGroupModule } from 'primeng/inputgroup';
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
+import { ButtonModule } from 'primeng/button';
+import { MessagesModule } from 'primeng/messages';
+import { ToastModule } from 'primeng/toast';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { DockModule } from 'primeng/dock';
+import { MenubarModule } from 'primeng/menubar';
+import { MegaMenuModule } from 'primeng/megamenu';
+import { MenuModule } from 'primeng/menu';
+import { AvatarModule } from 'primeng/avatar';
+import { DividerModule } from 'primeng/divider';
+import { AccordionModule } from 'primeng/accordion';
+import { TableModule } from 'primeng/table';
+import { PaginatorModule } from 'primeng/paginator';
+import { DropdownModule } from 'primeng/dropdown';
+import { SidebarModule } from 'primeng/sidebar';
+import { ConfirmPopupModule } from 'primeng/confirmpopup';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TooltipModule } from 'primeng/tooltip';
+import { ScrollPanelModule } from 'primeng/scrollpanel';
+import { PanelModule } from 'primeng/panel';
+import { PasswordModule } from 'primeng/password';
+import { FieldsetModule } from 'primeng/fieldset';
+import { InputSwitchModule } from 'primeng/inputswitch';
+
+@NgModule({
+  declarations: [],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+    HeaderComponent,
+    CardModule,
+    CheckboxModule,
+    InputTextModule,
+    InputMaskModule,
+    InputGroupModule,
+    InputGroupAddonModule,
+    ButtonModule,
+    MessagesModule,
+    ToastModule,
+    DockModule,
+    MenubarModule,
+    MegaMenuModule,
+    MenuModule,
+    AvatarModule,
+    DividerModule,
+    AccordionModule,
+    TableModule,
+    PaginatorModule,
+    DropdownModule,
+    SidebarModule,
+    ConfirmPopupModule,
+    ConfirmDialogModule,
+    TooltipModule,
+    PanelModule,
+    ScrollPanelModule,
+    PasswordModule,
+    FieldsetModule,
+    InputSwitchModule,
+  ],
+  exports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+    HeaderComponent,
+    CardModule,
+    CheckboxModule,
+    InputTextModule,
+    InputMaskModule,
+    InputGroupModule,
+    InputGroupAddonModule,
+    ButtonModule,
+    MessagesModule,
+    ToastModule,
+    DockModule,
+    MenubarModule,
+    MegaMenuModule,
+    MenuModule,
+    AvatarModule,
+    DividerModule,
+    AccordionModule,
+    TableModule,
+    PaginatorModule,
+    DropdownModule,
+    SidebarModule,
+    ConfirmPopupModule,
+    ConfirmDialogModule,
+    TooltipModule,
+    PanelModule,
+    ScrollPanelModule,
+    PasswordModule,
+    FieldsetModule,
+    InputSwitchModule,
+  ],
+  providers: [AuthService, MessageService, ConfirmationService],
+})
+export class SharedModule {}
