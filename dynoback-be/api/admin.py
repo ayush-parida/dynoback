@@ -182,12 +182,19 @@ def loadAdminApi(config):
         page = int(query_params.get('page', 1))  # Default to page 1
         per_page = int(query_params.get('per_page', 10))  # Default to 10 items per page
         search_param = query_params.get('search', None)  # Search parameter
+        sort_by = query_params.get('sort_by', 'email')  # Default sort column
+        sort_order = query_params.get('sort_order', 'asc')  # Default sort order
 
         # Fetch all active admins
         admins = admin_system.get_all_active_admins()
         if search_param:
             admins = [admin for admin in admins if search_param.lower() in admin['email'].lower()]
-
+        # Apply sorting
+        if sort_order.lower() == 'asc':
+            admins.sort(key=lambda x: x.get(sort_by, ''))
+        else:
+            admins.sort(key=lambda x: x.get(sort_by, ''), reverse=True)
+            
         # Pagination
         start = (page - 1) * per_page
         end = start + per_page
@@ -202,6 +209,8 @@ def loadAdminApi(config):
                     "current_page": page,
                     "per_page": per_page,
                     "total_pages": total_pages,
+                    "sort_by": sort_by,
+                    "sort_order": sort_order,
                     "total_admins": len(admins)
                 }
             }

@@ -18,11 +18,15 @@ export class AdminService {
   getActiveAdmins(
     page: number,
     perPage: number,
+    sort_by: string,
+    sort_order: string,
     search: string
   ): Observable<PaginatedAdminResponse> {
     var params: any = {
       page: page.toString(),
       per_page: perPage.toString(),
+      sort_by: sort_by,
+      sort_order: sort_order,
     };
     if (search) {
       params['search'] = search;

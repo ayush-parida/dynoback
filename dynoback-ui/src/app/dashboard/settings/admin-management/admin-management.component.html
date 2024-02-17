@@ -17,6 +17,8 @@
       'access.collections.read',
       'access.application.read'
     ]"
+    [lazy]="true"
+    (onLazyLoad)="sort($event)"
   >
     <ng-template pTemplate="caption">
       <div class="flex">
@@ -40,14 +42,22 @@
     </ng-template>
     <ng-template pTemplate="header">
       <tr>
-        <th>Email</th>
-        <th>Created Date</th>
+        <th pSortableColumn="uuid">
+          uuid <p-sortIcon field="uuid"></p-sortIcon>
+        </th>
+        <th pSortableColumn="email">
+          Email <p-sortIcon field="email"></p-sortIcon>
+        </th>
+        <th pSortableColumn="created">
+          Created Date <p-sortIcon field="created"></p-sortIcon>
+        </th>
         <th>Access Rights</th>
         <th>Actions</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-admin>
       <tr>
+        <td>{{ admin.uuid }}</td>
         <td>{{ admin.email }}</td>
         <td>{{ admin.created | date : "MM/dd/yyyy" }}</td>
         <td>
@@ -94,9 +104,9 @@
   </p-table>
   <p-paginator
     (onPageChange)="onPageChange($event)"
-    [first]="(pagination.currentPage - 1) * pagination.itemsPerPage"
-    [rows]="pagination.itemsPerPage"
-    [totalRecords]="pagination.totalAdmins"
+    [first]="(pagination.current_page - 1) * pagination.per_page"
+    [rows]="pagination.per_page"
+    [totalRecords]="pagination.total_admins"
     [rowsPerPageOptions]="[10, 25, 50, 100]"
     (onPage)="onPageChange($event)"
     [showCurrentPageReport]="true"

@@ -1,7 +1,11 @@
 import { Component, ViewChild, inject } from '@angular/core';
 import { SharedModule } from '../../../shared/classes/shared.module';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
-import { Admin, PaginatedAdminResponse } from './helpers/admin.interface';
+import {
+  Admin,
+  PaginatedAdminResponse,
+  Pagination,
+} from './helpers/admin.interface';
 import { AdminService } from './helpers/admin.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { uniqueEmailValidator } from '../../../shared/classes/admin-email.validator';
@@ -39,11 +43,13 @@ export class AdminManagementComponent {
   ];
 
   admins: Admin[] = [];
-  pagination = {
-    currentPage: 1,
-    itemsPerPage: 10,
-    totalAdmins: 0,
-    totalPages: 0,
+  pagination: Pagination = {
+    current_page: 1,
+    per_page: 10,
+    total_admins: 0,
+    total_pages: 0,
+    sort_by: '',
+    sort_order: 'asc',
   };
 
   avatars: any[] = [];
@@ -112,17 +118,24 @@ export class AdminManagementComponent {
     return formGroup;
   }
   private getAdmins(): void {
-    const { currentPage, itemsPerPage } = this.pagination;
+    const { current_page, per_page, sort_by, sort_order } = this.pagination;
     this.loading = true;
     this.subscriptions.add(
       this.adminService
-        .getActiveAdmins(currentPage, itemsPerPage, this.searchBar)
+        .getActiveAdmins(
+          current_page,
+          per_page,
+          sort_by,
+          sort_order,
+          this.searchBar
+        )
         .subscribe({
           next: (response: PaginatedAdminResponse) => {
             this.admins = response.admins;
-            // Update the pagination object with the response data
-            this.pagination.totalAdmins = response.pagination.total_admins;
-            this.pagination.totalPages = response.pagination.total_pages;
+            this.pagination.total_admins = response.pagination.total_admins;
+            this.pagination.total_pages = response.pagination.total_pages;
+            this.pagination.sort_by = response.pagination.sort_by;
+            this.pagination.sort_order = response.pagination.sort_order;
             this.loading = false;
           },
           error: (error) => {
@@ -149,8 +162,8 @@ export class AdminManagementComponent {
     );
   }
   onPageChange(event: any) {
-    this.pagination.currentPage = event.first / event.rows + 1;
-    this.pagination.itemsPerPage = event.rows;
+    this.pagination.current_page = event.first / event.rows + 1;
+    this.pagination.per_page = event.rows;
     this.getAdmins();
   }
   search() {
@@ -315,5 +328,10 @@ export class AdminManagementComponent {
         },
       })
     );
+  }
+  sort(event: any) {
+    this.pagination.sort_by = event.sortField;
+    this.pagination.sort_order = event.sortOrder == 1 ? 'asc' : 'desc';
+    this.getAdmins();
   }
 }

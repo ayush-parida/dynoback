@@ -11,6 +11,8 @@ export interface Pagination {
   per_page: number;
   total_pages: number;
   total_admins: number;
+  sort_by: string;
+  sort_order: 'asc' | 'desc';
 }
 
 export interface PaginatedAdminResponse {
