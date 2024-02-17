@@ -1,0 +1,13 @@
+@if (loading) {
+<div
+  [ngClass]="type != 'full' ? 'absolute' : ''"
+  class="p-component-overlay z-5"
+>
+  <div class="top-50 relative text-center">
+    <p-progressSpinner
+      styleClass="w-4rem h-4rem"
+      strokeWidth="7"
+    ></p-progressSpinner>
+  </div>
+</div>
+}

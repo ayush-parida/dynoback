@@ -1,5 +1,5 @@
 export interface Admin {
-  id: string;
+  uuid: string;
   isActive: boolean;
   email: string;
   created: Date;

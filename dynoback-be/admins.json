@@ -1,9 +1,10 @@
 {
   "admins": [
     {
-      "id": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
+      "uuid": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
       "isActive": true,
       "createdBy": "",
+      "updatedBy": "",
       "isSuper": true,
       "created": "2024-01-26 20:15:08.418Z",
       "updated": "2024-01-26 20:15:08.418Z",
@@ -11,7 +12,11 @@
       "password": "changeme",
       "emailVerified": false,
       "resetPassword": false,
-      "avatar": 0,
+      "avatar": {
+        "id": 0,
+        "path": "assets/avatars/avatar1.webp",
+        "name": "avatar1"
+      },
       "access": {
         "collections": {
           "create": true,
@@ -38,6 +43,50 @@
         "logs": true,
         "backupManagement": true
       }
+    },
+    {
+      "email": "ayush@gmail.com",
+      "password": "ddn11puram",
+      "emailVerified": true,
+      "passwordResetDone": false,
+      "avatar": {
+        "id": 1,
+        "path": "assets/avatars/avatar2.webp",
+        "name": "avatar2"
+      },
+      "access": {
+        "collections": {
+          "create": false,
+          "read": true,
+          "update": false,
+          "delete": false,
+          "import": false,
+          "edit": false
+        },
+        "admins": {
+          "create": false,
+          "read": true,
+          "update": false,
+          "delete": false
+        },
+        "application": {
+          "read": false,
+          "update": false
+        },
+        "importSchemas": false,
+        "exportSchemas": false,
+        "tokenManagement": false,
+        "mailManagement": false,
+        "logs": false,
+        "backupManagement": false
+      },
+      "uuid": "b879d6d6-64ce-45ff-9ce9-7a15c19e3af3",
+      "isActive": true,
+      "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
+      "updatedBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
+      "isSuper": false,
+      "created": "2024-02-17T08:23:14.016141",
+      "updated": "2024-02-17T10:44:35.535959"
     }
   ]
 }

@@ -6,6 +6,7 @@ import { AdminService } from './helpers/admin.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { uniqueEmailValidator } from '../../../shared/classes/admin-email.validator';
 import { ConfigService } from '../../../shared/services/config.service';
+import { Subscription, of } from 'rxjs';
 
 @Component({
   selector: 'app-admin-management',
@@ -16,15 +17,21 @@ import { ConfigService } from '../../../shared/services/config.service';
 })
 export class AdminManagementComponent {
   loading: boolean = false;
+  screenLoading: boolean = false;
+  adminSidebarLoading: boolean = false;
+  isView: boolean = false;
+  actionUuid: string = '';
   menubarItems: MenuItem[] = [
     {
       label: 'Refresh',
+      icon: 'pi pi-refresh',
       command: (event) => {
         this.getAdmins();
       },
     },
     {
       label: 'Add Admin',
+      icon: 'pi pi-plus',
       command: (event) => {
         this.addAdmin();
       },
@@ -43,7 +50,8 @@ export class AdminManagementComponent {
   searchBar: string = '';
   adminFormGroup: FormGroup = new FormGroup({});
   adminService = inject(AdminService);
-  addAdminSidebarVisible: boolean = false;
+  adminFormSidebarVisible: boolean = false;
+  subscriptions: Subscription = new Subscription();
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
   private fb = inject(FormBuilder);
@@ -51,19 +59,18 @@ export class AdminManagementComponent {
   constructor() {
     this.getAdmins();
     this.loadAvatars();
-    this.initAdminForm();
+    this.adminFormGroup = this.initAdminForm();
   }
-  initAdminForm() {
-    this.adminFormGroup = this.fb.group({
-      isActive: [true, Validators.required],
-      isSuper: [false, Validators.required],
+  initAdminForm(admin?: Admin): FormGroup {
+    var formGroup = this.fb.group({
       email: [
         '',
         [Validators.required, Validators.email],
         [
           uniqueEmailValidator(
             this.configService.http,
-            this.configService.apiUrl
+            this.configService.apiUrl,
+            this.actionUuid ? true : false
           ),
         ],
       ],
@@ -98,37 +105,48 @@ export class AdminManagementComponent {
         backupManagement: [false, Validators.required],
       }),
     });
+    if (admin) {
+      formGroup.patchValue(admin);
+      formGroup.controls.email.disable();
+    }
+    return formGroup;
   }
-  getAdmins(): void {
+  private getAdmins(): void {
     const { currentPage, itemsPerPage } = this.pagination;
     this.loading = true;
-    this.adminService.getActiveAdmins(currentPage, itemsPerPage).subscribe({
-      next: (response: PaginatedAdminResponse) => {
-        this.admins = response.admins;
-        // Update the pagination object with the response data
-        this.pagination.totalAdmins = response.pagination.total_admins;
-        this.pagination.totalPages = response.pagination.total_pages;
-        this.loading = false;
-      },
-      error: (error) => {
-        // Handle any errors that occur during the HTTP request
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Failed',
-          detail: error.error.message,
-        });
-      },
-    });
+    this.subscriptions.add(
+      this.adminService
+        .getActiveAdmins(currentPage, itemsPerPage, this.searchBar)
+        .subscribe({
+          next: (response: PaginatedAdminResponse) => {
+            this.admins = response.admins;
+            // Update the pagination object with the response data
+            this.pagination.totalAdmins = response.pagination.total_admins;
+            this.pagination.totalPages = response.pagination.total_pages;
+            this.loading = false;
+          },
+          error: (error) => {
+            this.loading = false;
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Failed',
+              detail: error.error.message,
+            });
+          },
+        })
+    );
   }
-  loadAvatars() {
-    this.adminService.getAvatars().subscribe((data) => {
-      this.avatars = data.map((item) => ({
-        id: item.id,
-        path: item.path,
-        // Assuming the avatar image name is indicative of the avatar's identity
-        name: item.path.split('/').pop().split('.')[0], // Extracting name from file name
-      }));
-    });
+  private loadAvatars() {
+    this.subscriptions.add(
+      this.adminService.getAvatars().subscribe((data) => {
+        this.avatars = data.map((item) => ({
+          id: item.id,
+          path: item.path,
+          // Assuming the avatar image name is indicative of the avatar's identity
+          name: item.path.split('/').pop().split('.')[0], // Extracting name from file name
+        }));
+      })
+    );
   }
   onPageChange(event: any) {
     this.pagination.currentPage = event.first / event.rows + 1;
@@ -136,39 +154,166 @@ export class AdminManagementComponent {
     this.getAdmins();
   }
   search() {
-    console.log(this.searchBar);
+    this.getAdmins();
   }
 
   addAdmin() {
-    this.addAdminSidebarVisible = true;
+    this.adminFormSidebarVisible = true;
   }
   confirmClose(event: any) {
-    this.confirmationService.confirm({
-      target: event.target as EventTarget,
-      message: 'Are you sure that you want to close?',
-      header: 'Close Confirmation',
-      icon: 'pi pi-exclamation-triangle',
-      acceptIcon: 'none',
-      rejectIcon: 'none',
-      acceptButtonStyleClass: 'p-button-danger p-button-text',
-      rejectButtonStyleClass: 'p-button-text p-button-text',
-      accept: () => {
-        this.messageService.add({
-          severity: 'info',
-          summary: 'User not created',
-          detail: 'Form Cleared',
-          life: 3000,
-        });
-        this.addAdminSidebarVisible = false;
-        this.adminFormGroup.reset();
-        this.adminFormGroup.markAsUntouched();
-        this.adminFormGroup.markAsPristine();
-        this.initAdminForm();
-      },
-      reject: () => {},
-    });
+    if (!this.isView) {
+      this.confirmationService.confirm({
+        target: event.target as EventTarget,
+        message: 'Are you sure that you want to close?',
+        header: 'Close Confirmation',
+        icon: 'pi pi-exclamation-triangle',
+        acceptIcon: 'none',
+        rejectIcon: 'none',
+        acceptButtonStyleClass: 'p-button-danger p-button-text',
+        rejectButtonStyleClass: 'p-button-text p-button-text',
+        accept: () => {
+          this.messageService.add({
+            severity: 'info',
+            summary: 'User not created',
+            detail: 'Form Cleared',
+            life: 3000,
+          });
+          this.closeFormSidebar();
+        },
+        reject: () => {},
+      });
+    } else {
+      this.closeFormSidebar();
+    }
+  }
+  private closeFormSidebar() {
+    this.adminFormSidebarVisible = false;
+    this.adminFormGroup.reset();
+    this.adminFormGroup.markAsUntouched();
+    this.adminFormGroup.markAsPristine();
+    this.adminFormGroup = this.initAdminForm();
+    this.actionUuid = '';
   }
   submitAdmin() {
-    console.log(this.adminFormGroup.value);
+    console.log(this.adminFormGroup);
+    if (this.adminFormGroup.valid) {
+      this.adminSidebarLoading = true;
+      let requestObservable;
+      if (this.actionUuid) {
+        requestObservable = this.adminService.putAdmin(
+          this.adminFormGroup.value,
+          this.actionUuid
+        );
+      } else {
+        requestObservable = this.adminService.postAdmin(
+          this.adminFormGroup.value
+        );
+      }
+
+      this.subscriptions.add(
+        requestObservable.subscribe({
+          next: (response) => {
+            this.adminSidebarLoading = false;
+            if (response.success) {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success!',
+                detail: response.message,
+                life: 3000,
+              });
+              this.closeFormSidebar();
+            } else {
+              this.messageService.add({
+                severity: 'info',
+                summary: 'Warning!',
+                detail: response.message,
+                life: 3000,
+              });
+            }
+          },
+          error: (error) => {
+            this.adminSidebarLoading = false;
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error! Failed!',
+              detail: error.error.message,
+            });
+          },
+        })
+      );
+    }
+  }
+  editClick(admin: Admin) {
+    this.adminFormSidebarVisible = true;
+    this.actionUuid = admin.uuid;
+    this.adminFormGroup = this.initAdminForm(admin);
+  }
+  viewClick(admin: Admin) {
+    this.adminFormSidebarVisible = true;
+    this.isView = true;
+    this.adminFormGroup = this.initAdminForm(admin);
+    this.adminFormGroup.disable();
+  }
+  deleteClick(event: any, uuid: string) {
+    this.actionUuid = uuid;
+    if (!this.isView) {
+      this.confirmationService.confirm({
+        target: event.target as EventTarget,
+        message: 'Are you sure that you want to delete?',
+        header: 'Delete Confirmation',
+        icon: 'pi pi-exclamation-triangle',
+        acceptIcon: 'none',
+        rejectIcon: 'none',
+        acceptButtonStyleClass: 'p-button-danger p-button-text',
+        rejectButtonStyleClass: 'p-button-text p-button-text',
+        accept: () => {
+          this.deleteAdmin();
+        },
+        reject: () => {
+          this.messageService.add({
+            severity: 'info',
+            summary: 'Action Canceled',
+            detail: 'User not deleted',
+            life: 3000,
+          });
+        },
+      });
+    } else {
+      this.closeFormSidebar();
+    }
+  }
+  private deleteAdmin(): void {
+    this.screenLoading = true;
+    this.subscriptions.add(
+      this.adminService.deleteAdmin(this.actionUuid).subscribe({
+        next: (response) => {
+          this.screenLoading = false;
+          if (response.success) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success!',
+              detail: response.message,
+              life: 3000,
+            });
+            this.getAdmins();
+          } else {
+            this.messageService.add({
+              severity: 'info',
+              summary: 'Warning!',
+              detail: response.message,
+              life: 3000,
+            });
+          }
+        },
+        error: (error) => {
+          this.screenLoading = false;
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Failed',
+            detail: error.error.message,
+          });
+        },
+      })
+    );
   }
 }

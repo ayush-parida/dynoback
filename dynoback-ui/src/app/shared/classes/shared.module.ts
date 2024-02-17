@@ -33,6 +33,7 @@ import { PanelModule } from 'primeng/panel';
 import { PasswordModule } from 'primeng/password';
 import { FieldsetModule } from 'primeng/fieldset';
 import { InputSwitchModule } from 'primeng/inputswitch';
+import { SpinnerComponent } from '../components/spinner/spinner.component';
 
 @NgModule({
   declarations: [],
@@ -42,6 +43,7 @@ import { InputSwitchModule } from 'primeng/inputswitch';
     ReactiveFormsModule,
     HttpClientModule,
     HeaderComponent,
+    SpinnerComponent,
     CardModule,
     CheckboxModule,
     InputTextModule,
@@ -77,6 +79,7 @@ import { InputSwitchModule } from 'primeng/inputswitch';
     ReactiveFormsModule,
     HttpClientModule,
     HeaderComponent,
+    SpinnerComponent,
     CardModule,
     CheckboxModule,
     InputTextModule,

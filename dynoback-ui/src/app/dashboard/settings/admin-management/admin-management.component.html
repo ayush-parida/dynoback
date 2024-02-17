@@ -1,7 +1,12 @@
 <app-header [menubarItems]="menubarItems"></app-header>
-<div class="card">
+<div class="card h-fit">
   <p-table
-    styleClass="p-datatable-striped"
+    responsiveLayout="stack"
+    [breakpoint]="'960px'"
+    [tableStyle]="{ 'min-width': '50rem' }"
+    styleClass="p-datatable-striped h-fit"
+    [scrollable]="true"
+    scrollHeight="80vh"
     #adminTable
     [value]="admins"
     dataKey="id"
@@ -23,9 +28,14 @@
             class="w-full"
             placeholder="Search email"
             [(ngModel)]="searchBar"
-            (input)="search()"
           />
         </span>
+        <p-button
+          styleClass="ml-2"
+          icon="pi pi-search"
+          label="Search"
+          (click)="search()"
+        ></p-button>
       </div>
     </ng-template>
     <ng-template pTemplate="header">
@@ -33,7 +43,7 @@
         <th>Email</th>
         <th>Created Date</th>
         <th>Access Rights</th>
-        <th>Status</th>
+        <th>Actions</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-admin>
@@ -42,9 +52,38 @@
         <td>{{ admin.created | date : "MM/dd/yyyy" }}</td>
         <td>
           Collections: {{ admin.access.collections.read ? "Read" : "No Read" }},
-          Admins: {{ admin.access.admins.read ? "Read" : "No Read" }}
+          Admins:
+          {{ admin.access.admins.read ? "Read" : "No Read" }} Application:
+          {{ admin.access.application.read ? "Read" : "No Read" }}
         </td>
-        <td>{{ admin.isActive ? "Active" : "Inactive" }}</td>
+        <td class="flex flex-wrap gap-3 justify-content-left">
+          <p-button
+            icon="pi pi-eye"
+            pTooltip="View"
+            tooltipPosition="top"
+            [raised]="true"
+            [rounded]="true"
+            (click)="viewClick(admin)"
+          ></p-button>
+          <p-button
+            icon="pi pi-pencil"
+            pTooltip="Edit"
+            tooltipPosition="top"
+            (click)="editClick(admin)"
+            severity="help"
+            [raised]="true"
+            [rounded]="true"
+          ></p-button>
+          <p-button
+            icon="pi pi-trash"
+            pTooltip="Delete"
+            tooltipPosition="top"
+            severity="danger"
+            [raised]="true"
+            [rounded]="true"
+            (click)="deleteClick($event, admin.uuid)"
+          ></p-button>
+        </td>
       </tr>
     </ng-template>
     <ng-template pTemplate="emptymessage">
@@ -64,8 +103,9 @@
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
   ></p-paginator>
 </div>
+
 <p-sidebar
-  [(visible)]="addAdminSidebarVisible"
+  [(visible)]="adminFormSidebarVisible"
   [showCloseIcon]="false"
   [closeOnEscape]="false"
   [position]="'right'"
@@ -76,6 +116,7 @@
   <ng-template pTemplate="header"><h3>Add Admin</h3> </ng-template>
 
   <ng-template pTemplate="content">
+    <app-spinner [loading]="adminSidebarLoading" />
     <p-scrollPanel [style]="{ width: '100%', height: '75vh' }">
       <form [formGroup]="adminFormGroup" class="p-fluid form-layout mx-4">
         <div class="p-grid">
@@ -99,25 +140,12 @@
               id="password"
               formControlName="password"
               placeholder="Enter password"
+              [toggleMask]="true"
             ></p-password>
           </div>
         </div>
 
         <div class="p-grid">
-          <div class="p-col-12 p-md-3">
-            <p-checkbox
-              [binary]="true"
-              formControlName="isActive"
-              label="Active"
-            ></p-checkbox>
-          </div>
-          <div class="p-col-12 p-md-3">
-            <p-checkbox
-              [binary]="true"
-              formControlName="isSuper"
-              label="Super User"
-            ></p-checkbox>
-          </div>
           <div class="p-col-12 p-md-3">
             <p-checkbox
               [binary]="true"
@@ -309,7 +337,7 @@
         ></p-button>
         <p-button
           class="p-button-text p-button-text"
-          label="Add"
+          [label]="actionUuid ? 'Update' : 'Add'"
           severity="primary"
           icon="pi pi-check"
           [raised]="true"
@@ -321,3 +349,4 @@
 </p-sidebar>
 <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
+<app-spinner [loading]="screenLoading" [type]="'full'" />

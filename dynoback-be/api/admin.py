@@ -43,7 +43,7 @@ class AdminManagementSystem:
         admins = self._read_admins()
         for admin in admins:
             if admin['email'] == email and admin['password'] == password and admin['isActive']:
-                token_data = f"{email}:{time.time()}"
+                token_data = f"{email}:{time.time()}:{admin['uuid']}"
                 encoded_token = base64.b64encode(token_data.encode()).decode()
                 del admin['password']
                 del admin['isActive']
@@ -59,39 +59,40 @@ class AdminManagementSystem:
         try:
             token = token.split('Bearer ')[1]
             decoded_data = base64.b64decode(token).decode()
-            email, timestamp = decoded_data.split(':')
+            email, timestamp, uuid = decoded_data.split(':')
             timestamp = float(timestamp)
 
             if time.time() - timestamp > self.config['adminTokenExpiry']:
-                return False
+                return {"status": False, "decoded": {}}
 
-            return True
+            return {"status": True, "decoded": {"email": email, "uuid": uuid}}
         except Exception:
-            return False
+            return {"status": False, "decoded": {}}
 
     def get_all_active_admins(self):
         # Retrieve all active admins
         admins = self._read_admins()
         return [admin for admin in admins if admin['isActive']]
 
-    def add_admin(self, new_admin, creator_email):
+    def add_admin(self, new_admin, creator_uuid):
         # Add a new admin
         admins = self._read_admins()
 
         mandatory_fields = ['email', 'password', 'avatar']
         missing_fields = [field for field in mandatory_fields if not new_admin.get(field)]
         if missing_fields:
-            return {"success": False, "message": f"Mandatory fields missing: {', '.join(missing_fields)}"}
+            return {"status": 200, "response":{"success": False, "message": f"Mandatory fields missing: {', '.join(missing_fields)}"}}
 
         if not self.is_valid_email(new_admin['email']):
-            return {"success": False, "message": "Invalid email format"}
+            return {"status": 200, "response":{"success": False, "message": "Invalid email format"}}
 
         if any(admin['email'] == new_admin['email'] for admin in admins):
-            return {"success": False, "message": "Email already exists"}
+            return {"status": 200, "response":{"success": False, "message": "Email already exists"}}
 
-        new_admin['id'] = str(uuid.uuid4())
+        new_admin['uuid'] = str(uuid.uuid4())
         new_admin['isActive'] = True
-        new_admin['createdBy'] = creator_email
+        new_admin['createdBy'] = creator_uuid
+        new_admin['updatedBy'] = ""
         new_admin['isSuper'] = False
         current_time = datetime.datetime.now().isoformat()
         new_admin['created'] = new_admin['updated'] = current_time
@@ -99,9 +100,9 @@ class AdminManagementSystem:
         admins.append(new_admin)
         self._write_admins(admins)
 
-        return {"status": 200, "response": {"success": True, "message": "Admin added successfully", "id": new_admin['id']}}
+        return {"status": 200, "response": {"success": True, "message": "Admin added successfully", "id": new_admin['uuid']}}
 
-    def edit_admin(self, admin_id, updated_admin):
+    def edit_admin(self, admin_id, updated_admin, updated_by_uuid):
         # Edit an existing admin
         admins = self._read_admins()
 
@@ -114,13 +115,14 @@ class AdminManagementSystem:
             return {"status": 200, "response":{"success": False, "message": "Invalid email format"}}
 
         for admin in admins:
-            if admin['id'] == admin_id and admin['isActive']:
+            if admin['uuid'] == admin_id and admin['isActive']:
                 updated_admin.pop('id', None)
                 updated_admin.pop('isActive', None)
                 updated_admin.pop('createdBy', None)
                 updated_admin.pop('isSuper', None)
                 updated_admin.pop('created', None)
                 updated_admin['updated'] = datetime.datetime.now().isoformat()
+                updated_admin['updatedBy'] = updated_by_uuid
 
                 admin.update(updated_admin)
                 self._write_admins(admins)
@@ -130,7 +132,7 @@ class AdminManagementSystem:
     def permanent_delete_admin(self, admin_id):
         # Permanently delete an admin
         admins = self._read_admins()
-        admins = [admin for admin in admins if not (admin['id'] == admin_id and not admin['isSuper'])]
+        admins = [admin for admin in admins if not (admin['uuid'] == admin_id and not admin['isSuper'])]
         
         if len(admins) == len(self._read_admins()):
             return {"status": 200, "response":{"success": False, "message": "Admin not found or is a super admin"}}
@@ -142,9 +144,9 @@ class AdminManagementSystem:
         # Deactivate an admin
         admins = self._read_admins()
         for admin in admins:
-            if admin['id'] == admin_id:
+            if admin['uuid'] == admin_id:
                 if admin['isSuper']:
-                    return {"success": False, "message": "Cannot deactivate a super admin"}
+                    return {"status": 200, "response":{"success": False, "message": "Cannot deactivate a super admin"}}
 
                 admin['isActive'] = False
                 admin['updated'] = datetime.datetime.now().isoformat()
@@ -173,14 +175,18 @@ def loadAdminApi(config):
 
     @api_route('/admins', 'GET')
     def get_all_active_admins(query_params, headers):
-        if not admin_system.validate_token(headers['Authorization']):
+        decoded_token = admin_system.validate_token(headers['Authorization'])
+        if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         # Retrieve query parameters for pagination
         page = int(query_params.get('page', 1))  # Default to page 1
         per_page = int(query_params.get('per_page', 10))  # Default to 10 items per page
+        search_param = query_params.get('search', None)  # Search parameter
 
         # Fetch all active admins
         admins = admin_system.get_all_active_admins()
+        if search_param:
+            admins = [admin for admin in admins if search_param.lower() in admin['email'].lower()]
 
         # Pagination
         start = (page - 1) * per_page
@@ -204,32 +210,38 @@ def loadAdminApi(config):
 
     @api_route('/admins', 'POST')
     def add_admin_route(body, headers):
-        if not admin_system.validate_token(headers['Authorization']):
+        decoded_token = admin_system.validate_token(headers['Authorization'])
+        if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         new_admin = body
-        return admin_system.add_admin(new_admin, '')
+        return admin_system.add_admin(new_admin, decoded_token["decoded"]["uuid"])
 
     @api_route('/admins/<admin_id>', 'PUT')  # or 'PATCH'
-    def edit_admin_route(admin_id, request, headers):
-        if not admin_system.validate_token(headers['Authorization']):
+    def edit_admin_route(admin_id, body, headers):
+        decoded_token = admin_system.validate_token(headers['Authorization'])
+        if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
-        updated_admin = request
-        return admin_system.edit_admin(admin_id, updated_admin)
+        updated_admin = body
+        return admin_system.edit_admin(admin_id, updated_admin, decoded_token["decoded"]["uuid"])
 
     @api_route('/admins/<admin_id>', 'DELETE')
     def delete_admin_route(admin_id, headers):
-        if not admin_system.validate_token(headers['Authorization']):
+        decoded_token = admin_system.validate_token(headers['Authorization'])
+        if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         return admin_system.soft_delete_admin(admin_id)
 
     @api_route('/avatars', 'GET')
     def get_avatars(headers):
-        if not admin_system.validate_token(headers['Authorization']):
+        decoded_token = admin_system.validate_token(headers['Authorization'])
+        if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         return admin_system.get_avatars()
 
     @api_route('/admins/unique-email/<email>', 'GET')
     def get_unique_email(email, headers):
-        if not admin_system.validate_token(headers['Authorization']):
+        decoded_token = admin_system.validate_token(headers['Authorization'])
+        if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         return admin_system.get_unique_emails(email)
+    
