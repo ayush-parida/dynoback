@@ -7,6 +7,7 @@ import datetime
 import os
 from api.api import api_route
 from api.auth import Authentication
+from core.database import test_db_connection
 
 class DatabaseManagement:
     def __init__(self, config, file_path='dbs.json'):
@@ -114,6 +115,18 @@ class DatabaseManagement:
     def kvp_db(self):
         dbs = self._read_dbs()
         return [{'display_name': db['display_name'], 'uuid': db['uuid']} for db in dbs if db['isActive']]
+    
+    def test_db_connection(self, db_id):
+        dbs = self._read_dbs()
+        for db in dbs:
+            if db['uuid'] == db_id:
+                if (test_db_connection(db)):
+                    return {"status": 200, "response":{"success": True, "message": "Database Connected Successfully"}}
+                else:
+                    return {"status": 200, "response":{"success": False, "message": "Database Connection Failed"}}
+                
+        return {"status": 200, "response":{"success": False, "message": "db not found"}}
+        
         
 def loadDatabaseApi(config, authentication: Authentication):
     database = DatabaseManagement(config)
@@ -190,3 +203,10 @@ def loadDatabaseApi(config, authentication: Authentication):
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         return database.get_by_id_db(database_id)
+    
+    @api_route('/database/connection-test/<database_id>', 'GET')
+    def test_database_connection(database_id, headers):
+        decoded_token = authentication.validate_token(headers['Authorization'])
+        if not decoded_token["status"]:
+            return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
+        return database.test_db_connection(database_id)

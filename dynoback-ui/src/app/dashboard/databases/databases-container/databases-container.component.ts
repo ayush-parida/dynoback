@@ -21,6 +21,7 @@ export class DatabasesContainerComponent {
   databaseFormSidebarVisible: boolean = false;
   databaseFormGroup: FormGroup = new FormGroup({});
   databaseSidebarLoading: boolean = false;
+  connectionTested: boolean = false;
   subscriptions: Subscription = new Subscription();
   private databaseService = inject(DatabaseService);
   private messageService = inject(MessageService);
@@ -98,6 +99,9 @@ export class DatabasesContainerComponent {
     if (database) {
       formGroup.patchValue(database);
     }
+    formGroup.valueChanges.subscribe(() => {
+      this.connectionTested = false;
+    });
     return formGroup;
   }
   editOpen(event: any) {
@@ -107,6 +111,44 @@ export class DatabasesContainerComponent {
   addOpen() {
     this.databaseFormSidebarVisible = true;
     this.databaseFormGroup = this.initDatabaseForm();
+  }
+  testConnection() {
+    this.loading = true;
+    this.subscriptions.add(
+      this.databaseService
+        .databaseConnectionTest(this.selectedDatabase.uuid)
+        .subscribe({
+          next: (response) => {
+            this.loading = false;
+            if (response.success) {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success!',
+                detail: response.message,
+                life: 3000,
+              });
+              this.connectionTested = true;
+            } else {
+              this.messageService.add({
+                severity: 'info',
+                summary: 'Warning!',
+                detail: response.message,
+                life: 3000,
+              });
+              this.connectionTested = false;
+            }
+          },
+          error: (error) => {
+            this.loading = false;
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Failed',
+              detail: error.error.message,
+            });
+            this.connectionTested = false;
+          },
+        })
+    );
   }
   submitDatabase() {
     if (this.databaseFormGroup.valid) {

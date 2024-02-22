@@ -153,5 +153,39 @@ export class DatabaseDetailsComponent implements OnInit {
   close() {
     this.closeEmit.emit(true);
   }
-  private testConnection() {}
+  private testConnection() {
+    this.loading = true;
+    this.subscriptions.add(
+      this.databaseService
+        .databaseConnectionTest(this.database_uuid)
+        .subscribe({
+          next: (response) => {
+            this.loading = false;
+            if (response.success) {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success!',
+                detail: response.message,
+                life: 3000,
+              });
+            } else {
+              this.messageService.add({
+                severity: 'info',
+                summary: 'Warning!',
+                detail: response.message,
+                life: 3000,
+              });
+            }
+          },
+          error: (error) => {
+            this.loading = false;
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Failed',
+              detail: error.error.message,
+            });
+          },
+        })
+    );
+  }
 }
