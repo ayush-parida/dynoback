@@ -123,7 +123,9 @@
   [dismissible]="false"
   (onHide)="confirmClose($event)"
 >
-  <ng-template pTemplate="header"><h3>Add Admin</h3> </ng-template>
+  <ng-template pTemplate="header"
+    ><h3>{{ actionUuid ? "Update" : "Add" }} Admin</h3>
+  </ng-template>
 
   <ng-template pTemplate="content">
     <app-spinner [loading]="adminSidebarLoading" />

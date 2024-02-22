@@ -196,7 +196,7 @@ export class AdminManagementComponent {
         accept: () => {
           this.messageService.add({
             severity: 'info',
-            summary: 'User not created',
+            summary: 'Action Canceled',
             detail: 'Form Cleared',
             life: 3000,
           });

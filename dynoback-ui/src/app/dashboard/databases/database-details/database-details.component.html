@@ -1,15 +1,75 @@
-<p-card header="Database Details" class="p-shadow-4 p-mx-auto p-mb-4">
-  <div class="p-fluid">
-    <div
-      *ngFor="let key of objectKeys(database)"
-      class="p-ai-center p-d-flex p-flex-column p-flex-md-row p-mb-3"
-    >
-      <div class="flex">
-        <div class="col-3 font-bold">{{ key | titlecase }}:</div>
-        <div class="col-9">
-          <p-chip label="{{ database[key] }}" class="p-mr-2"></p-chip>
+<app-header [menubarItems]="menubarItems"></app-header>
+<p-card class="p-shadow-4 p-mx-auto p-mb-4">
+  <div class="p-grid">
+    <div class="col-12">
+      <p-fieldset
+        legend="General Information"
+        [toggleable]="true"
+        styleClass="mb-3"
+      >
+        <div class="p-fluid">
+          <div class="p-field flex">
+            <div class="col-12 md:col-2">Name:</div>
+            <div class="col-12 md:col-10">{{ database.name }}</div>
+          </div>
+          <div class="p-field flex">
+            <div class="col-12 md:col-2">Display Name:</div>
+            <div class="col-12 md:col-10">{{ database.display_name }}</div>
+          </div>
         </div>
-      </div>
+      </p-fieldset>
+      <p-fieldset
+        legend="Connection Details"
+        [toggleable]="true"
+        styleClass="mb-3"
+      >
+        <div class="p-fluid">
+          <div class="p-field flex">
+            <div class="col-12 md:col-2">Host:</div>
+            <div class="col-12 md:col-10">{{ database.host }}</div>
+          </div>
+          <div class="p-field flex">
+            <div class="col-12 md:col-2">Port:</div>
+            <div class="col-12 md:col-10">{{ database.port }}</div>
+          </div>
+        </div>
+      </p-fieldset>
+      <p-fieldset legend="Security" [toggleable]="true" styleClass="mb-3">
+        <div class="p-fluid">
+          <div class="p-field flex">
+            <div class="col-12 md:col-2">User:</div>
+            <div class="col-12 md:col-10">{{ database.user }}</div>
+          </div>
+          <div class="p-field flex">
+            <div class="col-12 md:col-2">Password:</div>
+            <div class="col-12 md:col-10">{{ database.password }}</div>
+          </div>
+        </div>
+      </p-fieldset>
+      <p-fieldset
+        legend="Audit Information"
+        [toggleable]="true"
+        styleClass="mb-3"
+      >
+        <div class="p-fluid">
+          <div class="p-field flex">
+            <div class="col-12 md:col-2">Created:</div>
+            <div class="col-12 md:col-10">
+              {{ database.created | date : "fullDate" }}
+            </div>
+          </div>
+          <div class="p-field flex">
+            <div class="col-12 md:col-2">Updated:</div>
+            <div class="col-12 md:col-10">
+              {{ database.updated | date : "fullDate" }}
+            </div>
+          </div>
+        </div>
+      </p-fieldset>
     </div>
   </div>
 </p-card>
+
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+<app-spinner [loading]="loading" [type]="'full'" />

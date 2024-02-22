@@ -76,6 +76,14 @@ class DatabaseManagement:
                 self._write_dbs(dbs)
                 return {"status": 200, "response":{"success": True, "message": "db updated successfully"}}
         return {"status": 200, "response":{"success": False, "message": "db not found or not active"}}
+    
+    def get_by_id_db(self, db_id):
+        dbs = self._read_dbs()
+        
+        for db in dbs:
+            if db['uuid'] == db_id and db['isActive']:
+                return {"status": 200, "response":db}
+        return {"status": 200, "response":{"success": False, "message": "db not found or not active"}}
 
     def permanent_delete_db(self, db_id):
         # Permanently delete an db
@@ -105,7 +113,7 @@ class DatabaseManagement:
     
     def kvp_db(self):
         dbs = self._read_dbs()
-        return [{'name': db['name'], 'uuid': db['uuid']} for db in dbs if db['isActive']]
+        return [{'display_name': db['display_name'], 'uuid': db['uuid']} for db in dbs if db['isActive']]
         
 def loadDatabaseApi(config, authentication: Authentication):
     database = DatabaseManagement(config)
@@ -174,4 +182,11 @@ def loadDatabaseApi(config, authentication: Authentication):
     
     @api_route('/databases/kvp', 'GET')
     def kvp_database_route(headers):
-        return database.kvp_db()
+        return {"status": 200, "response":database.kvp_db()}
+    
+    @api_route('/databases/<database_id>', 'GET')  # or 'PATCH'
+    def edit_database_route(database_id, headers):
+        decoded_token = authentication.validate_token(headers['Authorization'])
+        if not decoded_token["status"]:
+            return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
+        return database.get_by_id_db(database_id)
