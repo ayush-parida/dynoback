@@ -6,6 +6,7 @@ import re
 import datetime
 import os
 from api.api import api_route
+from api.auth import Authentication
 class AdminManagementSystem:
     def __init__(self, config, file_path='admins.json'):
         # Initialize with file path for admin data and configuration
@@ -53,21 +54,6 @@ class AdminManagementSystem:
                 del admin['updated']
                 return {"status": 200, "response": {"success": True, "token": encoded_token, "message": "Login Successful", "response": admin}}
         return {"status": 403, "response": {"success": False, "message": "Invalid credentials or admin not active", "message": "Incorrect Username or Password"}}
-
-    def validate_token(self, token):
-        # Validate the provided token
-        try:
-            token = token.split('Bearer ')[1]
-            decoded_data = base64.b64decode(token).decode()
-            email, timestamp, uuid = decoded_data.split(':')
-            timestamp = float(timestamp)
-
-            if time.time() - timestamp > self.config['adminTokenExpiry']:
-                return {"status": False, "decoded": {}}
-
-            return {"status": True, "decoded": {"email": email, "uuid": uuid}}
-        except Exception:
-            return {"status": False, "decoded": {}}
 
     def get_all_active_admins(self):
         # Retrieve all active admins
@@ -166,7 +152,7 @@ class AdminManagementSystem:
         return {"status": 200, "response": {"user_exists": False}}
         
 
-def loadAdminApi(config):
+def loadAdminApi(config, authentication: Authentication):
     admin_system = AdminManagementSystem(config)
     
     @api_route('/login', 'POST')
@@ -175,7 +161,7 @@ def loadAdminApi(config):
 
     @api_route('/admins', 'GET')
     def get_all_active_admins(query_params, headers):
-        decoded_token = admin_system.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_token(headers['Authorization'])
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         # Retrieve query parameters for pagination
@@ -219,7 +205,7 @@ def loadAdminApi(config):
 
     @api_route('/admins', 'POST')
     def add_admin_route(body, headers):
-        decoded_token = admin_system.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_token(headers['Authorization'])
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         new_admin = body
@@ -227,7 +213,7 @@ def loadAdminApi(config):
 
     @api_route('/admins/<admin_id>', 'PUT')  # or 'PATCH'
     def edit_admin_route(admin_id, body, headers):
-        decoded_token = admin_system.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_token(headers['Authorization'])
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         updated_admin = body
@@ -235,21 +221,21 @@ def loadAdminApi(config):
 
     @api_route('/admins/<admin_id>', 'DELETE')
     def delete_admin_route(admin_id, headers):
-        decoded_token = admin_system.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_token(headers['Authorization'])
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         return admin_system.soft_delete_admin(admin_id)
 
     @api_route('/avatars', 'GET')
     def get_avatars(headers):
-        decoded_token = admin_system.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_token(headers['Authorization'])
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         return admin_system.get_avatars()
 
     @api_route('/admins/unique-email/<email>', 'GET')
     def get_unique_email(email, headers):
-        decoded_token = admin_system.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_token(headers['Authorization'])
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         return admin_system.get_unique_emails(email)

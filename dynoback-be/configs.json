@@ -35,21 +35,5 @@
       "id": 5,
       "path": "assets/avatars/avatar6.webp"
     }
-  ],
-  "dbs": [
-    {
-      "uuid": "102b6ae0-598b-40b6-adf2-7acff30b01a3",
-      "display_name": "DB1",
-      "name": "dynoback",
-      "user": "infiginiadmin",
-      "password": "infigini123",
-      "host": "43.204.12.237",
-      "port": 5433,
-      "isActive": true,
-      "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
-      "updatedBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
-      "created": "2024-02-17T08:23:14.016141",
-      "updated": "2024-02-17T10:44:35.535959"
-    }
   ]
 }

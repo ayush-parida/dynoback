@@ -1,4 +1,5 @@
 from http.server import HTTPServer, SimpleHTTPRequestHandler
+from api.auth import Authentication
 from api.handler import HTTPRequestHandler
 from api.api import routes
 from api.admin import loadAdminApi
@@ -42,8 +43,9 @@ def run(ip, port, server_class, handler_class, routes, config, db_pool):
     server_address = (ip, port)
     handler_class_with_args = make_custom_handler(handler_class, routes, config, db_pool)
     httpd = server_class(server_address, handler_class_with_args)
-    loadAdminApi(config)
-    loadDatabaseApi(config)
+    authentication = Authentication(config)
+    loadAdminApi(config, authentication)
+    loadDatabaseApi(config, authentication)
     httpd.RequestHandlerClass.routes = routes
     print(f'Starting httpd on {ip}:{port}...')
     httpd.serve_forever()
