@@ -16,7 +16,8 @@ def init_db_pools(dbs_config):
 
 def start_angular_app():
     # Start the Angular app; ensure the working directory is correctly set
-    subprocess.Popen(["npm", "run", "start"], cwd="../dynoback-ui")
+    # subprocess.Popen(["npm", "run", "start"], cwd="../dynoback-ui")
+    subprocess.Popen("npm run start", shell=True, cwd="../dynoback-ui")
 
 def start_server(config):
     db_pool = init_db_pools(config['dbs'])
