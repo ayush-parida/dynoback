@@ -2,8 +2,10 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnChanges,
   OnInit,
   Output,
+  SimpleChanges,
   inject,
 } from '@angular/core';
 import { Database } from '../helpers/database.interface';
@@ -19,7 +21,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './database-details.component.html',
   styleUrl: './database-details.component.scss',
 })
-export class DatabaseDetailsComponent implements OnInit {
+export class DatabaseDetailsComponent implements OnChanges {
   @Input()
   database_uuid: string = '';
   @Output()
@@ -69,8 +71,10 @@ export class DatabaseDetailsComponent implements OnInit {
   private databaseService = inject(DatabaseService);
   private messageService = inject(MessageService);
   constructor() {}
-  ngOnInit(): void {
-    this.getDatabaseById();
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['database_uuid']) {
+      this.getDatabaseById();
+    }
   }
 
   getDatabaseById() {
