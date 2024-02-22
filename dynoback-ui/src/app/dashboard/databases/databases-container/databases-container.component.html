@@ -194,6 +194,7 @@
           icon="pi pi-times"
           [raised]="true"
         ></p-button>
+        @if (connectionTested) {
         <p-button
           class="p-button-text p-button-text"
           [label]="selectedDatabase.uuid ? 'Update' : 'Add'"
@@ -202,6 +203,16 @@
           [raised]="true"
           (click)="submitDatabase()"
         ></p-button>
+        } @else {
+        <p-button
+          class="p-button-text p-button-text"
+          [label]="'Test Connection'"
+          severity="primary"
+          icon="pi pi-check"
+          [raised]="true"
+          (click)="testConnection()"
+        ></p-button>
+        }
       </div>
     </div>
   </ng-template>

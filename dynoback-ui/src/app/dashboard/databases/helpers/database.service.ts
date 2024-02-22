@@ -53,4 +53,13 @@ export class DatabaseService {
       })
     );
   }
+  databaseConnectionTest(uuid: string) {
+    return this.http
+      .get<any>(`${this.apiUrl}/database/connection-test/${uuid}`)
+      .pipe(
+        catchError((error) => {
+          return this.config.handleError(error);
+        })
+      );
+  }
 }
