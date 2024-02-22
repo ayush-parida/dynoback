@@ -126,7 +126,13 @@ class DatabaseManagement:
                     return {"status": 200, "response":{"success": False, "message": "Database Connection Failed"}}
                 
         return {"status": 200, "response":{"success": False, "message": "db not found"}}
-        
+    
+    def test_new_db_connection(self, body):
+        if (test_db_connection(body)):
+            return {"status": 200, "response":{"success": True, "message": "Database Connected Successfully"}}
+        else:
+            return {"status": 200, "response":{"success": False, "message": "Database Connection Failed"}}
+                        
         
 def loadDatabaseApi(config, authentication: Authentication):
     database = DatabaseManagement(config)
@@ -210,3 +216,10 @@ def loadDatabaseApi(config, authentication: Authentication):
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         return database.test_db_connection(database_id)
+    
+    @api_route('/database/new-connection-test', 'POST')  # or 'PATCH'
+    def edit_database_route(body, headers):
+        decoded_token = authentication.validate_token(headers['Authorization'])
+        if not decoded_token["status"]:
+            return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
+        return database.test_new_db_connection(body)

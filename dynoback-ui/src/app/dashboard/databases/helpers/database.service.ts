@@ -62,4 +62,13 @@ export class DatabaseService {
         })
       );
   }
+  newDatabaseConnectionTest(body: any) {
+    return this.http
+      .post<any>(`${this.apiUrl}/database/new-connection-test`, body)
+      .pipe(
+        catchError((error) => {
+          return this.config.handleError(error);
+        })
+      );
+  }
 }

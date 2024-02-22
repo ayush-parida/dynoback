@@ -134,6 +134,7 @@
               formControlName="password"
               placeholder="Enter password"
               [toggleMask]="true"
+              [feedback]="false"
             ></p-password>
             <div
               *ngIf="databaseFormGroup.get('password')?.errors?.['required']"
@@ -217,3 +218,7 @@
     </div>
   </ng-template>
 </p-sidebar>
+
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+<app-spinner [loading]="loading" [type]="'full'" />
