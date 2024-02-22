@@ -16,8 +16,38 @@ export class DatabaseService {
   private apiUrl = this.config.apiUrl;
   constructor() {}
 
-  getDatabases(): Observable<Database[]> {
-    return this.http.get<Database[]>(`${this.apiUrl}/databases`).pipe(
+  getDatabasesKvp(): Observable<Database[]> {
+    return this.http.get<Database[]>(`${this.apiUrl}/databases/kvp`).pipe(
+      catchError((error) => {
+        return this.config.handleError(error);
+      })
+    );
+  }
+  getDatabaseById(uuid: string): Observable<Database> {
+    return this.http.get<Database>(`${this.apiUrl}/databases/${uuid}`).pipe(
+      catchError((error) => {
+        return this.config.handleError(error);
+      })
+    );
+  }
+  postDatabase(database: Database) {
+    return this.http.post<any>(`${this.apiUrl}/databases`, database).pipe(
+      catchError((error) => {
+        return this.config.handleError(error);
+      })
+    );
+  }
+  putDatabase(database: Database, uuid: string) {
+    return this.http
+      .put<any>(`${this.apiUrl}/databases/${uuid}`, database)
+      .pipe(
+        catchError((error) => {
+          return this.config.handleError(error);
+        })
+      );
+  }
+  deleteDatabase(uuid: string) {
+    return this.http.delete<any>(`${this.apiUrl}/databases/${uuid}`).pipe(
       catchError((error) => {
         return this.config.handleError(error);
       })

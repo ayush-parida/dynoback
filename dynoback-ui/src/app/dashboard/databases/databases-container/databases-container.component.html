@@ -23,22 +23,186 @@
         <ul class="list-none p-0 m-0 overflow-hidden">
           @for (item of databases; track $index) {
 
-          <li>
+          <li (click)="selectedDatabase = item">
             <a
               pRipple
               class="flex align-items-center cursor-pointer p-2 py-3 my-1 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple text-decoration-none"
             >
-              <span class="font-medium">{{ item.label }}</span>
+              <span class="font-medium">{{ item.display_name }}</span>
             </a>
           </li>
           }
         </ul>
       </ng-template>
-      <ng-template pTemplate="footer"> </ng-template>
+      <ng-template pTemplate="footer">
+        <p-button
+          (click)="addOpen()"
+          severity="primary"
+          styleClass="w-100"
+          label="Add Connection"
+          icon="pi pi-plus"
+          [raised]="true"
+        ></p-button>
+      </ng-template>
     </p-sidebar>
     <div class="w-full">
-      <app-database-details [database]="selectedDatabase" />
+      <app-database-details
+        *ngIf="selectedDatabase.uuid"
+        [database_uuid]="selectedDatabase.uuid"
+        (editEmit)="editOpen($event)"
+        (closeEmit)="closeDetails($event)"
+      />
     </div>
   </div>
 </div>
 <app-spinner [loading]="loading" [type]="'full'" />
+<p-sidebar
+  [(visible)]="databaseFormSidebarVisible"
+  [showCloseIcon]="false"
+  [closeOnEscape]="false"
+  [position]="'right'"
+  styleClass="w-50rem"
+  [dismissible]="false"
+  (onHide)="confirmClose($event)"
+>
+  <ng-template pTemplate="header"
+    ><h3>{{ selectedDatabase.uuid ? "Update" : "Add" }} Database</h3>
+  </ng-template>
+
+  <ng-template pTemplate="content">
+    <app-spinner [loading]="databaseSidebarLoading" />
+    <p-scrollPanel [style]="{ width: '100%', height: '75vh' }">
+      <form [formGroup]="databaseFormGroup" class="p-fluid form-layout mx-4">
+        <div class="p-grid">
+          <!-- Display Name Field -->
+          <div class="p-field p-col-12 p-md-6">
+            <label for="display_name">Display Name</label>
+            <input
+              id="display_name"
+              type="text"
+              pInputText
+              formControlName="display_name"
+              placeholder="Enter display name"
+            />
+            <div
+              *ngIf="databaseFormGroup.get('display_name')?.errors?.['required']"
+            >
+              Name is required.
+            </div>
+            <div
+              *ngIf="databaseFormGroup.get('display_name')?.errors?.['minlength']"
+            >
+              Name must be at least 3 characters long.
+            </div>
+          </div>
+
+          <!-- Name Field (with required and minlength validators) -->
+          <div class="p-field p-col-12 p-md-6">
+            <label for="name">Name</label>
+            <input
+              id="name"
+              type="text"
+              pInputText
+              formControlName="name"
+              placeholder="Enter name"
+            />
+            <div *ngIf="databaseFormGroup.get('name')?.errors?.['required']">
+              Name is required.
+            </div>
+            <div *ngIf="databaseFormGroup.get('name')?.errors?.['minlength']">
+              Name must be at least 3 characters long.
+            </div>
+          </div>
+
+          <!-- User Field -->
+          <div class="p-field p-col-12 p-md-6">
+            <label for="user">User</label>
+            <input
+              id="user"
+              type="text"
+              pInputText
+              formControlName="user"
+              placeholder="Enter user"
+            />
+          </div>
+
+          <!-- Password Field (with required and minlength validators) -->
+          <div class="p-field p-col-12 p-md-6">
+            <label for="password">Password</label>
+            <p-password
+              id="password"
+              formControlName="password"
+              placeholder="Enter password"
+              [toggleMask]="true"
+            ></p-password>
+            <div
+              *ngIf="databaseFormGroup.get('password')?.errors?.['required']"
+            >
+              Password is required.
+            </div>
+            <div
+              *ngIf="databaseFormGroup.get('password')?.errors?.['minlength']"
+            >
+              Password must be at least 6 characters long.
+            </div>
+          </div>
+
+          <!-- Host Field (with required validator) -->
+          <div class="p-field p-col-12 p-md-6">
+            <label for="host">Host</label>
+            <input
+              id="host"
+              type="text"
+              pInputText
+              formControlName="host"
+              placeholder="Enter host"
+            />
+            <div *ngIf="databaseFormGroup.get('host')?.errors?.['required']">
+              Host is required.
+            </div>
+          </div>
+
+          <!-- Port Field (with required validator and pattern for numbers only) -->
+          <div class="p-field p-col-12 p-md-6">
+            <label for="port">Port</label>
+            <input
+              id="port"
+              type="text"
+              pInputText
+              formControlName="port"
+              placeholder="Enter port"
+            />
+            <div *ngIf="databaseFormGroup.get('port')?.errors?.['required']">
+              Port is required.
+            </div>
+            <div *ngIf="databaseFormGroup.get('port')?.errors?.['pattern']">
+              Port must be a number.
+            </div>
+          </div>
+        </div>
+      </form>
+    </p-scrollPanel>
+  </ng-template>
+  <ng-template pTemplate="footer">
+    <div class="flex">
+      <div class="ml-auto">
+        <p-button
+          (click)="confirmClose($event)"
+          severity="warning"
+          class="mr-2"
+          label="Close"
+          icon="pi pi-times"
+          [raised]="true"
+        ></p-button>
+        <p-button
+          class="p-button-text p-button-text"
+          [label]="selectedDatabase.uuid ? 'Update' : 'Add'"
+          severity="primary"
+          icon="pi pi-check"
+          [raised]="true"
+          (click)="submitDatabase()"
+        ></p-button>
+      </div>
+    </div>
+  </ng-template>
+</p-sidebar>

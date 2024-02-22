@@ -21,17 +21,16 @@ def start_angular_app():
     subprocess.Popen("npm run start", shell=True, cwd="../dynoback-ui")
 
 def start_server(config):
-    db_pool = init_db_pools(config['dbs'])
+    # db_pool = init_db_pools(config['dbs'])
     # Start the Angular application before starting the HTTP server
     start_angular_app()
-    run(ip=config['ip'], port=config['port'], server_class=HTTPServer, handler_class=HTTPRequestHandler, routes=routes, config=config, db_pool=db_pool)
+    run(ip=config['ip'], port=config['port'], server_class=HTTPServer, handler_class=HTTPRequestHandler, routes=routes, config=config)
 
-def make_custom_handler(handler, routes, config, db_pool):
+def make_custom_handler(handler, routes, config):
     class ArgumentsHTTPRequestHandler(handler):
         def __init__(self, *args, **kwargs):
             self.routes = routes
             self.config = config
-            self.db_pool = db_pool
             # It's important to properly initialize the base class
             super().__init__(*args, **kwargs)
         
@@ -39,9 +38,9 @@ def make_custom_handler(handler, routes, config, db_pool):
 
     return ArgumentsHTTPRequestHandler
 
-def run(ip, port, server_class, handler_class, routes, config, db_pool):
+def run(ip, port, server_class, handler_class, routes, config):
     server_address = (ip, port)
-    handler_class_with_args = make_custom_handler(handler_class, routes, config, db_pool)
+    handler_class_with_args = make_custom_handler(handler_class, routes, config)
     httpd = server_class(server_address, handler_class_with_args)
     authentication = Authentication(config)
     loadAdminApi(config, authentication)
