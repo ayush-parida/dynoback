@@ -2,6 +2,7 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 from api.handler import HTTPRequestHandler
 from api.api import routes
 from api.admin import loadAdminApi
+from api.database import loadDatabaseApi
 import psycopg_pool
 import subprocess
 
@@ -41,6 +42,7 @@ def run(ip, port, server_class, handler_class, routes, config, db_pool):
     handler_class_with_args = make_custom_handler(handler_class, routes, config, db_pool)
     httpd = server_class(server_address, handler_class_with_args)
     loadAdminApi(config)
+    loadDatabaseApi(config)
     httpd.RequestHandlerClass.routes = routes
     print(f'Starting httpd on {ip}:{port}...')
     httpd.serve_forever()

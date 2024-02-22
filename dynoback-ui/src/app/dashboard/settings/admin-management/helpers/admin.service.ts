@@ -38,36 +38,29 @@ export class AdminService {
   getAvatars(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/avatars`).pipe(
       catchError((error) => {
-        return this.handleError(error);
+        return this.config.handleError(error);
       })
     );
   }
   postAdmin(admin: Admin) {
     return this.http.post<any>(`${this.apiUrl}/admins`, admin).pipe(
       catchError((error) => {
-        return this.handleError(error);
+        return this.config.handleError(error);
       })
     );
   }
   putAdmin(admin: Admin, uuid: string) {
     return this.http.put<any>(`${this.apiUrl}/admins/${uuid}`, admin).pipe(
       catchError((error) => {
-        return this.handleError(error);
+        return this.config.handleError(error);
       })
     );
   }
   deleteAdmin(uuid: string) {
     return this.http.delete<any>(`${this.apiUrl}/admins/${uuid}`).pipe(
       catchError((error) => {
-        return this.handleError(error);
+        return this.config.handleError(error);
       })
     );
-  }
-
-  private handleError(error: any) {
-    if (error.status === 401) {
-      this.authService.logout();
-    }
-    return throwError(() => error);
   }
 }

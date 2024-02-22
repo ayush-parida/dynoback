@@ -34,6 +34,7 @@ import { PasswordModule } from 'primeng/password';
 import { FieldsetModule } from 'primeng/fieldset';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { SpinnerComponent } from '../components/spinner/spinner.component';
+import { ChipModule } from 'primeng/chip';
 
 @NgModule({
   declarations: [],
@@ -72,6 +73,7 @@ import { SpinnerComponent } from '../components/spinner/spinner.component';
     PasswordModule,
     FieldsetModule,
     InputSwitchModule,
+    ChipModule,
   ],
   exports: [
     CommonModule,
@@ -108,6 +110,7 @@ import { SpinnerComponent } from '../components/spinner/spinner.component';
     PasswordModule,
     FieldsetModule,
     InputSwitchModule,
+    ChipModule,
   ],
   providers: [AuthService, MessageService, ConfirmationService],
 })

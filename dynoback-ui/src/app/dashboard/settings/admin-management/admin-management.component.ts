@@ -76,7 +76,7 @@ export class AdminManagementComponent {
           uniqueEmailValidator(
             this.configService.http,
             this.configService.apiUrl,
-            this.actionUuid ? true : false
+            this.actionUuid || this.isView ? true : false
           ),
         ],
       ],
@@ -151,13 +151,22 @@ export class AdminManagementComponent {
   }
   private loadAvatars() {
     this.subscriptions.add(
-      this.adminService.getAvatars().subscribe((data) => {
-        this.avatars = data.map((item) => ({
-          id: item.id,
-          path: item.path,
-          // Assuming the avatar image name is indicative of the avatar's identity
-          name: item.path.split('/').pop().split('.')[0], // Extracting name from file name
-        }));
+      this.adminService.getAvatars().subscribe({
+        next: (data) => {
+          this.avatars = data.map((item) => ({
+            id: item.id,
+            path: item.path,
+            name: item.path.split('/').pop().split('.')[0],
+          }));
+        },
+        error: (error) => {
+          this.loading = false;
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Failed to Load Avatars',
+            detail: error.error.message,
+          });
+        },
       })
     );
   }
@@ -208,7 +217,6 @@ export class AdminManagementComponent {
     this.actionUuid = '';
   }
   submitAdmin() {
-    console.log(this.adminFormGroup);
     if (this.adminFormGroup.valid) {
       this.adminSidebarLoading = true;
       let requestObservable;

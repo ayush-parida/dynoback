@@ -1,0 +1,15 @@
+<p-card header="Database Details" class="p-shadow-4 p-mx-auto p-mb-4">
+  <div class="p-fluid">
+    <div
+      *ngFor="let key of objectKeys(database)"
+      class="p-ai-center p-d-flex p-flex-column p-flex-md-row p-mb-3"
+    >
+      <div class="flex">
+        <div class="col-3 font-bold">{{ key | titlecase }}:</div>
+        <div class="col-9">
+          <p-chip label="{{ database[key] }}" class="p-mr-2"></p-chip>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-card>

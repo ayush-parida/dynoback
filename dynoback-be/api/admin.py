@@ -7,7 +7,7 @@ import datetime
 import os
 from api.api import api_route
 class AdminManagementSystem:
-    def __init__(self, file_path, config):
+    def __init__(self, config, file_path='admins.json'):
         # Initialize with file path for admin data and configuration
         self.file_path = file_path
         self.config = config
@@ -165,9 +165,9 @@ class AdminManagementSystem:
                 return {"status": 200, "response": {"user_exists": True}}
         return {"status": 200, "response": {"user_exists": False}}
         
-file_path = 'admins.json'
+
 def loadAdminApi(config):
-    admin_system = AdminManagementSystem(file_path, config)
+    admin_system = AdminManagementSystem(config)
     
     @api_route('/login', 'POST')
     def login_route(body):
