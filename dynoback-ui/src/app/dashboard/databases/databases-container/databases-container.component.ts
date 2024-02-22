@@ -58,6 +58,7 @@ export class DatabasesContainerComponent {
     );
   }
   confirmClose(event: any) {
+    console.log(event);
     this.confirmationService.confirm({
       target: event.target as EventTarget,
       message: 'Are you sure that you want to close?',
@@ -110,14 +111,24 @@ export class DatabasesContainerComponent {
   }
   addOpen() {
     this.databaseFormSidebarVisible = true;
+    this.selectedDatabase = {} as Database;
     this.databaseFormGroup = this.initDatabaseForm();
   }
   testConnection() {
-    this.loading = true;
-    this.subscriptions.add(
-      this.databaseService
-        .databaseConnectionTest(this.selectedDatabase.uuid)
-        .subscribe({
+    if (this.databaseFormGroup.valid) {
+      this.loading = true;
+      let requestObservable;
+      if (this.selectedDatabase.uuid) {
+        requestObservable = this.databaseService.databaseConnectionTest(
+          this.selectedDatabase.uuid
+        );
+      } else {
+        requestObservable = this.databaseService.newDatabaseConnectionTest(
+          this.databaseFormGroup.value
+        );
+      }
+      this.subscriptions.add(
+        requestObservable.subscribe({
           next: (response) => {
             this.loading = false;
             if (response.success) {
@@ -142,13 +153,14 @@ export class DatabasesContainerComponent {
             this.loading = false;
             this.messageService.add({
               severity: 'error',
-              summary: 'Failed',
+              summary: 'Error! Failed!',
               detail: error.error.message,
             });
             this.connectionTested = false;
           },
         })
-    );
+      );
+    }
   }
   submitDatabase() {
     if (this.databaseFormGroup.valid) {
@@ -177,6 +189,7 @@ export class DatabasesContainerComponent {
                 life: 3000,
               });
               this.closeFormSidebar();
+              this.getDatabases();
             } else {
               this.messageService.add({
                 severity: 'info',

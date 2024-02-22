@@ -1,18 +1,32 @@
 {
-  "dbs": [
-    {
-      "uuid": "102b6ae0-598b-40b6-adf2-7acff30b01a3",
-      "display_name": "DB1",
-      "name": "dynoback",
-      "user": "infiginiadmin",
-      "password": "infigini123",
-      "host": "43.204.12.237",
-      "port": 5433,
-      "isActive": true,
-      "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
-      "updatedBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
-      "created": "2024-02-17T08:23:14.016141",
-      "updated": "2024-02-17T10:44:35.535959"
-    }
-  ]
+    "dbs": [
+        {
+            "uuid": "102b6ae0-598b-40b6-adf2-7acff30b01a3",
+            "display_name": "DB1",
+            "name": "dynoback",
+            "user": "infiginiadmin",
+            "password": "infigini123",
+            "host": "43.204.12.237",
+            "port": "5433",
+            "isActive": true,
+            "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
+            "updatedBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
+            "created": "2024-02-17T08:23:14.016141",
+            "updated": "2024-02-22T23:54:49.107106"
+        },
+        {
+            "display_name": "DB2",
+            "name": "dynoback",
+            "user": "infiginiadmin",
+            "password": "infigini123",
+            "host": "43.204.12.237",
+            "port": "5433",
+            "uuid": "7eba6b07-f362-4671-9beb-2ad5bccd217c",
+            "isActive": true,
+            "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
+            "updatedBy": "",
+            "created": "2024-02-22T23:57:50.580681",
+            "updated": "2024-02-22T23:57:50.580681"
+        }
+    ]
 }
