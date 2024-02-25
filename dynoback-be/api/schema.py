@@ -41,6 +41,8 @@ class ColumnManagement:
 def loadSchemaApi(config, authentication: Authentication):
     schemaType = SchemaTypeManagement(config)
     
+    column = ColumnManagement(config)
+    
     @api_route('/schema/types', 'GET')
     def get_all_schema_types(headers):
         decoded_token = authentication.validate_token(headers['Authorization'])
@@ -49,8 +51,6 @@ def loadSchemaApi(config, authentication: Authentication):
         schema_types = schemaType._read_schema_types()
         return {"status": 200, "response":[schema_type for schema_type in schema_types if schema_type['isActive']]}
     
-    
-    column = ColumnManagement(config)
     
     @api_route('/column/types', 'GET')
     def get_all_columns(headers):
