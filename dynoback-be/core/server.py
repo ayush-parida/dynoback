@@ -4,8 +4,10 @@ from api.handler import HTTPRequestHandler
 from api.api import routes
 from api.admin import loadAdminApi
 from api.database import loadDatabaseApi
+from api.schema import loadSchemaApi
 import psycopg_pool
 import subprocess
+
 
 def init_db_pools(dbs_config):
     db_pools = {}
@@ -45,6 +47,7 @@ def run(ip, port, server_class, handler_class, routes, config):
     authentication = Authentication(config)
     loadAdminApi(config, authentication)
     loadDatabaseApi(config, authentication)
+    loadSchemaApi(config, authentication)
     httpd.RequestHandlerClass.routes = routes
     print(f'Starting httpd on {ip}:{port}...')
     httpd.serve_forever()
