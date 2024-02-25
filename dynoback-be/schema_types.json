@@ -1,0 +1,29 @@
+{
+  "schema_types": [
+    {
+      "id": 1,
+      "name": "PG Table",
+      "isActive": true
+    },
+    {
+      "id": 2,
+      "name": "Auth Table",
+      "isActive": true
+    },
+    {
+      "id": 3,
+      "name": "JSON Standalone",
+      "isActive": true
+    },
+    {
+      "id": 4,
+      "name": "PG SQL List",
+      "isActive": false
+    },
+    {
+      "id": 5,
+      "name": "PG SQL Exec",
+      "isActive": false
+    }
+  ]
+}
