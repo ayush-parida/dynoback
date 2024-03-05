@@ -141,7 +141,9 @@
               formControlName="email"
               placeholder="Enter email"
             />
-            <div *ngIf="adminFormGroup.get('email')?.errors?.['uniqueEmail']">
+            <div
+              *ngIf="adminFormGroup.get('email')?.touched && adminFormGroup.get('email')?.errors?.['uniqueEmail']"
+            >
               This email is already taken.
             </div>
           </div>
@@ -186,13 +188,24 @@
             <ng-template pTemplate="selectedItem">
               <div
                 class="flex align-items-center gap-2"
-                *ngIf="adminFormGroup.get('avatar')?.value"
+                *ngIf="
+                  adminFormGroup.get('avatar')?.touched &&
+                  adminFormGroup.get('avatar')?.value
+                "
               >
                 <img
-                  [src]="adminFormGroup.get('avatar')?.value?.path"
+                  [src]="
+                    adminFormGroup.get('avatar')?.touched &&
+                    adminFormGroup.get('avatar')?.value?.path
+                  "
                   style="width: 32px; height: 32px; border-radius: 50%"
                 />
-                <div>{{ adminFormGroup.get("avatar")?.value?.name }}</div>
+                <div>
+                  {{
+                    adminFormGroup.get("avatar")?.touched &&
+                      adminFormGroup.get("avatar")?.value?.name
+                  }}
+                </div>
               </div>
             </ng-template>
             <ng-template let-avatar pTemplate="item">

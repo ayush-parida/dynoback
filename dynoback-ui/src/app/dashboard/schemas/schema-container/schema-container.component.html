@@ -1,0 +1,248 @@
+<div class="min-h-screen flex relative lg:static surface-ground">
+  <div class="flex w-full">
+    <p-sidebar
+      [visible]="true"
+      [dismissible]="false"
+      [showCloseIcon]="false"
+      [closeOnEscape]="false"
+      [modal]="false"
+      [transitionOptions]="'0ms cubic-bezier(0, 0, 0.2, 1)'"
+      styleClass="w-15rem relative"
+    >
+      <ng-template pTemplate="header">
+        <div
+          class="flex align-items-center justify-content-between pt-3 flex-shrink-0"
+        >
+          <span class="inline-flex align-items-center gap-2">
+            <span class="font-semibold text-1xl text-primary">Schemas</span>
+          </span>
+          <span> </span>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="content">
+        <ul class="list-none p-0 m-0 overflow-hidden">
+          @for (item of schemas; track $index) {
+
+          <li (click)="selectedSchema = item">
+            <a
+              pRipple
+              class="flex align-items-center cursor-pointer p-2 py-3 my-1 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple text-decoration-none"
+            >
+              <span class="font-medium">{{ item.display_name }}</span>
+            </a>
+          </li>
+          }
+        </ul>
+      </ng-template>
+      <ng-template pTemplate="footer">
+        <p-button
+          (click)="addOpen()"
+          severity="primary"
+          styleClass="w-100"
+          label="Add Schema"
+          icon="pi pi-plus"
+          [raised]="true"
+        ></p-button>
+      </ng-template>
+    </p-sidebar>
+    <div class="w-full"></div>
+  </div>
+</div>
+<p-sidebar
+  [(visible)]="schemaFormSidebarVisible"
+  [showCloseIcon]="false"
+  [closeOnEscape]="false"
+  [position]="'right'"
+  styleClass="w-50rem"
+  [dismissible]="false"
+  (onHide)="confirmClose($event)"
+>
+  <ng-template pTemplate="header">
+    <div class="w-full">
+      <form [formGroup]="schemaFormGroup">
+        <div class="flex w-100">
+          <h3 class="w-2">
+            {{ selectedSchema.uuid ? "Update" : "Add" }} Schema
+          </h3>
+          <p-dropdown
+            class="w-5 ml-auto mt-2"
+            styleClass="min-w-full"
+            formControlName="type"
+            [options]="schemaTypes"
+            optionLabel="name"
+            placeholder="Select a Schema Type"
+            optionValue="id"
+          ></p-dropdown>
+        </div>
+        <div class="flex w-full">
+          <p-dropdown
+            class="w-full ml-auto my-2"
+            styleClass="min-w-full"
+            formControlName="connectionPoolId"
+            [options]="connections"
+            optionLabel="display_name"
+            placeholder="Select a Collection Pool"
+            optionValue="uuid"
+          ></p-dropdown>
+        </div>
+        <div class="p-fluid form-layout">
+          <div class="flex">
+            <div class="p-field w-12">
+              <label for="name">Schema Name</label>
+              <input
+                id="name"
+                type="text"
+                pInputText
+                formControlName="name"
+                placeholder="Enter Schema Name"
+              />
+              <div
+                *ngIf="schemaFormGroup.get('schema_name')?.touched && schemaFormGroup.get('schema_name')?.errors?.['required']"
+              >
+                Name is required.
+              </div>
+              <div
+                *ngIf="schemaFormGroup.get('schema_name')?.touched && schemaFormGroup.get('schema_name')?.errors?.['minlength']"
+              >
+                Name must be at least 3 characters long.
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="content">
+    <app-spinner [loading]="schemaSidebarLoading" />
+    <p-scrollPanel [style]="{ width: '100%', height: '75vh' }">
+      <p-divider></p-divider>
+      <div class="w-full">
+        <p class="text-1xl font-bold w-full mx-2">
+          Predefined Columns: id, created, updated, is_active
+        </p>
+        <div class="flex w-full">
+          <div class="card flex justify-content-center w-full">
+            <p-accordion
+              class="w-full"
+              [activeIndex]="activeColumnExpand"
+              [expandIcon]="'pi pi-no'"
+              [collapseIcon]="'pi pi-no'"
+              (activeIndexChange)="activeIndexChanged($event)"
+            >
+              @for (column of fullSchema; track $index) { @switch (column.id) {
+              @case (FIELD_TYPE.TEXT) {
+              <app-text-column
+                [column]="column"
+                [createActions]="createActions"
+              />
+              } @case (FIELD_TYPE.EDITOR) {<app-editor-column
+                [column]="column"
+                [createActions]="createActions"
+              />
+              }@case (FIELD_TYPE.NUMBER) {
+              <app-number-column
+                [column]="column"
+                [createActions]="createActions"
+              />
+              }@case (FIELD_TYPE.BOOL) {
+              <app-bool-column
+                [column]="column"
+                [createActions]="createActions"
+              />
+              }@case (FIELD_TYPE.EMAIL) {
+              <app-email-column
+                [column]="column"
+                [createActions]="createActions"
+              />}@case (FIELD_TYPE.URL) {
+              <app-url-column
+                [column]="column"
+                [createActions]="createActions"
+              />}@case (FIELD_TYPE.DATE) {
+              <app-date-column
+                [column]="column"
+                [createActions]="createActions"
+              />}@case (FIELD_TYPE.SELECT) {
+              <app-select-column
+                [column]="column"
+                [createActions]="createActions"
+              />}@case (FIELD_TYPE.FILE) {
+              <app-file-column
+                [column]="column"
+                [createActions]="createActions"
+              />}@case (FIELD_TYPE.JSON) {<app-json-column
+                [column]="column"
+                [createActions]="createActions"
+              />
+              }@case (FIELD_TYPE.RELATION) {
+              <app-relation-column
+                [column]="column"
+                [createActions]="createActions"
+              />} } }
+            </p-accordion>
+          </div>
+        </div>
+        <div class="flex w-full">
+          <p-dropdown
+            *ngIf="showColumnSelect"
+            class="w-12 ml-auto mt-2 mx-2"
+            styleClass="min-w-full"
+            [options]="fieldTypes"
+            optionLabel="type"
+            placeholder="Select a Column Type"
+            [(ngModel)]="selectedColumn"
+            (onChange)="columnTypeSelected()"
+          ></p-dropdown>
+        </div>
+        <div class="flex w-full">
+          <p-button
+            *ngIf="!showColumnSelect"
+            (click)="addColumn()"
+            severity="info"
+            class="mt-2 w-full mx-2"
+            styleClass="w-full"
+            label="Add Column"
+            icon="pi pi-plus"
+            [raised]="true"
+          ></p-button
+          ><p-button
+            *ngIf="showColumnSelect"
+            (click)="cancelAddColumn()"
+            severity="info"
+            class="mt-2 w-full mx-2"
+            styleClass="w-full"
+            label="Cancel"
+            icon="pi pi-times"
+            [raised]="true"
+          ></p-button>
+        </div>
+      </div>
+    </p-scrollPanel>
+  </ng-template>
+  <ng-template pTemplate="footer">
+    <div class="flex">
+      <div class="ml-auto">
+        <p-button
+          (click)="confirmClose($event)"
+          severity="warning"
+          class="mr-2"
+          label="Close"
+          icon="pi pi-times"
+          [raised]="true"
+        ></p-button>
+
+        <p-button
+          (click)="submitForm()"
+          severity="primary"
+          class="mr-2"
+          label="Create"
+          icon="pi pi-times"
+          [raised]="true"
+        ></p-button>
+      </div>
+    </div>
+  </ng-template>
+</p-sidebar>
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+<app-spinner [loading]="loading" [type]="'full'" />

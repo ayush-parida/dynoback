@@ -23,3 +23,7 @@ body {
 .w-50rem {
   width: 50rem;
 }
+
+.p-component-overlay.p-datepicker-mask-scrollblocker {
+  z-index: 1105 !important;
+}
