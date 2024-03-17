@@ -1,3 +1,51 @@
 {
-  "schemas": []
+  "schemas": [
+    {
+      "type": 1,
+      "name": "test",
+      "connectionPoolId": "102b6ae0-598b-40b6-adf2-7acff30b01a3",
+      "schema": [
+        {
+          "id": 1,
+          "system": false,
+          "isActive": true,
+          "name": "field 1",
+          "type": "text",
+          "required": true,
+          "presentable": false,
+          "unique": true,
+          "default": "",
+          "options": {
+            "min": null,
+            "max": null,
+            "pattern": ""
+          },
+          "uuid": "f72751a4-95e4-4096-8fe9-cf9d963bcc24"
+        },
+        {
+          "id": 2,
+          "system": false,
+          "isActive": true,
+          "name": "field 2",
+          "type": "number",
+          "required": false,
+          "presentable": false,
+          "unique": false,
+          "default": "",
+          "options": {
+            "min": null,
+            "max": null,
+            "noDecimal": false
+          },
+          "uuid": "50d8b6af-350d-4bd0-900f-ed78f93b4e8f"
+        }
+      ],
+      "uuid": "1827b15f-0d21-4818-9858-261455a72908",
+      "isActive": true,
+      "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
+      "updatedBy": "",
+      "created": "2024-03-16T05:36:09.701564",
+      "updated": "2024-03-16T05:36:09.701564"
+    }
+  ]
 }

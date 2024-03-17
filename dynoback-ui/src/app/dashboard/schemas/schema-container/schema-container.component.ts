@@ -52,8 +52,17 @@ export class SchemaContainerComponent {
   schemaSidebarLoading: boolean = false;
   isView: boolean = false;
   schemaFormGroup: FormGroup = new FormGroup({});
+  connectionPoolId: string = '';
   subscriptions: Subscription = new Subscription();
-
+  menubarItems: MenuItem[] = [
+    {
+      label: 'Settings',
+      icon: 'pi pi-cog',
+      command: (event) => {
+        this.editOpen();
+      },
+    },
+  ];
   private messageService = inject(MessageService);
   private fb = inject(FormBuilder);
   private confirmationService = inject(ConfirmationService);
@@ -62,9 +71,9 @@ export class SchemaContainerComponent {
 
   constructor() {
     this.getSchemaTypes();
-    this.addOpen();
     this.getColumns();
-    this.getConnections();
+    this.getConnections(true);
+    this.getSchemas();
   }
 
   addOpen(): void {
@@ -72,46 +81,86 @@ export class SchemaContainerComponent {
     this.selectedSchema = {} as Database;
     this.schemaFormGroup = this.initSchemaForm();
   }
-  initSchemaForm(): FormGroup {
-    let formGroup = this.fb.group({
-      type: [
-        1,
-        [Validators.required],
-        [
-          uniqueSchemaNameValidator(
-            this.configService.http,
-            this.configService.apiUrl,
-            this.selectedSchema.uuid || this.isView ? true : false
-          ),
+  editOpen(): void {
+    this.schemaFormSidebarVisible = true;
+    this.getSchemaDetails();
+  }
+  getSchemaDetails() {
+    this.loading = true;
+    this.subscriptions.add(
+      this.schemaService.getSchemaDetails(this.selectedSchema.uuid).subscribe({
+        next: (data: any) => {
+          this.loading = false;
+          this.schemaFormGroup = this.initSchemaForm(false, data);
+          this.fullSchema = data.schema;
+        },
+        error: (error) => {
+          this.loading = false;
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Failed to Load Databases',
+            detail: error.error.message,
+          });
+        },
+      })
+    );
+  }
+  initSchemaForm(reset: boolean = true, values?: any): FormGroup {
+    if (!reset) {
+      let formGroup = this.fb.group({
+        type: [1, [Validators.required]],
+        name: [
+          { value: '', disabled: true },
+          [Validators.required, Validators.minLength(3)],
         ],
-      ],
-      name: ['', [Validators.required, Validators.minLength(3)]],
-      connectionPoolId: [null, [Validators.required]],
-    });
-    return formGroup;
+        connectionPoolId: [null, [Validators.required]],
+      });
+      console.log(this.selectedSchema.schema);
+      formGroup.patchValue(values);
+      console.log(formGroup.value);
+      return formGroup;
+    } else {
+      let formGroup = this.fb.group({
+        type: [1, [Validators.required]],
+        name: [
+          '',
+          [Validators.required, Validators.minLength(3)],
+          [
+            uniqueSchemaNameValidator(
+              this.configService.http,
+              this.configService.apiUrl,
+              this.selectedSchema.uuid || this.isView ? true : false
+            ),
+          ],
+        ],
+        connectionPoolId: [null, [Validators.required]],
+      });
+      return formGroup;
+    }
   }
   confirmClose(event: any) {
-    console.log(event);
-    this.confirmationService.confirm({
-      target: event.target as EventTarget,
-      message: 'Are you sure that you want to close?',
-      header: 'Close Confirmation',
-      icon: 'pi pi-exclamation-triangle',
-      acceptIcon: 'none',
-      rejectIcon: 'none',
-      acceptButtonStyleClass: 'p-button-danger p-button-text',
-      rejectButtonStyleClass: 'p-button-text p-button-text',
-      accept: () => {
-        this.messageService.add({
-          severity: 'info',
-          summary: 'Action Canceled',
-          detail: 'Form Cleared',
-          life: 3000,
-        });
-        this.closeFormSidebar(true);
-      },
-      reject: () => {},
-    });
+    if (!this.selectedSchema?.uuid)
+      this.confirmationService.confirm({
+        target: event.target as EventTarget,
+        message: 'Are you sure that you want to close?',
+        header: 'Close Confirmation',
+        icon: 'pi pi-exclamation-triangle',
+        acceptIcon: 'none',
+        rejectIcon: 'none',
+        acceptButtonStyleClass: 'p-button-danger p-button-text',
+        rejectButtonStyleClass: 'p-button-text p-button-text',
+        accept: () => {
+          this.messageService.add({
+            severity: 'info',
+            summary: 'Action Canceled',
+            detail: 'Form Cleared',
+            life: 3000,
+          });
+          this.closeFormSidebar(true);
+        },
+        reject: () => {},
+      });
+    else this.closeFormSidebar(true);
   }
   private closeFormSidebar(clearSelected?: boolean) {
     this.schemaFormSidebarVisible = false;
@@ -120,6 +169,26 @@ export class SchemaContainerComponent {
     this.schemaFormGroup.markAsPristine();
     this.schemaFormGroup = this.initSchemaForm();
     if (!clearSelected) this.selectedSchema = {};
+  }
+
+  getSchemas(): void {
+    this.loading = true;
+    this.subscriptions.add(
+      this.schemaService.getSchemas().subscribe({
+        next: (data) => {
+          this.loading = false;
+          this.schemas = data;
+        },
+        error: (error) => {
+          this.loading = false;
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Failed to Load Databases',
+            detail: error.error.message,
+          });
+        },
+      })
+    );
   }
   getSchemaTypes(): void {
     this.loading = true;
@@ -183,13 +252,19 @@ export class SchemaContainerComponent {
       })
     );
   }
-  getConnections(): void {
+  getConnections(testConnection: boolean): void {
     this.loading = true;
     this.subscriptions.add(
       this.schemaService.getDatabasesKvp().subscribe({
         next: (data) => {
           this.loading = false;
           this.connections = data;
+          if (this.connections.length) {
+            this.connectionPoolId = this.connections[0].uuid;
+            if (testConnection) {
+              this.testConnection();
+            }
+          }
         },
         error: (error) => {
           this.loading = false;
@@ -200,6 +275,50 @@ export class SchemaContainerComponent {
           });
         },
       })
+    );
+  }
+  testConnection(): void {
+    this.loading = true;
+    this.subscriptions.add(
+      this.schemaService
+        .databaseConnectionTest(this.connectionPoolId)
+        .subscribe({
+          next: (response) => {
+            this.loading = false;
+            if (response.success) {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success!',
+                detail: response.message,
+                life: 3000,
+              });
+            } else {
+              this.messageService.add({
+                severity: 'info',
+                summary: 'Warning!',
+                detail: response.message,
+                life: 3000,
+              });
+              this.connections.filter((x) => x.uuid == this.connectionPoolId)
+                .length
+                ? (this.connections.filter(
+                    (x) => x.uuid == this.connectionPoolId
+                  )[0].disabled = true)
+                : '';
+              if (this.connectionPoolId != this.connections[0].uuid)
+                this.connectionPoolId = this.connections[0].uuid;
+              else this.connectionPoolId = '';
+            }
+          },
+          error: (error) => {
+            this.loading = false;
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error! Failed!',
+              detail: error.error.message,
+            });
+          },
+        })
     );
   }
   addColumn() {
@@ -216,11 +335,24 @@ export class SchemaContainerComponent {
     this.showColumnSelect = false;
   }
   submitForm(): void {
-    console.log(this.schemaFormGroup.value);
-    console.log(this.fullSchema);
     this.loading = true;
+    let requestObservable;
+    if (this.selectedSchema?.uuid) {
+      requestObservable = this.schemaService.putSchema(
+        this.selectedSchema.uuid,
+        {
+          ...this.schemaFormGroup.value,
+          ...{ schema: this.fullSchema },
+        }
+      );
+    } else {
+      requestObservable = this.schemaService.postSchema({
+        ...this.schemaFormGroup.value,
+        ...{ schema: this.fullSchema },
+      });
+    }
     this.subscriptions.add(
-      this.schemaService.getColumns().subscribe({
+      requestObservable.subscribe({
         next: (data) => {
           this.loading = false;
           this.fieldTypes = data;
@@ -244,6 +376,7 @@ export class SchemaContainerComponent {
     this.fullSchema.push(duplicate);
   }
   activeIndexChanged(event: any) {
+    console.log(event);
     this.activeColumnExpand = event;
   }
   deleteColumn() {

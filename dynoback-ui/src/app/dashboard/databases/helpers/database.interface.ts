@@ -12,5 +12,6 @@ export interface Database {
   created: string;
   updated: string;
   label?: string;
+  disabled: boolean;
   [key: string]: string | number | boolean | any;
 }

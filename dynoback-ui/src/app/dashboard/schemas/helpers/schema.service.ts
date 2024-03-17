@@ -35,6 +35,15 @@ export class SchemaService {
       })
     );
   }
+  databaseConnectionTest(uuid: string) {
+    return this.http
+      .get<any>(`${this.apiUrl}/database/connection-test/${uuid}`)
+      .pipe(
+        catchError((error) => {
+          return this.config.handleError(error);
+        })
+      );
+  }
   postSchema(body: any): Observable<any[]> {
     return this.http.post<any>(`${this.apiUrl}/schema`, body).pipe(
       catchError((error) => {
@@ -44,6 +53,20 @@ export class SchemaService {
   }
   getSchemas(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/schema`).pipe(
+      catchError((error) => {
+        return this.config.handleError(error);
+      })
+    );
+  }
+  getSchemaDetails(uuid: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/schema/${uuid}`).pipe(
+      catchError((error) => {
+        return this.config.handleError(error);
+      })
+    );
+  }
+  putSchema(uuid: string, body: any): Observable<any[]> {
+    return this.http.put<any>(`${this.apiUrl}/schema/${uuid}`, body).pipe(
       catchError((error) => {
         return this.config.handleError(error);
       })

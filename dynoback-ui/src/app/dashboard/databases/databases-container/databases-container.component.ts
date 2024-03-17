@@ -32,7 +32,7 @@ export class DatabasesContainerComponent {
     this.getDatabases();
   }
 
-  getDatabases(): void {
+  getDatabases(reset: boolean = true): void {
     this.loading = true;
     this.subscriptions.add(
       this.databaseService.getDatabasesKvp().subscribe({
@@ -42,7 +42,7 @@ export class DatabasesContainerComponent {
             ...item,
             label: item.display_name,
           }));
-          if (this.databases.length) {
+          if (this.databases.length && reset) {
             this.selectedDatabase = this.databases[0];
           }
         },
@@ -214,6 +214,12 @@ export class DatabasesContainerComponent {
   closeDetails(event: any) {
     if (event) {
       this.closeFormSidebar();
+      this.getDatabases();
+    }
+  }
+  testConnectionEvent(event: any) {
+    if (event) {
+      this.getDatabases(false);
     }
   }
 }

@@ -61,26 +61,54 @@ class SchemaManagement:
             json.dump({"schemas": schemas}, file, indent=4)
     def add_schema(self, body, creator_uuid):
         schemas = self._read_schemas()
-        mandatory_fields = [ "connectionPoolId", "name", "type", "system"]
+        mandatory_fields = [ "connectionPoolId", "name", "type", "schema"]
         missing_fields = [field for field in mandatory_fields if not body.get(field)]
         if missing_fields:
             return {"status": 200, "response":{"success": False, "message": f"Mandatory fields missing: {', '.join(missing_fields)}"}}
+        if len(body['schema'])==0:
+            return {"status": 200, "response":{"success": False, "message": f"Schema cannot be []"}}
         if any(schema['name'] == body['name'] for schema in schemas):
             return {"status": 200, "response":{"success": False, "message": "Name already exists"}}
-        
         body['uuid']=str(uuid.uuid4())
         body['isActive']=True
         body['createdBy'] = creator_uuid
         body['updatedBy'] = ""
-        del body['id']
         for col in body['schema']:
             col['uuid']=str(uuid.uuid4())
-            del col['id']
         current_time = datetime.datetime.now().isoformat()
         body['created'] = body['updated'] = current_time
         schemas.append(body)
         self._write_schemas(schemas)
         return {"status": 200, "response": {"success": True, "message": "Schema added successfully", "id": body['uuid']}}
+    
+    def edit_schema(self, schema_uuid, updated_schema, updated_by_uuid):
+        schemas = self._read_schemas()
+        mandatory_fields = [ "connectionPoolId", "name", "type", "schema"]
+        missing_fields = [field for field in mandatory_fields if not updated_schema.get(field)]
+        if missing_fields:
+            return {"status": 200, "response":{"success": False, "message": f"Mandatory fields missing: {', '.join(missing_fields)}"}}
+        if len(updated_schema['schema'])==0:
+            return {"status": 200, "response":{"success": False, "message": f"Schema cannot be []"}}
+        for schema in schemas:
+            if schema['uuid'] == schema_uuid and schema['isActive']:
+                updated_schema.pop('id', None)
+                updated_schema.pop('isActive', None)
+                updated_schema.pop('createdBy', None)
+                updated_schema.pop('created', None)
+                updated_schema['updated'] = datetime.datetime.now().isoformat()
+                updated_schema['updatedBy'] = updated_by_uuid
+                schema.update(updated_schema)
+                self._write_schemas(schemas)
+                return {"status": 200, "response":{"success": True, "message": "Schema updated successfully"}}
+        return {"status": 200, "response":{"success": False, "message": "Schema not found or not active"}}
+    
+    def get_by_id_schema(self, schema_id):
+        dbs = self._read_schemas()
+        
+        for db in dbs:
+            if db['uuid'] == schema_id and db['isActive']:
+                return {"status": 200, "response":db}
+        return {"status": 200, "response":{"success": False, "message": "Schema not found or not active"}}
 
             
 def loadSchemaApi(config, authentication: Authentication):
@@ -121,3 +149,10 @@ def loadSchemaApi(config, authentication: Authentication):
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         new_schema = body
         return schema.add_schema(new_schema, decoded_token["decoded"]["uuid"])
+    
+    @api_route('/schema/<schema_id>', 'GET')
+    def get_schema_by_id(schema_id, headers):
+        decoded_token = authentication.validate_token(headers['Authorization'])
+        if not decoded_token["status"]:
+            return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
+        return schema.get_by_id_schema(schema_id)

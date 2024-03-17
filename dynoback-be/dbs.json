@@ -12,7 +12,8 @@
             "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
             "updatedBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
             "created": "2024-02-17T08:23:14.016141",
-            "updated": "2024-02-22T23:54:49.107106"
+            "updated": "2024-02-22T23:54:49.107106",
+            "disabled": false
         },
         {
             "display_name": "DB2",
@@ -26,10 +27,11 @@
             "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
             "updatedBy": "",
             "created": "2024-02-22T23:57:50.580681",
-            "updated": "2024-02-22T23:57:50.580681"
+            "updated": "2024-02-22T23:57:50.580681",
+            "disabled": false
         },
         {
-            "display_name": "ai50",
+            "display_name": "ai50-local",
             "name": "ai50",
             "user": "infiginiadmin",
             "password": "infigini123",
@@ -38,9 +40,10 @@
             "uuid": "482313b8-ce15-44ee-bf7d-b34443034db2",
             "isActive": true,
             "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
-            "updatedBy": "",
+            "updatedBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
             "created": "2024-02-27T20:42:40.625830",
-            "updated": "2024-02-27T20:42:40.625830"
+            "updated": "2024-03-18T03:59:21.634906",
+            "disabled": false
         },
         {
             "display_name": "ayush mac - etf_test_server_one",
@@ -54,7 +57,23 @@
             "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
             "updatedBy": "",
             "created": "2024-02-27T20:49:15.002729",
-            "updated": "2024-02-27T20:49:15.002729"
+            "updated": "2024-03-17T14:18:22.477531",
+            "disabled": true
+        },
+        {
+            "display_name": "infiginimain",
+            "name": "postgres",
+            "user": "infiginiadmin",
+            "password": "infigini123",
+            "host": "43.204.12.237",
+            "port": "5433",
+            "uuid": "1d12ce35-0b45-4ea6-b1cf-1f5266f43189",
+            "isActive": true,
+            "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
+            "updatedBy": "",
+            "created": "2024-03-09T16:02:06.235799",
+            "updated": "2024-03-09T16:02:06.235799",
+            "disabled": false
         }
     ]
 }

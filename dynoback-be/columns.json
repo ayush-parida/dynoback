@@ -9,6 +9,7 @@
       "required": false,
       "presentable": false,
       "unique": false,
+      "default": "",
       "options": {
         "min": null,
         "max": null,
@@ -24,6 +25,7 @@
       "required": false,
       "presentable": false,
       "unique": false,
+      "default": "",
       "options": {
         "convertUrls": true
       }
@@ -37,6 +39,7 @@
       "required": false,
       "presentable": false,
       "unique": false,
+      "default": "",
       "options": {
         "min": null,
         "max": null,
@@ -52,6 +55,7 @@
       "required": false,
       "presentable": false,
       "unique": false,
+      "default": "",
       "options": {}
     },
     {
@@ -63,6 +67,7 @@
       "required": false,
       "presentable": false,
       "unique": false,
+      "default": "",
       "options": {
         "exceptDomains": null,
         "onlyDomains": null
@@ -77,6 +82,7 @@
       "required": false,
       "presentable": false,
       "unique": false,
+      "default": "",
       "options": {
         "exceptDomains": null,
         "onlyDomains": null
@@ -91,6 +97,7 @@
       "required": false,
       "presentable": false,
       "unique": false,
+      "default": "",
       "options": {
         "min": "",
         "max": ""
@@ -105,6 +112,7 @@
       "required": false,
       "presentable": false,
       "unique": false,
+      "default": "",
       "options": {
         "maxSelect": 1,
         "values": []
@@ -119,6 +127,7 @@
       "required": false,
       "presentable": false,
       "unique": false,
+      "default": "",
       "options": {
         "mimeTypes": [],
         "thumbs": [],
@@ -136,6 +145,7 @@
       "required": false,
       "presentable": false,
       "unique": false,
+      "default": "",
       "options": {
         "maxSize": 2000000
       }
@@ -149,6 +159,7 @@
       "required": false,
       "presentable": false,
       "unique": false,
+      "default": "",
       "options": {
         "collectionId": null,
         "cascadeDelete": false,

@@ -10,28 +10,43 @@
       styleClass="w-15rem relative"
     >
       <ng-template pTemplate="header">
-        <div
-          class="flex align-items-center justify-content-between pt-3 flex-shrink-0"
-        >
-          <span class="inline-flex align-items-center gap-2">
-            <span class="font-semibold text-1xl text-primary">Schemas</span>
-          </span>
-          <span> </span>
+        <div class="w-full">
+          <div
+            class="flex align-items-center justify-content-between pt-3 flex-shrink-0"
+          >
+            <span class="inline-flex align-items-center gap-2">
+              <span class="font-semibold text-1xl text-primary">Schemas</span>
+            </span>
+            <span> </span>
+          </div>
+          <p-dropdown
+            styleClass="w-full block"
+            class="w-full my-2 block"
+            styleClass="min-w-full"
+            [(ngModel)]="connectionPoolId"
+            [options]="connections"
+            optionLabel="display_name"
+            placeholder="Select a Collection Pool"
+            optionValue="uuid"
+            (onChange)="testConnection()"
+          ></p-dropdown>
         </div>
       </ng-template>
       <ng-template pTemplate="content">
+        <p-divider styleClass="mt-0"></p-divider>
         <ul class="list-none p-0 m-0 overflow-hidden">
-          @for (item of schemas; track $index) {
-
-          <li (click)="selectedSchema = item">
+          @for (item of schemas; track $index) { @if (item.connectionPoolId ==
+          connectionPoolId) {
+          <li (click)="selectedSchema = item; getSchemaDetails()">
             <a
               pRipple
-              class="flex align-items-center cursor-pointer p-2 py-3 my-1 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple text-decoration-none"
+              [ngClass]="selectedSchema?.uuid == item.uuid ? 'surface-300' : ''"
+              class="flex align-items-center cursor-pointer p-2 py-3 my-1 border-round text-700 surface-100 hover:surface-200 transition-duration-150 transition-colors p-ripple text-decoration-none"
             >
-              <span class="font-medium">{{ item.display_name }}</span>
+              <span class="font-medium">{{ item.name }}</span>
             </a>
           </li>
-          }
+          } }
         </ul>
       </ng-template>
       <ng-template pTemplate="footer">
@@ -45,7 +60,14 @@
         ></p-button>
       </ng-template>
     </p-sidebar>
-    <div class="w-full"></div>
+    <div class="w-full">
+      @if (selectedSchema?.uuid) {
+      <app-header [menubarItems]="menubarItems"></app-header> } @else {
+      <div class="w-full text-center h-full flex">
+        <div class="m-auto font-bold text-3xl">Select Schema Please</div>
+      </div>
+      }
+    </div>
   </div>
 </div>
 <p-sidebar
@@ -110,17 +132,18 @@
           </div>
         </div>
       </form>
+
+      <p class="text-1xl font-bold w-full mx-2">
+        Predefined Columns: id, created, updated, is_active
+      </p>
+      <p-divider></p-divider>
     </div>
   </ng-template>
 
   <ng-template pTemplate="content">
     <app-spinner [loading]="schemaSidebarLoading" />
     <p-scrollPanel [style]="{ width: '100%', height: '75vh' }">
-      <p-divider></p-divider>
       <div class="w-full">
-        <p class="text-1xl font-bold w-full mx-2">
-          Predefined Columns: id, created, updated, is_active
-        </p>
         <div class="flex w-full">
           <div class="card flex justify-content-center w-full">
             <p-accordion
@@ -128,7 +151,7 @@
               [activeIndex]="activeColumnExpand"
               [expandIcon]="'pi pi-no'"
               [collapseIcon]="'pi pi-no'"
-              (activeIndexChange)="activeIndexChanged($event)"
+              (onOpen)="activeIndexChanged($event)"
             >
               @for (column of fullSchema; track $index) { @switch (column.id) {
               @case (FIELD_TYPE.TEXT) {
@@ -230,15 +253,26 @@
           icon="pi pi-times"
           [raised]="true"
         ></p-button>
+        @if (selectedSchema?.uuid) {
+        <p-button
+          (click)="submitForm()"
+          severity="primary"
+          class="mr-2"
+          label="Update"
+          icon="pi pi-check"
+          [raised]="true"
+        ></p-button>
 
+        } @else {
         <p-button
           (click)="submitForm()"
           severity="primary"
           class="mr-2"
           label="Create"
-          icon="pi pi-times"
+          icon="pi pi-check"
           [raised]="true"
         ></p-button>
+        }
       </div>
     </div>
   </ng-template>

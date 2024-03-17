@@ -47,7 +47,7 @@
           <label for="pattern">Regex Pattern</label>
         </span>
       </div>
-      <div class="col-6">
+      <div class="col-4">
         <div class="flex align-items-center gap-1">
           <p-checkbox
             [(ngModel)]="column.required"
@@ -57,7 +57,17 @@
           <label for="required">Required</label>
         </div>
       </div>
-      <div class="col-6">
+      <div class="col-4">
+        <div class="flex align-items-center gap-1">
+          <p-checkbox
+            [(ngModel)]="column.unique"
+            inputId="unique"
+            [binary]="true"
+          ></p-checkbox>
+          <label for="unique">Unique</label>
+        </div>
+      </div>
+      <div class="col-4">
         <div class="flex">
           <i
             class="pi pi-ellipsis-h ml-auto"

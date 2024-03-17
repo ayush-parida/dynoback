@@ -1,5 +1,5 @@
 import json
-from core.server import init_db_pools
+from core.database import init_db_pools
 
 def map_field_to_postgres_type(field):
     """Maps a JSON schema field to a PostgreSQL column type, constraints, and default values based on options."""
