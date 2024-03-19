@@ -120,6 +120,8 @@ class DatabaseManagement:
         for db in dbs:
             if db['uuid'] == db_id:
                 if (test_db_connection(db)):
+                    db['disabled'] = False
+                    self._write_dbs(dbs)
                     return {"status": 200, "response":{"success": True, "message": "Database Connected Successfully"}}
                 else:
                     db['disabled'] = True

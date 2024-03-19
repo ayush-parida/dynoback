@@ -72,4 +72,11 @@ export class SchemaService {
       })
     );
   }
+  deleteSchema(uuid: string): Observable<any[]> {
+    return this.http.delete<any>(`${this.apiUrl}/schema/${uuid}`).pipe(
+      catchError((error) => {
+        return this.config.handleError(error);
+      })
+    );
+  }
 }

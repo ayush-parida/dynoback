@@ -62,6 +62,13 @@ export class SchemaContainerComponent {
         this.editOpen();
       },
     },
+    {
+      label: 'Delete',
+      icon: 'pi pi-trash',
+      command: (event) => {
+        this.deleteConfirmation(event);
+      },
+    },
   ];
   private messageService = inject(MessageService);
   private fb = inject(FormBuilder);
@@ -79,6 +86,7 @@ export class SchemaContainerComponent {
   addOpen(): void {
     this.schemaFormSidebarVisible = true;
     this.selectedSchema = {} as Database;
+    this.fullSchema = [];
     this.schemaFormGroup = this.initSchemaForm();
   }
   editOpen(): void {
@@ -111,7 +119,11 @@ export class SchemaContainerComponent {
         type: [1, [Validators.required]],
         name: [
           { value: '', disabled: true },
-          [Validators.required, Validators.minLength(3)],
+          [
+            Validators.required,
+            Validators.minLength(3),
+            Validators.pattern(/^[a-z_]*$/),
+          ],
         ],
         connectionPoolId: [null, [Validators.required]],
       });
@@ -124,7 +136,11 @@ export class SchemaContainerComponent {
         type: [1, [Validators.required]],
         name: [
           '',
-          [Validators.required, Validators.minLength(3)],
+          [
+            Validators.required,
+            Validators.minLength(3),
+            Validators.pattern(/^[a-z_]*$/),
+          ],
           [
             uniqueSchemaNameValidator(
               this.configService.http,
@@ -353,15 +369,28 @@ export class SchemaContainerComponent {
     }
     this.subscriptions.add(
       requestObservable.subscribe({
-        next: (data) => {
+        next: (data: any) => {
           this.loading = false;
-          this.fieldTypes = data;
+          if (data.success) {
+            this.messageService.add({
+              severity: 'success',
+              summary: data.message,
+              detail: data.message,
+            });
+            this.schemaFormSidebarVisible = false;
+            this.getSchemas();
+          } else
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Failed to Update Schema',
+              detail: 'Some Error Occurred',
+            });
         },
         error: (error) => {
           this.loading = false;
           this.messageService.add({
             severity: 'error',
-            summary: 'Failed to Load Databases',
+            summary: 'Failed to Update Schema',
             detail: error.error.message,
           });
         },
@@ -386,5 +415,55 @@ export class SchemaContainerComponent {
   preventDefault(event: any) {
     console.log(event);
     event.originalEvent.preventDefault();
+  }
+  deleteConfirmation(event: any) {
+    if (this.selectedSchema?.uuid)
+      this.confirmationService.confirm({
+        target: event.target as EventTarget,
+        message:
+          'Are you sure that you want to delete schema?\nThis action is irreversible!',
+        header: 'Delete Confirmation',
+        icon: 'pi pi-exclamation-triangle',
+        acceptIcon: 'none',
+        rejectIcon: 'none',
+        acceptButtonStyleClass: 'p-button-danger p-button-text',
+        rejectButtonStyleClass: 'p-button-text p-button-text',
+        accept: () => {
+          this.deleteSchema();
+        },
+        reject: () => {},
+      });
+  }
+  deleteSchema(): void {
+    this.subscriptions.add(
+      this.schemaService.deleteSchema(this.selectedSchema.uuid).subscribe({
+        next: (data: any) => {
+          this.loading = false;
+          if (data.success) {
+            this.messageService.add({
+              severity: 'success',
+              summary: data.message,
+              detail: data.message,
+            });
+            this.schemaFormSidebarVisible = false;
+            this.selectedSchema = {};
+            this.getSchemas();
+          } else
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Failed to Update Schema',
+              detail: 'Some Error Occurred',
+            });
+        },
+        error: (error) => {
+          this.loading = false;
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Failed to Update Schema',
+            detail: error.error.message,
+          });
+        },
+      })
+    );
   }
 }

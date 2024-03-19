@@ -4,6 +4,7 @@ import os
 import json
 import uuid
 import datetime
+from core.process_schema import process_create_schema, process_edit_schema, process_delete_schema
 
 class SchemaTypeManagement:
     def __init__(self, config, file_path='schema_types.json'):
@@ -79,11 +80,15 @@ class SchemaManagement:
         body['created'] = body['updated'] = current_time
         schemas.append(body)
         self._write_schemas(schemas)
-        return {"status": 200, "response": {"success": True, "message": "Schema added successfully", "id": body['uuid']}}
+        response = process_create_schema(self.config, body)
+        if(response['status'] == 200):
+            return {"status": 200, "response": {"success": True, "message": response['response']['message'], "id": body['uuid']}}
+        else:
+            return {"status": 400, "response": {"success": False, "message": response['response']['message'], "id": body['uuid']}}
     
     def edit_schema(self, schema_uuid, updated_schema, updated_by_uuid):
         schemas = self._read_schemas()
-        mandatory_fields = [ "connectionPoolId", "name", "type", "schema"]
+        mandatory_fields = [ "connectionPoolId", "type", "schema"]
         missing_fields = [field for field in mandatory_fields if not updated_schema.get(field)]
         if missing_fields:
             return {"status": 200, "response":{"success": False, "message": f"Mandatory fields missing: {', '.join(missing_fields)}"}}
@@ -97,19 +102,47 @@ class SchemaManagement:
                 updated_schema.pop('created', None)
                 updated_schema['updated'] = datetime.datetime.now().isoformat()
                 updated_schema['updatedBy'] = updated_by_uuid
+                response = process_edit_schema(self.config, schema, updated_schema)['response']['message']
                 schema.update(updated_schema)
                 self._write_schemas(schemas)
-                return {"status": 200, "response":{"success": True, "message": "Schema updated successfully"}}
+                if(response['status'] == 200):
+                    return {"status": 200, "response": {"success": True, "message": response['response']['message']}}
+                else:
+                    return {"status": 400, "response": {"success": False, "message": response['response']['message']}}
         return {"status": 200, "response":{"success": False, "message": "Schema not found or not active"}}
     
     def get_by_id_schema(self, schema_id):
-        dbs = self._read_schemas()
+        schemas = self._read_schemas()
         
-        for db in dbs:
-            if db['uuid'] == schema_id and db['isActive']:
-                return {"status": 200, "response":db}
+        for schema in schemas:
+            if schema['uuid'] == schema_id and schema['isActive']:
+                return {"status": 200, "response":schema}
         return {"status": 200, "response":{"success": False, "message": "Schema not found or not active"}}
+    
+    def delete_schema(self, schema_id):
+        schemas = self._read_schemas()
+        schema_exists = False
+        for schema in schemas:
+            if schema['uuid'] == schema_id:
+                schema_exists = True
+                response = process_delete_schema(self.config, schema)
+                schemas.remove(schema)
+                break
+        if schema_exists:
+            self._write_schemas(schemas)
+            if(response['status'] == 200):
+                return {"status": 200, "response": {"success": True, "message": response['response']['message']}}
+            else:
+                return {"status": 400, "response": {"success": False, "message": response['response']['message']}}
+        else:
+            return {"status": 404, "response": {"success": False, "message": "Schema not found"}}
 
+    def get_unique_names(self, name):
+        schemas = self._read_schemas()
+        for schema in schemas:
+            if schema['name'] == name:
+                return {"status": 200, "response": {"user_exists": True}}
+        return {"status": 200, "response": {"user_exists": False}}
             
 def loadSchemaApi(config, authentication: Authentication):
     schemaType = SchemaTypeManagement(config)
@@ -156,3 +189,29 @@ def loadSchemaApi(config, authentication: Authentication):
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         return schema.get_by_id_schema(schema_id)
+    
+    @api_route('/schema/<schema_id>', 'PUT')
+    def put_schema_by_id(schema_id, body, headers):
+        decoded_token = authentication.validate_token(headers['Authorization'])
+        if not decoded_token["status"]:
+            return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
+        return schema.edit_schema(schema_id, body, decoded_token["decoded"]["uuid"])
+    
+    @api_route('/schema/<schema_id>', 'DELETE')
+    def delete_schema_by_id(schema_id, headers):
+        decoded_token = authentication.validate_token(headers['Authorization'])
+        if not decoded_token["status"]:
+            return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
+        return schema.delete_schema(schema_id)
+    
+    @api_route('/schemas/unique-name/<name>', 'GET')
+    def get_unique_name(name, headers):
+        decoded_token = authentication.validate_token(headers['Authorization'])
+        if not decoded_token["status"]:
+            return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
+        return schema.get_unique_names(name)
+    
+    @api_route('/process-schema/<uuid>', 'GET')
+    def process_schema(uuid, headers):
+        schema_detail = schema.get_by_id_schema(uuid)['response']
+        return process_create_schema(config, schema_detail)

@@ -7,7 +7,6 @@ import datetime
 import os
 from api.api import api_route
 from api.auth import Authentication
-from core.process_schema import process_schemas
 class AdminManagementSystem:
     def __init__(self, config, file_path='admins.json'):
         # Initialize with file path for admin data and configuration
@@ -241,6 +240,4 @@ def loadAdminApi(config, authentication: Authentication):
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         return admin_system.get_unique_emails(email)
     
-    @api_route('/process-schema', 'GET')
-    def process_schema(headers):
-        return process_schemas(config)
+    

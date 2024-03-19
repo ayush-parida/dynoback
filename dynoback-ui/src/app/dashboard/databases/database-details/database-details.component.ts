@@ -174,6 +174,7 @@ export class DatabaseDetailsComponent implements OnChanges {
                 detail: response.message,
                 life: 3000,
               });
+              this.testConnectionEmit.emit(true);
             } else {
               this.messageService.add({
                 severity: 'error',

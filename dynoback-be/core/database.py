@@ -43,3 +43,37 @@ def init_db_pools(dbs_config):
         except:
             db_pools[pool_key] = False
     return db_pools
+
+def fetch_db(db_uuid, dbs_config):
+    for db_config in dbs_config:
+        if db_config['uuid'] == db_uuid:
+            return db_config
+
+def execute_query(query, db_config):
+    try:
+        # Connect to the PostgreSQL database
+        with psycopg.connect(
+                dbname=db_config['name'],
+                user=db_config['user'],
+                password=db_config['password'],
+                host=db_config['host'],
+                port=db_config['port']) as conn:
+            
+            # Automatically commit unless a transaction is explicitly started
+            conn.autocommit = True
+            
+            with conn.cursor() as cur:
+                # Execute each command separately
+                cur.execute('SELECT VERSION();')
+                print(cur.fetchall())  # Print database version information
+                
+                # Create extension if not exists (for pgcrypto, necessary for gen_random_uuid())
+                cur.execute('CREATE EXTENSION IF NOT EXISTS pgcrypto;')
+                print(query)
+                # Execute the provided query
+                cur.execute(query)
+
+        return True
+    except OperationalError as e:
+        print(f"An error occurred: {e}")
+        return False
