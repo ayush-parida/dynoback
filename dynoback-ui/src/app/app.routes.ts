@@ -64,6 +64,15 @@ export const routes: Routes = [
               },
             ],
           },
+          {
+            path: 'schemas',
+            loadComponent: () =>
+              import(
+                './dashboard/schemas/schema-container/schema-container.component'
+              ).then((c) => c.SchemaContainerComponent),
+            canActivate: [authGuard],
+            children: [],
+          },
         ],
       },
     ],

@@ -1,5 +1,5 @@
 import json
-from core.server import init_db_pools
+from core.database import init_db_pools
 
 def map_field_to_postgres_type(field):
     """Maps a JSON schema field to a PostgreSQL column type, constraints, and default values based on options."""
@@ -66,86 +66,6 @@ def map_field_to_postgres_type(field):
     column_definition = f"{col_type} {' '.join(constraints)} {default_clause}".strip()
     return column_definition
 
-
-def generate_postgres_create_table(json_schema):
-    """Generates a PostgreSQL CREATE TABLE statement from a JSON schema, including special handling based on table type."""
-    table_name = json_schema['name']
-    table_type = json_schema.get('type', 'base')  # Default to 'base' if not specified
-    
-    # Common columns for all tables
-    columns_definitions = [
-        "uuid UUID PRIMARY KEY DEFAULT gen_random_uuid()",
-        "created TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP",
-        "updated TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP",
-        "is_active BOOLEAN DEFAULT TRUE"
-    ]
-    
-    # Additional columns for 'auth' table type
-    if table_type == 'auth':
-        columns_definitions.extend([
-            "username TEXT UNIQUE",
-            "email TEXT UNIQUE",
-            "verified BOOLEAN DEFAULT FALSE",
-            "show_email BOOLEAN DEFAULT TRUE",
-            "password TEXT"
-        ])
-    
-    for field in json_schema.get('schema', []):
-        column_definition = f"{field['name']} {map_field_to_postgres_type(field)}"
-        columns_definitions.append(column_definition)
-    
-    # Handle relations and file fields within the loop if necessary
-    # This could involve adding FOREIGN KEY constraints or handling file storage references
-    
-    create_table_statement = f"CREATE TABLE {table_name} (\n    " + ",\n    ".join(columns_definitions) + "\n);"
-    return create_table_statement
-
-def generate_alter_table_statements(old_schema, new_schema):
-    """Generates ALTER TABLE statements for schema updates, including handling for default values and relation changes."""
-    old_fields = {field['name']: field for field in old_schema.get('schema', [])}
-    new_fields = {field['name']: field for field in new_schema.get('schema', [])}
-    table_name = new_schema['name']
-    statements = []
-
-    # Handle removed fields
-    for old_field_name in set(old_fields) - set(new_fields):
-        statements.append(f"ALTER TABLE {table_name} DROP COLUMN IF EXISTS {old_field_name} CASCADE;")
-
-    # Handle added, modified fields, and default values
-    for new_field_name, new_field in new_fields.items():
-        column_definition = map_field_to_postgres_type(new_field)
-        if new_field_name not in old_fields:
-            # Add new column along with its type and default value if specified
-            statements.append(f"ALTER TABLE {table_name} ADD COLUMN {new_field_name} {column_definition};")
-        else:
-            old_field = old_fields[new_field_name]
-            old_column_definition = map_field_to_postgres_type(old_field)
-            # Check if the column type or constraints have changed
-            if column_definition != old_column_definition:
-                # If type has changed, generate ALTER COLUMN TYPE statement
-                # This assumes column_definition starts with the type info
-                col_type = column_definition.split()[0]
-                statements.append(f"ALTER TABLE {table_name} ALTER COLUMN {new_field_name} TYPE {col_type};")
-            # Check and update default value if it has changed or needs to be added
-            if 'default' in new_field.get('options', {}):
-                default_value = new_field['options']['default']
-                statements.append(f"ALTER TABLE {table_name} ALTER COLUMN {new_field_name} SET DEFAULT '{default_value}';")
-            elif 'default' in old_field.get('options', {}) and 'default' not in new_field.get('options', {}):
-                # Remove default if it was in old field but not in new
-                statements.append(f"ALTER TABLE {table_name} ALTER COLUMN {new_field_name} DROP DEFAULT;")
-
-    # Ensure standard fields are present (uuid, created, updated, is_active)
-    standard_fields = [
-        ("uuid", "UUID PRIMARY KEY DEFAULT gen_random_uuid()"),
-        ("created", "TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP"),
-        ("updated", "TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP"),
-        ("is_active", "BOOLEAN DEFAULT TRUE")
-    ]
-    for field_name, field_definition in standard_fields:
-        if field_name not in new_fields:
-            statements.append(f"ALTER TABLE {table_name} ADD COLUMN IF NOT EXISTS {field_name} {field_definition};")
-
-    return statements
 
 def fetch_current_schema(conn, table_name):
     current_schema = []

@@ -90,7 +90,6 @@ class HTTPRequestHandler(SimpleHTTPRequestHandler):
                         kwargs['headers'] = headers  
                         
                     result = route['function'](**kwargs)
-                    print(result)
                     self._set_headers(status=result.get('status', 200))
                     self.end_headers()
                     self.wfile.write(json.dumps(result.get('response', {})).encode('utf-8'))

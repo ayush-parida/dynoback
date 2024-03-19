@@ -5,17 +5,10 @@ from api.api import routes
 from api.admin import loadAdminApi
 from api.database import loadDatabaseApi
 from api.schema import loadSchemaApi
-import psycopg_pool
 import subprocess
 
 
-def init_db_pools(dbs_config):
-    db_pools = {}
-    for db_config in dbs_config:
-        connInfo = f"dbname={db_config['name']} user={db_config['user']} password={db_config['password']} host={db_config['host']} port={db_config.get('port', 5432)}"
-        pool_key = f"{db_config['name']}@{db_config['host']}"
-        db_pools[pool_key] = psycopg_pool.ConnectionPool(connInfo, min_size=1, max_size=10)
-    return db_pools
+
 
 def start_angular_app():
     # Start the Angular app; ensure the working directory is correctly set

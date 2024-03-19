@@ -1,0 +1,172 @@
+{
+    "schemas": [
+        {
+            "type": 1,
+            "name": "test",
+            "connectionPoolId": "102b6ae0-598b-40b6-adf2-7acff30b01a3",
+            "schema": [
+                {
+                    "system": false,
+                    "isActive": true,
+                    "id": 1,
+                    "name": "field 1",
+                    "type": "text",
+                    "required": false,
+                    "presentable": false,
+                    "unique": false,
+                    "default": "",
+                    "options": {
+                        "min": 2,
+                        "max": 100,
+                        "pattern": ""
+                    }
+                },
+                {
+                    "system": false,
+                    "isActive": true,
+                    "id": 2,
+                    "name": "field 2",
+                    "type": "editor",
+                    "required": true,
+                    "presentable": false,
+                    "unique": false,
+                    "default": "",
+                    "options": {
+                        "convertUrls": true
+                    },
+                    "convertUrls": true
+                },
+                {
+                    "system": false,
+                    "isActive": true,
+                    "id": 3,
+                    "name": "field 3",
+                    "type": "number",
+                    "required": true,
+                    "presentable": false,
+                    "unique": false,
+                    "default": "",
+                    "options": {
+                        "min": 20,
+                        "max": 200,
+                        "noDecimal": true
+                    }
+                },
+                {
+                    "system": false,
+                    "isActive": true,
+                    "id": 4,
+                    "name": "field 4",
+                    "type": "bool",
+                    "required": true,
+                    "presentable": false,
+                    "unique": false,
+                    "default": "",
+                    "options": {}
+                },
+                {
+                    "system": false,
+                    "isActive": true,
+                    "id": 5,
+                    "name": "field 5",
+                    "type": "email",
+                    "required": true,
+                    "presentable": false,
+                    "unique": true,
+                    "default": "",
+                    "options": {
+                        "exceptDomains": null,
+                        "onlyDomains": "gmail.com"
+                    }
+                },
+                {
+                    "system": false,
+                    "isActive": true,
+                    "id": 6,
+                    "name": "field 6",
+                    "type": "url",
+                    "required": true,
+                    "presentable": false,
+                    "unique": true,
+                    "default": "",
+                    "options": {
+                        "exceptDomains": "",
+                        "onlyDomains": "gmail.com"
+                    }
+                },
+                {
+                    "system": false,
+                    "isActive": true,
+                    "id": 7,
+                    "name": "field 7",
+                    "type": "date",
+                    "required": true,
+                    "presentable": false,
+                    "unique": false,
+                    "default": "",
+                    "options": {
+                        "min": "2024-03-03T10:38:30.000Z",
+                        "max": "2024-03-30T10:38:33.000Z"
+                    }
+                },
+                {
+                    "system": false,
+                    "isActive": true,
+                    "id": 8,
+                    "name": "field 8",
+                    "type": "select",
+                    "required": true,
+                    "presentable": false,
+                    "unique": false,
+                    "default": "",
+                    "options": {
+                        "maxSelect": 1,
+                        "values": [
+                            "a",
+                            "b",
+                            "c",
+                            "d",
+                            "e"
+                        ]
+                    }
+                }
+            ],
+            "uuid": "1827b15f-0d21-4818-9858-261455a72908",
+            "isActive": true,
+            "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
+            "updatedBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
+            "created": "2024-03-16T05:36:09.701564",
+            "updated": "2024-03-19T19:20:12.031131"
+        },
+        {
+            "type": 1,
+            "name": "test_2",
+            "connectionPoolId": "102b6ae0-598b-40b6-adf2-7acff30b01a3",
+            "schema": [
+                {
+                    "system": false,
+                    "isActive": true,
+                    "id": 1,
+                    "name": "name",
+                    "type": "text",
+                    "required": true,
+                    "presentable": false,
+                    "unique": true,
+                    "default": "",
+                    "options": {
+                        "min": null,
+                        "max": null,
+                        "pattern": ""
+                    },
+                    "uuid": "a6d10a20-7aa4-4c76-8db4-9724c195530a"
+                }
+            ],
+            "uuid": "961d53d9-0157-4834-851d-fdc6f53d5be5",
+            "isActive": true,
+            "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
+            "updatedBy": "",
+            "created": "2024-03-19T19:24:24.075956",
+            "updated": "2024-03-19T19:24:24.075956"
+        }
+    ]
+}

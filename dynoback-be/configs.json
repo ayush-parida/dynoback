@@ -2,7 +2,7 @@
   "AppName": "GDP",
   "ip": "0.0.0.0",
   "port": 4200,
-  "adminTokenExpiry": 3600,
+  "adminTokenExpiry": 360000,
   "origins": [
     "http://127.0.0.1:4200",
     "http://0.0.0.0:4200",

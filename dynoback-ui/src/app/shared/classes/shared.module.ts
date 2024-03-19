@@ -35,6 +35,11 @@ import { FieldsetModule } from 'primeng/fieldset';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { SpinnerComponent } from '../components/spinner/spinner.component';
 import { ChipModule } from 'primeng/chip';
+import { BadgeModule } from 'primeng/badge';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { CalendarModule } from 'primeng/calendar';
+import { EditorModule } from 'primeng/editor';
+import { ChipsModule } from 'primeng/chips';
 
 @NgModule({
   declarations: [],
@@ -74,6 +79,11 @@ import { ChipModule } from 'primeng/chip';
     FieldsetModule,
     InputSwitchModule,
     ChipModule,
+    BadgeModule,
+    InputNumberModule,
+    CalendarModule,
+    EditorModule,
+    ChipsModule,
   ],
   exports: [
     CommonModule,
@@ -111,6 +121,11 @@ import { ChipModule } from 'primeng/chip';
     FieldsetModule,
     InputSwitchModule,
     ChipModule,
+    BadgeModule,
+    InputNumberModule,
+    CalendarModule,
+    EditorModule,
+    ChipsModule,
   ],
   providers: [AuthService, MessageService, ConfirmationService],
 })

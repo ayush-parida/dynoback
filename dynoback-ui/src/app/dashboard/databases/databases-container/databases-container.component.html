@@ -26,6 +26,7 @@
           <li (click)="selectedDatabase = item">
             <a
               pRipple
+              [ngClass]="item.disabled ? 'bg-red-100' : 'bg-green-100'"
               class="flex align-items-center cursor-pointer p-2 py-3 my-1 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple text-decoration-none"
             >
               <span class="font-medium">{{ item.display_name }}</span>
@@ -51,11 +52,11 @@
         [database_uuid]="selectedDatabase.uuid"
         (editEmit)="editOpen($event)"
         (closeEmit)="closeDetails($event)"
+        (testConnectionEmit)="testConnectionEvent($event)"
       />
     </div>
   </div>
 </div>
-<app-spinner [loading]="loading" [type]="'full'" />
 <p-sidebar
   [(visible)]="databaseFormSidebarVisible"
   [showCloseIcon]="false"
@@ -85,12 +86,12 @@
               placeholder="Enter display name"
             />
             <div
-              *ngIf="databaseFormGroup.get('display_name')?.errors?.['required']"
+              *ngIf="databaseFormGroup.get('display_name')?.touched && databaseFormGroup.get('display_name')?.errors?.['required']"
             >
               Name is required.
             </div>
             <div
-              *ngIf="databaseFormGroup.get('display_name')?.errors?.['minlength']"
+              *ngIf="databaseFormGroup.get('display_name')?.touched && databaseFormGroup.get('display_name')?.errors?.['minlength']"
             >
               Name must be at least 3 characters long.
             </div>
@@ -106,10 +107,14 @@
               formControlName="name"
               placeholder="Enter name"
             />
-            <div *ngIf="databaseFormGroup.get('name')?.errors?.['required']">
+            <div
+              *ngIf="databaseFormGroup.get('name')?.touched && databaseFormGroup.get('name')?.errors?.['required']"
+            >
               Name is required.
             </div>
-            <div *ngIf="databaseFormGroup.get('name')?.errors?.['minlength']">
+            <div
+              *ngIf="databaseFormGroup.get('name')?.touched && databaseFormGroup.get('name')?.errors?.['minlength']"
+            >
               Name must be at least 3 characters long.
             </div>
           </div>
@@ -137,12 +142,12 @@
               [feedback]="false"
             ></p-password>
             <div
-              *ngIf="databaseFormGroup.get('password')?.errors?.['required']"
+              *ngIf="databaseFormGroup.get('password')?.touched && databaseFormGroup.get('password')?.errors?.['required']"
             >
               Password is required.
             </div>
             <div
-              *ngIf="databaseFormGroup.get('password')?.errors?.['minlength']"
+              *ngIf="databaseFormGroup.get('password')?.touched && databaseFormGroup.get('password')?.errors?.['minlength']"
             >
               Password must be at least 6 characters long.
             </div>
@@ -158,7 +163,9 @@
               formControlName="host"
               placeholder="Enter host"
             />
-            <div *ngIf="databaseFormGroup.get('host')?.errors?.['required']">
+            <div
+              *ngIf="databaseFormGroup.get('host')?.touched && databaseFormGroup.get('host')?.errors?.['required']"
+            >
               Host is required.
             </div>
           </div>
@@ -173,10 +180,14 @@
               formControlName="port"
               placeholder="Enter port"
             />
-            <div *ngIf="databaseFormGroup.get('port')?.errors?.['required']">
+            <div
+              *ngIf="databaseFormGroup.get('port')?.touched && databaseFormGroup.get('port')?.errors?.['required']"
+            >
               Port is required.
             </div>
-            <div *ngIf="databaseFormGroup.get('port')?.errors?.['pattern']">
+            <div
+              *ngIf="databaseFormGroup.get('port')?.touched && databaseFormGroup.get('port')?.errors?.['pattern']"
+            >
               Port must be a number.
             </div>
           </div>

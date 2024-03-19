@@ -47,6 +47,7 @@ class DatabaseManagement:
         new_db['isActive'] = True
         new_db['createdBy'] = creator_uuid
         new_db['updatedBy'] = ""
+        new_db['disabled'] = False
         current_time = datetime.datetime.now().isoformat()
         new_db['created'] = new_db['updated'] = current_time
 
@@ -89,7 +90,7 @@ class DatabaseManagement:
     def permanent_delete_db(self, db_id):
         # Permanently delete an db
         dbs = self._read_dbs()
-        dbs = [db for db in dbs if not (db['uuid'] == db_id and not db['isSuper'])]
+        dbs = [db for db in dbs if not (db['uuid'] == db_id)]
         
         if len(dbs) == len(self._read_dbs()):
             return {"status": 200, "response":{"success": False, "message": "db not found or is a super db"}}
@@ -102,8 +103,6 @@ class DatabaseManagement:
         dbs = self._read_dbs()
         for db in dbs:
             if db['uuid'] == db_id:
-                if db['isSuper']:
-                    return {"status": 200, "response":{"success": False, "message": "Cannot deactivate a super db"}}
 
                 db['isActive'] = False
                 db['updated'] = datetime.datetime.now().isoformat()
@@ -114,15 +113,20 @@ class DatabaseManagement:
     
     def kvp_db(self):
         dbs = self._read_dbs()
-        return [{'display_name': db['display_name'], 'uuid': db['uuid']} for db in dbs if db['isActive']]
+        return [{'display_name': db['display_name'], 'disabled': db['disabled'], 'uuid': db['uuid']} for db in dbs if db['isActive']]
     
     def test_db_connection(self, db_id):
         dbs = self._read_dbs()
         for db in dbs:
             if db['uuid'] == db_id:
                 if (test_db_connection(db)):
+                    db['disabled'] = False
+                    self._write_dbs(dbs)
                     return {"status": 200, "response":{"success": True, "message": "Database Connected Successfully"}}
                 else:
+                    db['disabled'] = True
+                    db['updated'] = datetime.datetime.now().isoformat()
+                    self._write_dbs(dbs)
                     return {"status": 200, "response":{"success": False, "message": "Database Connection Failed"}}
                 
         return {"status": 200, "response":{"success": False, "message": "db not found"}}
@@ -204,7 +208,7 @@ def loadDatabaseApi(config, authentication: Authentication):
         return {"status": 200, "response":database.kvp_db()}
     
     @api_route('/databases/<database_id>', 'GET')  # or 'PATCH'
-    def edit_database_route(database_id, headers):
+    def get_database_route(database_id, headers):
         decoded_token = authentication.validate_token(headers['Authorization'])
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}

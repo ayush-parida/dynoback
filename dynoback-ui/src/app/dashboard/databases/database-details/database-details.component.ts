@@ -28,6 +28,8 @@ export class DatabaseDetailsComponent implements OnChanges {
   editEmit = new EventEmitter<any>();
   @Output()
   closeEmit = new EventEmitter<any>();
+  @Output()
+  testConnectionEmit = new EventEmitter<any>();
   loading: boolean = false;
   database: Database = {} as Database;
   objectKeys = Object.keys;
@@ -172,13 +174,15 @@ export class DatabaseDetailsComponent implements OnChanges {
                 detail: response.message,
                 life: 3000,
               });
+              this.testConnectionEmit.emit(true);
             } else {
               this.messageService.add({
-                severity: 'info',
+                severity: 'error',
                 summary: 'Warning!',
                 detail: response.message,
                 life: 3000,
               });
+              this.testConnectionEmit.emit(true);
             }
           },
           error: (error) => {

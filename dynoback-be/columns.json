@@ -2,12 +2,14 @@
   "columns": [
     {
       "system": false,
-      "id": null,
+      "isActive": true,
+      "id": 1,
       "name": "field",
       "type": "text",
       "required": false,
       "presentable": false,
       "unique": false,
+      "default": "",
       "options": {
         "min": null,
         "max": null,
@@ -16,24 +18,28 @@
     },
     {
       "system": false,
-      "id": null,
+      "isActive": true,
+      "id": 2,
       "name": "field",
       "type": "editor",
       "required": false,
       "presentable": false,
       "unique": false,
+      "default": "",
       "options": {
         "convertUrls": true
       }
     },
     {
       "system": false,
-      "id": null,
+      "isActive": true,
+      "id": 3,
       "name": "field",
       "type": "number",
       "required": false,
       "presentable": false,
       "unique": false,
+      "default": "",
       "options": {
         "min": null,
         "max": null,
@@ -42,22 +48,26 @@
     },
     {
       "system": false,
-      "id": null,
+      "isActive": true,
+      "id": 4,
       "name": "field",
       "type": "bool",
       "required": false,
       "presentable": false,
       "unique": false,
+      "default": "",
       "options": {}
     },
     {
       "system": false,
-      "id": null,
+      "isActive": true,
+      "id": 5,
       "name": "field",
       "type": "email",
       "required": false,
       "presentable": false,
       "unique": false,
+      "default": "",
       "options": {
         "exceptDomains": null,
         "onlyDomains": null
@@ -65,12 +75,14 @@
     },
     {
       "system": false,
-      "id": null,
+      "isActive": true,
+      "id": 6,
       "name": "field",
       "type": "url",
       "required": false,
       "presentable": false,
       "unique": false,
+      "default": "",
       "options": {
         "exceptDomains": null,
         "onlyDomains": null
@@ -78,12 +90,14 @@
     },
     {
       "system": false,
-      "id": null,
+      "isActive": true,
+      "id": 7,
       "name": "field",
       "type": "date",
       "required": false,
       "presentable": false,
       "unique": false,
+      "default": "",
       "options": {
         "min": "",
         "max": ""
@@ -91,25 +105,29 @@
     },
     {
       "system": false,
-      "id": null,
+      "isActive": true,
+      "id": 8,
       "name": "field",
       "type": "select",
       "required": false,
       "presentable": false,
       "unique": false,
+      "default": "",
       "options": {
-        "maxSelect": 3,
-        "values": ["a", "b", "c"]
+        "maxSelect": 1,
+        "values": []
       }
     },
     {
       "system": false,
-      "id": null,
+      "isActive": false,
+      "id": 9,
       "name": "field",
       "type": "file",
       "required": false,
       "presentable": false,
       "unique": false,
+      "default": "",
       "options": {
         "mimeTypes": [],
         "thumbs": [],
@@ -120,24 +138,28 @@
     },
     {
       "system": false,
-      "id": null,
+      "isActive": true,
+      "id": 10,
       "name": "field",
       "type": "json",
       "required": false,
       "presentable": false,
       "unique": false,
+      "default": "",
       "options": {
         "maxSize": 2000000
       }
     },
     {
       "system": false,
-      "id": null,
+      "isActive": false,
+      "id": 11,
       "name": "field",
       "type": "relation",
       "required": false,
       "presentable": false,
       "unique": false,
+      "default": "",
       "options": {
         "collectionId": null,
         "cascadeDelete": false,
