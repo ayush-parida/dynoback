@@ -1,1 +1,84 @@
-<p>relation-column works!</p>
+<p-accordionTab (selectedChange)="selectedChange($event)">
+  <ng-template pTemplate="header">
+    <span class="flex align-items-center gap-2 w-full pt-4">
+      <span class="p-float-label w-full">
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="column.name"
+          class="w-full"
+          id="name"
+        />
+        <label for="name"
+          >Column Name (Type: {{ column.type | titlecase }})</label
+        >
+      </span>
+      <span class="p-float-label w-full">
+        <p-dropdown
+          styleClass="w-full block"
+          class="w-full my-2 block"
+          styleClass="min-w-full"
+          [(ngModel)]="column.options.relatedTableUuid"
+          [options]="schemas"
+          optionLabel="name"
+          placeholder="Select a Schema"
+          optionValue="uuid"
+        ></p-dropdown>
+      </span>
+
+      <i class="pi pi-cog ml-auto text-2xl"></i>
+    </span>
+  </ng-template>
+  <div>
+    <div class="grid mt-2">
+      <div class="col-12">
+        <span class="p-float-label w-full">
+          <p-inputNumber
+            class="w-full"
+            styleClass="w-full"
+            inputId="maxSelect"
+            [(ngModel)]="column.options.maxSelect"
+            [useGrouping]="false"
+          >
+          </p-inputNumber>
+          <label for="maxSelect">Max Select (Use 1 for single select)</label>
+        </span>
+      </div>
+      <div class="col-4">
+        <div class="flex align-items-center gap-1">
+          <p-checkbox
+            [(ngModel)]="column.options.cascadeDelete"
+            inputId="cascadeDelete"
+            [binary]="true"
+          ></p-checkbox>
+          <label for="cascadeDelete">Cascade Delete</label>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="flex align-items-center gap-1">
+          <p-checkbox
+            [(ngModel)]="column.required"
+            inputId="required"
+            [binary]="true"
+          ></p-checkbox>
+          <label for="required">Required / Non Falsey</label>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="flex">
+          <i
+            class="pi pi-ellipsis-h ml-auto"
+            (click)="createMenu.toggle($event)"
+            pTooltip="Actions"
+          ></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-accordionTab>
+<p-menu
+  #createMenu
+  [model]="createActions"
+  [popup]="true"
+  appendTo="body"
+></p-menu>

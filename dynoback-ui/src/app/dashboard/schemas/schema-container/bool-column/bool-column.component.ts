@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { SharedModule } from '../../../../shared/classes/shared.module';
 
@@ -15,4 +15,9 @@ export class BoolColumnComponent {
   column: any;
   @Input()
   createActions: MenuItem[] = [];
+  @Output()
+  customIndexChangeEmit = new EventEmitter<boolean>();
+  selectedChange(event: any) {
+    this.customIndexChangeEmit.emit(true);
+  }
 }

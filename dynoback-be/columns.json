@@ -152,7 +152,7 @@
     },
     {
       "system": false,
-      "isActive": false,
+      "isActive": true,
       "id": 11,
       "name": "field",
       "type": "relation",
@@ -162,7 +162,8 @@
       "default": "",
       "options": {
         "collectionId": null,
-        "cascadeDelete": false,
+        "cascadeDelete": true,
+        "relatedTableUuid": "",
         "minSelect": null,
         "maxSelect": 1,
         "displayFields": null

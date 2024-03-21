@@ -139,20 +139,19 @@ def generate_postgres_alter_table_statements(old_schema, new_schema):
             elif not old_field.get('required') and new_field.get('required'):
                 statements.append(f"ALTER TABLE {table_name} ALTER COLUMN \"{new_field_name_sanitized}\" SET NOT NULL;")
 
-        # Handling unique constraint changes
-        old_unique = old_field.get('unique', False) if old_field else False
-        new_unique = new_field.get('unique', False)
-        unique_constraint_name = f"{table_name}_{new_field_name_sanitized}_key"
-        unique_index_name = f"idx_{table_name}_{new_field_name_sanitized}_unique"
-        
-        if old_unique and not new_unique:
-            # Drop the unique index if the unique constraint should be removed
-            # statements.append(f"DROP INDEX IF EXISTS \"{unique_index_name}\";")
-            statements.append(f"ALTER TABLE {table_name} DROP CONSTRAINT {unique_constraint_name};")
-        elif not old_unique and new_unique:
-            # Create a unique index if the unique constraint should be added
-            # statements.append(f"CREATE UNIQUE INDEX \"{unique_index_name}\" ON {table_name} ({new_field_name_sanitized});")
-            pass
+            # Handling unique constraint changes
+            old_unique = old_field.get('unique', False) if old_field else False
+            new_unique = new_field.get('unique', False)
+            unique_constraint_name = f"{table_name}_{new_field_name_sanitized}_key"
+            unique_index_name = f"idx_{table_name}_{new_field_name_sanitized}_unique"
+            
+            if old_unique and not new_unique:
+                # Drop the unique index if the unique constraint should be removed
+                # statements.append(f"DROP INDEX IF EXISTS \"{unique_index_name}\";")
+                statements.append(f"ALTER TABLE {table_name} DROP CONSTRAINT {unique_constraint_name};")
+            # elif not old_unique and new_unique:
+                # Create a unique index if the unique constraint should be added
+                # statements.append(f"CREATE UNIQUE INDEX \"{unique_index_name}\" ON {table_name} ({new_field_name_sanitized});")
 
     return statements
 

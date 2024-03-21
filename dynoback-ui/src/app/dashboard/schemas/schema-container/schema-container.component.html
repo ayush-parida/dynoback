@@ -83,7 +83,7 @@
     <div class="w-full">
       <form [formGroup]="schemaFormGroup">
         <div class="flex w-100">
-          <h3 class="w-2">
+          <h3 class="w-3">
             {{ selectedSchema.uuid ? "Update" : "Add" }} Schema
           </h3>
           <p-dropdown
@@ -131,6 +131,18 @@
             </div>
           </div>
         </div>
+        <div class="p-fluid form-layout">
+          <div class="flex">
+            <div class="p-field w-12 mt-3">
+              <p-checkbox
+                formControlName="softDelete"
+                inputId="softDelete"
+                [binary]="true"
+              ></p-checkbox>
+              <label for="softDelete">&nbsp;Soft Delete</label>
+            </div>
+          </div>
+        </div>
       </form>
 
       <p class="text-1xl font-bold w-full mx-2">
@@ -151,56 +163,68 @@
               [activeIndex]="activeColumnExpand"
               [expandIcon]="'pi pi-no'"
               [collapseIcon]="'pi pi-no'"
-              (onOpen)="activeIndexChanged($event)"
             >
               @for (column of fullSchema; track $index) { @switch (column.id) {
               @case (FIELD_TYPE.TEXT) {
               <app-text-column
                 [column]="column"
                 [createActions]="createActions"
+                (customIndexChangeEmit)="activeIndexChanged($index)"
               />
               } @case (FIELD_TYPE.EDITOR) {<app-editor-column
                 [column]="column"
                 [createActions]="createActions"
+                (customIndexChangeEmit)="activeIndexChanged($index)"
               />
               }@case (FIELD_TYPE.NUMBER) {
               <app-number-column
                 [column]="column"
                 [createActions]="createActions"
+                (customIndexChangeEmit)="activeIndexChanged($index)"
               />
               }@case (FIELD_TYPE.BOOL) {
               <app-bool-column
                 [column]="column"
                 [createActions]="createActions"
+                (customIndexChangeEmit)="activeIndexChanged($index)"
               />
               }@case (FIELD_TYPE.EMAIL) {
               <app-email-column
                 [column]="column"
                 [createActions]="createActions"
+                (customIndexChangeEmit)="activeIndexChanged($index)"
               />}@case (FIELD_TYPE.URL) {
               <app-url-column
                 [column]="column"
                 [createActions]="createActions"
+                (customIndexChangeEmit)="activeIndexChanged($index)"
               />}@case (FIELD_TYPE.DATE) {
               <app-date-column
                 [column]="column"
                 [createActions]="createActions"
+                (customIndexChangeEmit)="activeIndexChanged($index)"
               />}@case (FIELD_TYPE.SELECT) {
               <app-select-column
                 [column]="column"
                 [createActions]="createActions"
+                (customIndexChangeEmit)="activeIndexChanged($index)"
               />}@case (FIELD_TYPE.FILE) {
               <app-file-column
                 [column]="column"
                 [createActions]="createActions"
+                (customIndexChangeEmit)="activeIndexChanged($index)"
               />}@case (FIELD_TYPE.JSON) {<app-json-column
                 [column]="column"
                 [createActions]="createActions"
+                (customIndexChangeEmit)="activeIndexChanged($index)"
               />
               }@case (FIELD_TYPE.RELATION) {
               <app-relation-column
                 [column]="column"
                 [createActions]="createActions"
+                [connectionPoolId]="connectionPoolId"
+                [schemaUuid]="selectedSchema?.uuid"
+                (customIndexChangeEmit)="activeIndexChanged($index)"
               />} } }
             </p-accordion>
           </div>
