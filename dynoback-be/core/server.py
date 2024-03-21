@@ -1,5 +1,6 @@
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from api.auth import Authentication
+from api.dynamic_api import loadSchemasApi
 from api.handler import HTTPRequestHandler
 from api.api import routes
 from api.admin import loadAdminApi
@@ -41,6 +42,7 @@ def run(ip, port, server_class, handler_class, routes, config):
     loadAdminApi(config, authentication)
     loadDatabaseApi(config, authentication)
     loadSchemaApi(config, authentication)
+    loadSchemasApi(config, authentication)
     httpd.RequestHandlerClass.routes = routes
     print(f'Starting httpd on {ip}:{port}...')
     httpd.serve_forever()

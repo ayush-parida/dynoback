@@ -126,6 +126,7 @@ export class SchemaContainerComponent {
           ],
         ],
         connectionPoolId: [null, [Validators.required]],
+        softDelete: [true],
       });
       console.log(this.selectedSchema.schema);
       formGroup.patchValue(values);
@@ -150,6 +151,7 @@ export class SchemaContainerComponent {
           ],
         ],
         connectionPoolId: [null, [Validators.required]],
+        softDelete: [true],
       });
       return formGroup;
     }
@@ -405,7 +407,6 @@ export class SchemaContainerComponent {
     this.fullSchema.push(duplicate);
   }
   activeIndexChanged(event: any) {
-    console.log(event);
     this.activeColumnExpand = event;
   }
   deleteColumn() {

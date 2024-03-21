@@ -10,8 +10,8 @@ from api.auth import Authentication
 from core.database import test_db_connection
 
 class DatabaseManagement:
-    def __init__(self, config, file_path='dbs.json'):
-        self.file_path = file_path
+    def __init__(self, config):
+        self.file_path = config['databases']
         self.config = config
         
     def _read_dbs(self):

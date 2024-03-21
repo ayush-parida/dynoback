@@ -64,12 +64,9 @@ def execute_query(query, db_config):
             
             with conn.cursor() as cur:
                 # Execute each command separately
-                cur.execute('SELECT VERSION();')
-                print(cur.fetchall())  # Print database version information
                 
                 # Create extension if not exists (for pgcrypto, necessary for gen_random_uuid())
                 cur.execute('CREATE EXTENSION IF NOT EXISTS pgcrypto;')
-                print(query)
                 # Execute the provided query
                 cur.execute(query)
 
