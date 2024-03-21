@@ -141,14 +141,47 @@ def loadSchemasApi(config, authentication):
         if not decoded_token["status"]:
             return {"status": 401, "response": {"success": False, "message": "Invalid or expired token"}}
         
+        # Assuming you have query parameters for sorting
+        sort_by = query_params.get('sort_by', 'uuid')  # Adjust 'default_column' as needed
+        sort_order = query_params.get('sort_order', 'asc')
+        
         page = int(query_params.get('page', 1))
         per_page = int(query_params.get('per_page', 10))
-        # Implement additional query parameters as needed (e.g., search, sort)
+        
+        # Fetch all records (Consider modifying this to actually implement filtering and sorting)
+        all_records = db_api.get_all(schema_name)
+        
+        # Apply sorting based on sort_by and sort_order
+        # This is a placeholder. Implement actual sorting based on your data structure and requirements.
+        # For example, you might sort the records based on a key if they're dictionaries.
+        
+        # Paginate records
+        start = (page - 1) * per_page
+        end = start + per_page
+        paginated_records = all_records[start:end]
+        
+        total_records = len(all_records)
+        total_pages = (total_records + per_page - 1) // per_page  # Ceiling division to account for incomplete pages
+        
+        # Serialize paginated records
+        records_data = json.loads(json.dumps(paginated_records, cls=CustomJSONEncoder))
+        
+        return {
+            "status": 200,
+            "response": {
+                "success": True,
+                "records": records_data,
+                "pagination": {
+                    "current_page": page,
+                    "per_page": per_page,
+                    "total_pages": total_pages,
+                    "sort_by": sort_by,
+                    "sort_order": sort_order,
+                    "total": total_records
+                }
+            }
+        }
 
-        records = db_api.get_all(schema_name)
-        # Apply filtering, sorting, and pagination to records as needed
-
-        return {"status": 200, "response": json.loads(json.dumps(records, cls=CustomJSONEncoder))}
 
     def get_record_by_id(schema_name, record_id, headers):
         decoded_token = authentication.validate_token(headers['Authorization'])
@@ -223,10 +256,9 @@ def loadSchemasApi(config, authentication):
             return _delete_record
 
     # Dynamically create routes for each schema and operation
-    operations = _load_json(config['schemas'])['operations']
     schemas = _load_json(config['schemas'])['schemas']
     for schema in schemas:
-        for operation in operations:
+        for operation in schema['operations']:
             func = create_api_function(schema, operation)
             path = f"/{schema['name']}" if operation != "GET_BY_ID" else f"/{schema['name']}/<record_id>"
             method = "GET" if operation in ["GET_ALL", "GET_BY_ID"] else operation
