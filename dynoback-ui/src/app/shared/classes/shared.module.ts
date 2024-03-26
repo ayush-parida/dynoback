@@ -40,6 +40,10 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { CalendarModule } from 'primeng/calendar';
 import { EditorModule } from 'primeng/editor';
 import { ChipsModule } from 'primeng/chips';
+import { ToolbarModule } from 'primeng/toolbar';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { MultiSelectModule } from 'primeng/multiselect';
 
 @NgModule({
   declarations: [],
@@ -84,6 +88,10 @@ import { ChipsModule } from 'primeng/chips';
     CalendarModule,
     EditorModule,
     ChipsModule,
+    ToolbarModule,
+    DialogModule,
+    InputTextareaModule,
+    MultiSelectModule,
   ],
   exports: [
     CommonModule,
@@ -126,6 +134,10 @@ import { ChipsModule } from 'primeng/chips';
     CalendarModule,
     EditorModule,
     ChipsModule,
+    ToolbarModule,
+    DialogModule,
+    InputTextareaModule,
+    MultiSelectModule,
   ],
   providers: [AuthService, MessageService, ConfirmationService],
 })

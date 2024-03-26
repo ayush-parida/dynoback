@@ -1,0 +1,282 @@
+<!-- component.html -->
+<div class="w-full p-3">
+  <div class="card">
+    <p-toast></p-toast>
+    <p-toolbar styleClass="mb-4 gap-2">
+      <ng-template pTemplate="left">
+        <!-- Buttons for new entries and bulk delete operations -->
+        <!-- <button
+          pButton
+          pRipple
+          label="Delete All"
+          icon="pi pi-trash"
+          class="p-button-danger"
+          (click)="deleteSelectedEntries()"
+          [disabled]="!selectedEntries || !selectedEntries.length"
+        ></button> -->
+      </ng-template>
+
+      <ng-template pTemplate="right">
+        <!-- File upload and export functionality placeholders -->
+        <!-- <p-fileUpload mode="basic" accept="image/*" [maxFileSize]="1000000" label="Import" chooseLabel="Import" class="mr-2 inline-block"></p-fileUpload> -->
+        <!-- <button
+          pButton
+          pRipple
+          label="Export"
+          icon="pi pi-upload"
+          class="p-button-help"
+        ></button> -->
+
+        <button
+          pButton
+          pRipple
+          label="New"
+          icon="pi pi-plus"
+          class="p-button-success mr-2"
+          (click)="openNew()"
+        ></button>
+      </ng-template>
+    </p-toolbar>
+
+    <!-- Dynamic PrimeNG Table for Entries -->
+    <p-table
+      #dt
+      [value]="entries"
+      dataKey="id"
+      [paginator]="false"
+      [loading]="loading"
+      [lazy]="true"
+      (onLazyLoad)="loadEntriesLazy($event)"
+      (onSort)="onSort($event)"
+    >
+      <ng-template pTemplate="caption">
+        <div class="flex align-items-center justify-content-between">
+          <div class="block w-full">
+            <div class="flex w-full">
+              <p-multiSelect
+                [options]="dynamicColumns"
+                [(ngModel)]="selectedFields"
+                optionLabel="name"
+                selectedItemsLabel="{0} columns selected"
+                [style]="{ 'min-width': '200px' }"
+                placeholder="Choose Columns"
+              ></p-multiSelect>
+            </div>
+            <span class="p-input-icon-left w-full">
+              <i class="pi pi-search"></i>
+              <input
+                pInputText
+                type="text"
+                (input)="filterGlobal()"
+                placeholder="Search..."
+                [(ngModel)]="searchFilter"
+                [disabled]="true"
+              />
+            </span>
+          </div>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 4rem">
+            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+          </th>
+          <th>UUID</th>
+          <th
+            *ngFor="let col of dynamicColumns"
+            pSortableColumn="{{ getFieldName(col.name) }}"
+          >
+            <div class="flex justify-content-between align-items-center">
+              {{ col.name
+              }}<p-sortIcon field="{{ getFieldName(col.name) }}"></p-sortIcon>
+              <p-columnFilter
+                type="text"
+                field="{{ getFieldName(col.name) }}"
+                display="menu"
+                class="ml-auto"
+              ></p-columnFilter>
+            </div>
+          </th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-entry>
+        <tr>
+          <td><p-tableCheckbox [value]="entry"></p-tableCheckbox></td>
+          <td>{{ entry.uuid }}</td>
+          <td *ngFor="let col of dynamicColumns">
+            <ng-container [ngSwitch]="col.id">
+              <span *ngSwitchCase="FIELD_TYPE.TEXT">{{
+                entry[getFieldName(col.name)]
+              }}</span>
+              <span *ngSwitchCase="FIELD_TYPE.NUMBER">{{
+                entry[getFieldName(col.name)]
+              }}</span>
+              <span *ngSwitchCase="FIELD_TYPE.DATE">{{
+                entry[getFieldName(col.name)] | date
+              }}</span>
+              <span *ngSwitchCase="FIELD_TYPE.BOOL">{{
+                entry[getFieldName(col.name)] ? "Yes" : "No"
+              }}</span>
+              <span *ngSwitchCase="FIELD_TYPE.EMAIL">{{
+                entry[getFieldName(col.name)]
+              }}</span>
+              <span *ngSwitchCase="FIELD_TYPE.URL"
+                ><a
+                  href="{{ entry[getFieldName(col.name)] }}"
+                  target="_blank"
+                  >{{ entry[getFieldName(col.name)] }}</a
+                ></span
+              >
+              <span *ngSwitchCase="FIELD_TYPE.EDITOR">{{
+                entry[getFieldName(col.name)]
+              }}</span>
+              <span *ngSwitchCase="FIELD_TYPE.SELECT">{{
+                entry[getFieldName(col.name)]
+              }}</span>
+            </ng-container>
+          </td>
+          <td>
+            <button
+              pButton
+              pRipple
+              label="Edit"
+              icon="pi pi-pencil"
+              class="p-button-success mr-2"
+              (click)="editEntry(entry)"
+            ></button>
+            <button
+              pButton
+              pRipple
+              label="Delete"
+              icon="pi pi-trash"
+              class="p-button-danger mr-2"
+              (click)="deleteEntry(entry)"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+    <p-paginator
+      (onPageChange)="onPageChange($event)"
+      [first]="(pagination.current_page - 1) * pagination.per_page"
+      [rows]="pagination.per_page"
+      [totalRecords]="pagination.total"
+      [rowsPerPageOptions]="[10, 25, 50, 100]"
+      (onPage)="onPageChange($event)"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    ></p-paginator>
+
+    <!-- Dialog for Editing/Adding Entries -->
+    <p-dialog
+      header="Entry Details"
+      [(visible)]="entryDialog"
+      [modal]="true"
+      [style]="{ width: '75vw' }"
+    >
+      <form [formGroup]="form" (ngSubmit)="saveEntry()">
+        <div class="grid">
+          <div class="col-6 mt-2" *ngFor="let col of dynamicColumns">
+            <div class="flex flex-column w-full">
+              <label for="{{ getFieldName(col.name) }}" class="font-bold">{{
+                col.name
+              }}</label>
+              @switch (col.id) { @case (FIELD_TYPE.TEXT) {
+              <input
+                pInputText
+                id="{{ getFieldName(col.name) }}"
+                type="text"
+                formControlName="{{ getFieldName(col.name) }}"
+                class="w-full"
+              />
+              } @case (FIELD_TYPE.EMAIL) {
+              <input
+                pInputText
+                id="{{ getFieldName(col.name) }}"
+                type="email"
+                formControlName="{{ getFieldName(col.name) }}"
+                class="w-full"
+              />
+              } @case (FIELD_TYPE.URL) {
+              <input
+                pInputText
+                id="{{ getFieldName(col.name) }}"
+                type="url"
+                formControlName="{{ getFieldName(col.name) }}"
+                class="w-full"
+              />
+              } @case (FIELD_TYPE.EDITOR) {
+              <textarea
+                pInputTextarea
+                id="{{ getFieldName(col.name) }}"
+                formControlName="{{ getFieldName(col.name) }}"
+                class="w-full"
+                styleClass="w-full"
+              ></textarea>
+              } @case (FIELD_TYPE.NUMBER) {
+              <p-inputNumber
+                [id]="getFieldName(col.name)"
+                formControlName="{{ getFieldName(col.name) }}"
+                class="w-full"
+                [mode]="'decimal'"
+              ></p-inputNumber>
+              } @case (FIELD_TYPE.BOOL) {
+              <p-checkbox
+                [binary]="true"
+                [id]="getFieldName(col.name)"
+                formControlName="{{ getFieldName(col.name) }}"
+                class="w-full"
+              ></p-checkbox>
+              } @case (FIELD_TYPE.DATE) {
+              <p-calendar
+                [id]="getFieldName(col.name)"
+                formControlName="{{ getFieldName(col.name) }}"
+                class="w-full"
+                [showIcon]="true"
+                [showTime]="true"
+              ></p-calendar>
+              } @case (FIELD_TYPE.SELECT) {
+              <p-dropdown
+                [id]="getFieldName(col.name)"
+                [options]="col.options.values"
+                formControlName="{{ getFieldName(col.name) }}"
+                class="w-full"
+                styleClass="w-full"
+              >
+                <ng-template let-item pTemplate="selectedItem">
+                  {{ item }}
+                </ng-template>
+                <ng-template let-item pTemplate="item">
+                  {{ item }}
+                </ng-template>
+              </p-dropdown>
+              } }
+            </div>
+          </div>
+        </div>
+        <p-footer>
+          <p-divider></p-divider>
+          <div class="flex w-full align-content-end">
+            <div class="mx-auto flex gap-2">
+              <button
+                type="submit"
+                pButton
+                label="Save"
+                [disabled]="!form.valid"
+              ></button>
+              <button
+                type="button"
+                pButton
+                label="Cancel"
+                (click)="hideDialog()"
+                class="ui-button-secondary"
+              ></button>
+            </div>
+          </div>
+        </p-footer>
+      </form>
+    </p-dialog>
+  </div>
+</div>

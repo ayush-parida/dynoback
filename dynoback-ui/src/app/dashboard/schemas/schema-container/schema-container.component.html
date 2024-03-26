@@ -40,7 +40,7 @@
           <li (click)="selectedSchema = item; getSchemaDetails()">
             <a
               pRipple
-              [ngClass]="selectedSchema?.uuid == item.uuid ? 'surface-300' : ''"
+              [ngClass]="selectedSchema.uuid == item.uuid ? 'surface-300' : ''"
               class="flex align-items-center cursor-pointer p-2 py-3 my-1 border-round text-700 surface-100 hover:surface-200 transition-duration-150 transition-colors p-ripple text-decoration-none"
             >
               <span class="font-medium">{{ item.name }}</span>
@@ -61,8 +61,9 @@
       </ng-template>
     </p-sidebar>
     <div class="w-full">
-      @if (selectedSchema?.uuid) {
-      <app-header [menubarItems]="menubarItems"></app-header> } @else {
+      @if (selectedSchema.uuid) {
+      <app-header [menubarItems]="menubarItems"></app-header>
+      <app-schema-data [schema]="selectedSchema"></app-schema-data> } @else {
       <div class="w-full text-center h-full flex">
         <div class="m-auto font-bold text-3xl">Select Schema Please</div>
       </div>
@@ -223,7 +224,7 @@
                 [column]="column"
                 [createActions]="createActions"
                 [connectionPoolId]="connectionPoolId"
-                [schemaUuid]="selectedSchema?.uuid"
+                [schemaUuid]="selectedSchema.uuid"
                 (customIndexChangeEmit)="activeIndexChanged($index)"
               />} } }
             </p-accordion>
@@ -277,7 +278,7 @@
           icon="pi pi-times"
           [raised]="true"
         ></p-button>
-        @if (selectedSchema?.uuid) {
+        @if (selectedSchema.uuid) {
         <p-button
           (click)="submitForm()"
           severity="primary"

@@ -27,3 +27,13 @@ body {
 .p-component-overlay.p-datepicker-mask-scrollblocker {
   z-index: 1105 !important;
 }
+
+
+.p-inputwrapper {
+
+  .p-inputnumber,
+  .p-calendar,
+  .p-inputtext {
+    width: 100% !important;
+  }
+}

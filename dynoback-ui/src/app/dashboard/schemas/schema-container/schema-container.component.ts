@@ -5,7 +5,7 @@ import { MessageService, ConfirmationService, MenuItem } from 'primeng/api';
 import { Subscription } from 'rxjs';
 import { Database } from '../../databases/helpers/database.interface';
 import { SchemaService } from '../helpers/schema.service';
-import { Column, SchemaType } from '../helpers/schema.interface';
+import { Column, Schema, SchemaType } from '../helpers/schema.interface';
 import { uniqueSchemaNameValidator } from '../../../shared/classes/schema-name.validator';
 import { ConfigService } from '../../../shared/services/config.service';
 import { AccordionModule } from 'primeng/accordion';
@@ -21,6 +21,7 @@ import { SelectColumnComponent } from './select-column/select-column.component';
 import { FileColumnComponent } from './file-column/file-column.component';
 import { JsonColumnComponent } from './json-column/json-column.component';
 import { RelationColumnComponent } from './relation-column/relation-column.component';
+import { SchemaDataComponent } from './schema-data/schema-data.component';
 
 @Component({
   selector: 'app-schema-container',
@@ -39,14 +40,15 @@ import { RelationColumnComponent } from './relation-column/relation-column.compo
     FileColumnComponent,
     JsonColumnComponent,
     RelationColumnComponent,
+    SchemaDataComponent,
   ],
   templateUrl: './schema-container.component.html',
   styleUrl: './schema-container.component.scss',
 })
 export class SchemaContainerComponent {
   loading: boolean = false;
-  selectedSchema: any = {};
-  schemas: any[] = [];
+  selectedSchema: Schema = {} as Schema;
+  schemas: Schema[] = [];
   schemaTypes: SchemaType[] = [];
   schemaFormSidebarVisible: boolean = false;
   schemaSidebarLoading: boolean = false;
@@ -63,7 +65,7 @@ export class SchemaContainerComponent {
       },
     },
     {
-      label: 'Delete',
+      label: 'Delete Schema',
       icon: 'pi pi-trash',
       command: (event) => {
         this.deleteConfirmation(event);
@@ -85,7 +87,7 @@ export class SchemaContainerComponent {
 
   addOpen(): void {
     this.schemaFormSidebarVisible = true;
-    this.selectedSchema = {} as Database;
+    this.selectedSchema = {} as Schema;
     this.fullSchema = [];
     this.schemaFormGroup = this.initSchemaForm();
   }
@@ -128,9 +130,7 @@ export class SchemaContainerComponent {
         connectionPoolId: [null, [Validators.required]],
         softDelete: [true],
       });
-      console.log(this.selectedSchema.schema);
       formGroup.patchValue(values);
-      console.log(formGroup.value);
       return formGroup;
     } else {
       let formGroup = this.fb.group({
@@ -186,7 +186,7 @@ export class SchemaContainerComponent {
     this.schemaFormGroup.markAsUntouched();
     this.schemaFormGroup.markAsPristine();
     this.schemaFormGroup = this.initSchemaForm();
-    if (!clearSelected) this.selectedSchema = {};
+    if (!clearSelected) this.selectedSchema = {} as Schema;
   }
 
   getSchemas(): void {
@@ -247,6 +247,13 @@ export class SchemaContainerComponent {
       icon: 'pi pi-times',
       command: () => {
         this.deleteColumn();
+      },
+    },
+    {
+      label: 'API Preview',
+      icon: 'pi pi-server',
+      command: () => {
+        this.getApiProperties();
       },
     },
   ];
@@ -447,7 +454,7 @@ export class SchemaContainerComponent {
               detail: data.message,
             });
             this.schemaFormSidebarVisible = false;
-            this.selectedSchema = {};
+            this.selectedSchema = {} as Schema;
             this.getSchemas();
           } else
             this.messageService.add({
@@ -467,4 +474,5 @@ export class SchemaContainerComponent {
       })
     );
   }
+  getApiProperties() {}
 }

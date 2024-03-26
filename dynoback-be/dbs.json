@@ -2,7 +2,7 @@
     "dbs": [
         {
             "uuid": "102b6ae0-598b-40b6-adf2-7acff30b01a3",
-            "display_name": "DB1",
+            "display_name": "DB1_DB",
             "name": "dynoback",
             "user": "infiginiadmin",
             "password": "infigini123",
@@ -12,7 +12,7 @@
             "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
             "updatedBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
             "created": "2024-02-17T08:23:14.016141",
-            "updated": "2024-03-18T22:10:04.781976",
+            "updated": "2024-03-25T22:48:02.930083",
             "disabled": false
         },
         {
