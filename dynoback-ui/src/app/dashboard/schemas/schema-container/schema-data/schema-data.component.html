@@ -47,6 +47,17 @@
                 type="button"
                 pButton
                 pRipple
+                icon="pi pi-refresh"
+                label="Refresh"
+                class="p-button-info"
+                (click)="fetchEntries()"
+                pTooltip="Refresh"
+                tooltipPosition="bottom"
+              ></button>
+              <button
+                type="button"
+                pButton
+                pRipple
                 icon="pi pi-file"
                 (click)="dt.exportCSV()"
                 pTooltip="CSV"
@@ -73,17 +84,23 @@
                 tooltipPosition="bottom"
               ></button>
             </div>
-            <span class="p-input-icon-left w-full">
-              <i class="pi pi-copy"></i>
+            <p-inputGroup styleClass="w-full" class="w-full">
+              <button
+                type="button"
+                pButton
+                icon="pi pi-copy"
+                class="p-button-info"
+                (click)="copyContent(searchFilter)"
+              ></button>
               <input
-                pInputText
                 type="text"
-                (input)="filterGlobal()"
+                pInputText
                 placeholder="Filter..."
+                (input)="filterGlobal()"
                 [(ngModel)]="searchFilter"
                 [disabled]="true"
               />
-            </span>
+            </p-inputGroup>
           </div>
         </div>
       </ng-template>
@@ -102,8 +119,8 @@
 
           <th pSortableColumn="{{ getFieldName(col.name) }}">
             <div class="flex justify-content-between align-items-center">
-              {{ col.name
-              }}<p-sortIcon field="{{ getFieldName(col.name) }}"></p-sortIcon>
+              <span class="field-name">{{ col.name }}</span
+              ><p-sortIcon field="{{ getFieldName(col.name) }}"></p-sortIcon>
               <p-columnFilter
                 type="text"
                 field="{{ getFieldName(col.name) }}"
