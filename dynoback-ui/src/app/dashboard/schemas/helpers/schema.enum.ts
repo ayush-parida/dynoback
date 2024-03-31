@@ -17,3 +17,11 @@ export enum FIELD_TYPE {
   JSON = 10,
   RELATION = 11,
 }
+
+export enum API_NAMES {
+  GET_ALL = 'Filtering / Pagination',
+  GET_BY_ID = 'Details',
+  POST = 'Create',
+  PUT = 'Update',
+  DELETE = 'Delete',
+}

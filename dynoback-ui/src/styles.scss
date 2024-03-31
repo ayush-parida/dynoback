@@ -33,7 +33,16 @@ body {
 
   .p-inputnumber,
   .p-calendar,
-  .p-inputtext {
+  .p-inputtext,
+  .p-multiselect {
     width: 100% !important;
   }
+
+  .p-dialog-content {
+    overflow: visible !important;
+  }
+}
+
+.loading-icon-size {
+  font-size: 5em !important;
 }

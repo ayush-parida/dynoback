@@ -11,7 +11,7 @@
                     "id": 1,
                     "name": "field 1",
                     "type": "text",
-                    "required": false,
+                    "required": true,
                     "presentable": false,
                     "unique": false,
                     "default": "",
@@ -108,27 +108,6 @@
                         "min": "2024-03-03T10:38:30.000Z",
                         "max": "2024-03-30T10:38:33.000Z"
                     }
-                },
-                {
-                    "system": false,
-                    "isActive": true,
-                    "id": 8,
-                    "name": "field 8",
-                    "type": "select",
-                    "required": true,
-                    "presentable": false,
-                    "unique": false,
-                    "default": "",
-                    "options": {
-                        "maxSelect": 1,
-                        "values": [
-                            "a",
-                            "b",
-                            "c",
-                            "d",
-                            "e"
-                        ]
-                    }
                 }
             ],
             "uuid": "1827b15f-0d21-4818-9858-261455a72908",
@@ -137,7 +116,7 @@
             "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
             "updatedBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
             "created": "2024-03-16T05:36:09.701564",
-            "updated": "2024-03-19T19:20:12.031131",
+            "updated": "2024-03-31T15:31:07.374461",
             "operations": [
                 "GET_ALL",
                 "GET_BY_ID",
@@ -198,6 +177,24 @@
                         "max": null,
                         "noDecimal": false
                     }
+                },
+                {
+                    "system": false,
+                    "isActive": true,
+                    "id": 11,
+                    "name": "field 4",
+                    "type": "relation",
+                    "required": false,
+                    "presentable": false,
+                    "unique": false,
+                    "default": "",
+                    "options": {
+                        "collectionId": "102b6ae0-598b-40b6-adf2-7acff30b01a3",
+                        "cascadeDelete": true,
+                        "relatedTableUuid": "1827b15f-0d21-4818-9858-261455a72908",
+                        "displayFields": null,
+                        "relatedTableName": "test"
+                    }
                 }
             ],
             "uuid": "961d53d9-0157-4834-851d-fdc6f53d5be5",
@@ -206,7 +203,7 @@
             "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
             "updatedBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
             "created": "2024-03-19T19:24:24.075956",
-            "updated": "2024-03-26T15:32:26.352798",
+            "updated": "2024-03-31T17:43:09.853345",
             "operations": [
                 "GET_ALL",
                 "GET_BY_ID",
@@ -254,12 +251,26 @@
                         "noDecimal": false
                     },
                     "uuid": "93a13ae2-bc49-4e4f-b2fe-b93bb4ce39d8"
+                },
+                {
+                    "system": false,
+                    "isActive": true,
+                    "id": 10,
+                    "name": "body",
+                    "type": "json",
+                    "required": false,
+                    "presentable": false,
+                    "unique": false,
+                    "default": "",
+                    "options": {
+                        "maxSize": 2000000
+                    }
                 }
             ],
             "uuid": "ef1167f2-dccf-4513-afcc-f82508348af9",
             "isActive": true,
             "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
-            "updatedBy": "",
+            "updatedBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
             "operations": [
                 "GET_ALL",
                 "GET_BY_ID",
@@ -268,7 +279,7 @@
                 "DELETE"
             ],
             "created": "2024-03-25T22:13:17.102076",
-            "updated": "2024-03-25T22:13:17.102076"
+            "updated": "2024-03-31T17:53:01.468926"
         }
     ]
 }

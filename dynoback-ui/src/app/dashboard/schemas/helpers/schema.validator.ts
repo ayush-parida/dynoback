@@ -1,6 +1,6 @@
 import { ValidatorFn, AbstractControl } from '@angular/forms';
 
-function emailDomainValidator(allowedDomains: string[]): ValidatorFn {
+export function emailDomainValidator(allowedDomains: string[]): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } | null => {
     if (!control.value) {
       // if control is empty return no error
@@ -15,7 +15,7 @@ function emailDomainValidator(allowedDomains: string[]): ValidatorFn {
   };
 }
 
-function urlDomainValidator(allowedDomains: string[]): ValidatorFn {
+export function urlDomainValidator(allowedDomains: string[]): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } | null => {
     if (!control.value) {
       // if control is empty return no error
@@ -36,7 +36,7 @@ function urlDomainValidator(allowedDomains: string[]): ValidatorFn {
   };
 }
 
-function selectFieldValueValidator(allowedValues: any[]): ValidatorFn {
+export function selectFieldValueValidator(allowedValues: any[]): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } | null => {
     if (allowedValues.includes(control.value)) {
       return null; // valid
@@ -45,7 +45,7 @@ function selectFieldValueValidator(allowedValues: any[]): ValidatorFn {
   };
 }
 
-function dateRangeValidator(
+export function dateRangeValidator(
   minDateStr?: string,
   maxDateStr?: string
 ): ValidatorFn {

@@ -2,41 +2,6 @@
 <div class="w-full p-3">
   <div class="card">
     <p-toast></p-toast>
-    <p-toolbar styleClass="mb-4 gap-2">
-      <ng-template pTemplate="left">
-        <!-- Buttons for new entries and bulk delete operations -->
-        <!-- <button
-          pButton
-          pRipple
-          label="Delete All"
-          icon="pi pi-trash"
-          class="p-button-danger"
-          (click)="deleteSelectedEntries()"
-          [disabled]="!selectedEntries || !selectedEntries.length"
-        ></button> -->
-      </ng-template>
-
-      <ng-template pTemplate="right">
-        <!-- File upload and export functionality placeholders -->
-        <!-- <p-fileUpload mode="basic" accept="image/*" [maxFileSize]="1000000" label="Import" chooseLabel="Import" class="mr-2 inline-block"></p-fileUpload> -->
-        <!-- <button
-          pButton
-          pRipple
-          label="Export"
-          icon="pi pi-upload"
-          class="p-button-help"
-        ></button> -->
-
-        <button
-          pButton
-          pRipple
-          label="New"
-          icon="pi pi-plus"
-          class="p-button-success mr-2"
-          (click)="openNew()"
-        ></button>
-      </ng-template>
-    </p-toolbar>
 
     <!-- Dynamic PrimeNG Table for Entries -->
     <p-table
@@ -45,14 +10,20 @@
       dataKey="id"
       [paginator]="false"
       [loading]="loading"
+      loadingIcon="
+    pi pi-spin pi-spinner loading-icon-size"
       [lazy]="true"
       (onLazyLoad)="loadEntriesLazy($event)"
       (onSort)="onSort($event)"
+      [scrollable]="true"
+      scrollHeight="50rem"
+      [tableStyle]="{ 'min-width': '50rem' }"
+      responsiveLayout="scroll"
     >
       <ng-template pTemplate="caption">
         <div class="flex align-items-center justify-content-between">
           <div class="block w-full">
-            <div class="flex w-full">
+            <div class="flex w-full gap-2 mb-2">
               <p-multiSelect
                 [options]="dynamicColumns"
                 [(ngModel)]="selectedFields"
@@ -60,15 +31,55 @@
                 selectedItemsLabel="{0} columns selected"
                 [style]="{ 'min-width': '200px' }"
                 placeholder="Choose Columns"
+                (onChange)="dynamicColumnChange()"
+                [showToggleAll]="false"
               ></p-multiSelect>
+
+              <button
+                pButton
+                pRipple
+                label="New"
+                icon="pi pi-plus"
+                class="p-button-success ml-auto"
+                (click)="openNew()"
+              ></button>
+              <button
+                type="button"
+                pButton
+                pRipple
+                icon="pi pi-file"
+                (click)="dt.exportCSV()"
+                pTooltip="CSV"
+                tooltipPosition="bottom"
+              ></button>
+              <button
+                type="button"
+                pButton
+                pRipple
+                icon="pi pi-file-excel"
+                (click)="exportExcel()"
+                class="p-button-success"
+                pTooltip="XLS"
+                tooltipPosition="bottom"
+              ></button>
+              <button
+                type="button"
+                pButton
+                pRipple
+                icon="pi pi-file-pdf"
+                (click)="exportPdf()"
+                class="p-button-warning"
+                pTooltip="PDF"
+                tooltipPosition="bottom"
+              ></button>
             </div>
             <span class="p-input-icon-left w-full">
-              <i class="pi pi-search"></i>
+              <i class="pi pi-copy"></i>
               <input
                 pInputText
                 type="text"
                 (input)="filterGlobal()"
-                placeholder="Search..."
+                placeholder="Filter..."
                 [(ngModel)]="searchFilter"
                 [disabled]="true"
               />
@@ -81,11 +92,15 @@
           <th style="width: 4rem">
             <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
           </th>
-          <th>UUID</th>
-          <th
-            *ngFor="let col of dynamicColumns"
-            pSortableColumn="{{ getFieldName(col.name) }}"
-          >
+          <th pSortableColumn="uuid">
+            <div class="flex justify-content-between align-items-center">
+              UUID<p-sortIcon field="uuid"></p-sortIcon>
+            </div>
+          </th>
+          @for (col of dynamicColumns; track $index) { @if
+          (selectedFields.includes(col)) {
+
+          <th pSortableColumn="{{ getFieldName(col.name) }}">
             <div class="flex justify-content-between align-items-center">
               {{ col.name
               }}<p-sortIcon field="{{ getFieldName(col.name) }}"></p-sortIcon>
@@ -97,6 +112,17 @@
               ></p-columnFilter>
             </div>
           </th>
+          } }
+          <th pSortableColumn="created">
+            <div class="flex justify-content-between align-items-center">
+              Created<p-sortIcon field="created"></p-sortIcon>
+            </div>
+          </th>
+          <th pSortableColumn="updated">
+            <div class="flex justify-content-between align-items-center">
+              Updated<p-sortIcon field="updated"></p-sortIcon>
+            </div>
+          </th>
           <th>Actions</th>
         </tr>
       </ng-template>
@@ -104,8 +130,17 @@
       <ng-template pTemplate="body" let-entry>
         <tr>
           <td><p-tableCheckbox [value]="entry"></p-tableCheckbox></td>
-          <td>{{ entry.uuid }}</td>
-          <td *ngFor="let col of dynamicColumns">
+          <td>
+            <p-chip
+              class="cursor-pointer"
+              label="{{ entry.uuid }}"
+              icon="pi pi-copy"
+              (click)="copyContent(entry.uuid)"
+            ></p-chip>
+          </td>
+          @for (col of dynamicColumns; track $index) { @if
+          (selectedFields.includes(col)) {
+          <td>
             <ng-container [ngSwitch]="col.id">
               <span *ngSwitchCase="FIELD_TYPE.TEXT">{{
                 entry[getFieldName(col.name)]
@@ -135,8 +170,14 @@
               <span *ngSwitchCase="FIELD_TYPE.SELECT">{{
                 entry[getFieldName(col.name)]
               }}</span>
+              <span *ngSwitchCase="FIELD_TYPE.RELATION">{{
+                entry[getFieldName(col.name)]
+              }}</span>
             </ng-container>
           </td>
+          } }
+          <td>{{ entry.created | date : "dd/MM/yyyy hh:mm a" }}</td>
+          <td>{{ entry.updated | date : "dd/MM/yyyy hh:mm a" }}</td>
           <td>
             <button
               pButton
@@ -237,7 +278,8 @@
                 [showIcon]="true"
                 [showTime]="true"
               ></p-calendar>
-              } @case (FIELD_TYPE.SELECT) {
+              }@case (FIELD_TYPE.JSON) { } @case (FIELD_TYPE.FILE) { } @case
+              (FIELD_TYPE.SELECT) { @if (col.options.maxSelect == 1) {
               <p-dropdown
                 [id]="getFieldName(col.name)"
                 [options]="col.options.values"
@@ -252,7 +294,24 @@
                   {{ item }}
                 </ng-template>
               </p-dropdown>
-              } }
+              } @else {
+              <p-multiSelect
+                class="overflow-visible"
+                [options]="col.options.values"
+                formControlName="{{ getFieldName(col.name) }}"
+                selectedItemsLabel="{0} items selected"
+                [style]="{ 'min-width': '200px' }"
+                placeholder="Choose Multiple"
+                [showToggleAll]="false"
+              >
+                <ng-template let-item pTemplate="selectedItem">
+                  {{ item }}
+                </ng-template>
+                <ng-template let-item pTemplate="item">
+                  {{ item }}
+                </ng-template></p-multiSelect
+              >
+              } } }
             </div>
           </div>
         </div>
@@ -260,12 +319,7 @@
           <p-divider></p-divider>
           <div class="flex w-full align-content-end">
             <div class="mx-auto flex gap-2">
-              <button
-                type="submit"
-                pButton
-                label="Save"
-                [disabled]="!form.valid"
-              ></button>
+              <button type="submit" pButton label="Save"></button>
               <button
                 type="button"
                 pButton

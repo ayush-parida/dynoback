@@ -34,7 +34,7 @@ export class DataService {
 
     // If specific fields are requested, join them into a comma-separated string
     if (fields && fields.length > 0) {
-      params.fields = fields.join(',');
+      params.fields = 'uuid,created,updated,is_active,' + fields.join(',');
     }
 
     return this.http

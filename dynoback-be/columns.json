@@ -164,8 +164,6 @@
         "collectionId": null,
         "cascadeDelete": true,
         "relatedTableUuid": "",
-        "minSelect": null,
-        "maxSelect": 1,
         "displayFields": null
       }
     }

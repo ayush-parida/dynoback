@@ -58,7 +58,8 @@
               "buildTarget": "dynoback-ui:build:production"
             },
             "development": {
-              "buildTarget": "dynoback-ui:build:development"
+              "buildTarget": "dynoback-ui:build:development",
+              "host": "localhost"
             }
           },
           "defaultConfiguration": "development"

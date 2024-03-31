@@ -71,7 +71,38 @@ export class SchemaContainerComponent {
         this.deleteConfirmation(event);
       },
     },
+    {
+      label: 'API Preview',
+      icon: 'pi pi-server',
+      command: () => {
+        this.getApiProperties();
+      },
+    },
   ];
+
+  fieldTypes: any[] = [];
+  selectedColumn: Column = {} as Column;
+  fullSchema: any[] = [];
+  showColumnSelect: boolean = false;
+  activeColumnExpand: number = -1;
+  connections: any[] = [];
+  createActions: MenuItem[] = [
+    {
+      label: 'Duplicate',
+      icon: 'pi pi-plus',
+      command: () => {
+        this.duplicateColumn();
+      },
+    },
+    {
+      label: 'Delete',
+      icon: 'pi pi-times',
+      command: () => {
+        this.deleteColumn();
+      },
+    },
+  ];
+  FIELD_TYPE = FIELD_TYPE;
   private messageService = inject(MessageService);
   private fb = inject(FormBuilder);
   private confirmationService = inject(ConfirmationService);
@@ -189,13 +220,19 @@ export class SchemaContainerComponent {
     if (!clearSelected) this.selectedSchema = {} as Schema;
   }
 
-  getSchemas(): void {
+  getSchemas(uuid?: string): void {
     this.loading = true;
     this.subscriptions.add(
       this.schemaService.getSchemas().subscribe({
         next: (data) => {
           this.loading = false;
           this.schemas = data;
+          if (uuid) {
+            this.selectedSchema = this.schemas.filter((x) => x.uuid == uuid)
+              .length
+              ? this.schemas.filter((x) => x.uuid == uuid)[0]
+              : ({} as Schema);
+          }
         },
         error: (error) => {
           this.loading = false;
@@ -228,36 +265,6 @@ export class SchemaContainerComponent {
     );
   }
 
-  fieldTypes: any[] = [];
-  selectedColumn: Column = {} as Column;
-  fullSchema: any[] = [];
-  showColumnSelect: boolean = false;
-  activeColumnExpand: number = -1;
-  connections: any[] = [];
-  createActions: MenuItem[] = [
-    {
-      label: 'Duplicate',
-      icon: 'pi pi-plus',
-      command: () => {
-        this.duplicateColumn();
-      },
-    },
-    {
-      label: 'Delete',
-      icon: 'pi pi-times',
-      command: () => {
-        this.deleteColumn();
-      },
-    },
-    {
-      label: 'API Preview',
-      icon: 'pi pi-server',
-      command: () => {
-        this.getApiProperties();
-      },
-    },
-  ];
-  FIELD_TYPE = FIELD_TYPE;
   getColumns(): void {
     this.loading = true;
     this.subscriptions.add(
@@ -387,7 +394,8 @@ export class SchemaContainerComponent {
               detail: data.message,
             });
             this.schemaFormSidebarVisible = false;
-            this.getSchemas();
+            this.getSchemas(this.selectedSchema.uuid);
+            this.selectedSchema = {} as Schema;
           } else
             this.messageService.add({
               severity: 'error',
@@ -474,5 +482,8 @@ export class SchemaContainerComponent {
       })
     );
   }
-  getApiProperties() {}
+
+  getApiProperties() {
+    console.log(this.selectedSchema);
+  }
 }

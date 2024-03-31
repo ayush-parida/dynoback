@@ -12,6 +12,13 @@ import { Pagination, Schema } from '../../helpers/schema.interface';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { FIELD_TYPE } from '../../helpers/schema.enum';
+import * as FileSaver from 'file-saver';
+import {
+  emailDomainValidator,
+  urlDomainValidator,
+  dateRangeValidator,
+  selectFieldValueValidator,
+} from '../../helpers/schema.validator';
 
 @Component({
   selector: 'app-schema-data',
@@ -30,7 +37,7 @@ export class SchemaDataComponent implements OnChanges {
   displayDialog: boolean = false;
   loading: boolean = false;
   searchFilter: string = '';
-  selectedFields: string[] = [];
+  selectedFields: any[] = [];
   pagination: Pagination = {
     current_page: 1,
     per_page: 10,
@@ -67,21 +74,35 @@ export class SchemaDataComponent implements OnChanges {
   }
   fetchEntries() {
     const { current_page, per_page, sort_by, sort_order } = this.pagination;
-    this.dataService
-      .getEntries(
-        this.schema.name,
-        current_page,
-        per_page,
-        sort_by,
-        sort_order,
-        this.searchFilter,
-        this.selectedFields
-      )
-      .subscribe((data: any) => {
-        this.entries = data.records; // Assuming the response has the entries
-        this.pagination = data.pagination; // Total number of records, for pagination
-        console.log(this.pagination);
-      });
+    this.loading = true;
+    this.entries = [];
+    this.subscriptions.add(
+      this.dataService
+        .getEntries(
+          this.schema.name,
+          current_page,
+          per_page,
+          sort_by,
+          sort_order,
+          this.searchFilter,
+          this.selectedFields.map((x) => this.getFieldName(x.name))
+        )
+        .subscribe({
+          next: (data: any) => {
+            this.loading = false;
+            this.entries = data.records; // Assuming the response has the entries
+            this.pagination = data.pagination; // Total number of records, for pagination
+          },
+          error: (error) => {
+            this.loading = false;
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Operation Failed',
+              detail: error.error.message,
+            });
+          },
+        })
+    );
   }
 
   loadEntriesLazy(event: any) {
@@ -103,6 +124,8 @@ export class SchemaDataComponent implements OnChanges {
 
   setupColumns() {
     this.dynamicColumns = this.schema.schema;
+
+    this.selectedFields = this.dynamicColumns;
     this.form = this.formBuilder.group({});
     for (const col of this.dynamicColumns) {
       const validators = [];
@@ -200,6 +223,23 @@ export class SchemaDataComponent implements OnChanges {
             ),
           },
         };
+      } else if (col.id == FIELD_TYPE.SELECT) {
+        if (col.options.maxSelect == 1) {
+          customEntry = {
+            ...customEntry,
+            ...{
+              [this.getFieldName(col.name)]: entry[this.getFieldName(col.name)],
+            },
+          };
+        } else {
+          customEntry = {
+            ...customEntry,
+            ...{
+              [this.getFieldName(col.name)]:
+                entry[this.getFieldName(col.name)].split(','),
+            },
+          };
+        }
       } else {
         customEntry = {
           ...customEntry,
@@ -254,6 +294,7 @@ export class SchemaDataComponent implements OnChanges {
 
   saveEntry() {
     // Assuming form validation is handled
+    console.log(this.form);
     if (this.form.valid) {
       const formData = this.form.value;
       this.loading = true;
@@ -322,19 +363,60 @@ export class SchemaDataComponent implements OnChanges {
     this.pagination.sort_order = event.order === 1 ? 'asc' : 'desc';
     this.fetchEntries();
   }
-}
-function emailDomainValidator(allowedDomains: any): any {
-  throw new Error('Function not implemented.');
-}
+  exportPdf() {
+    import('jspdf').then((jsPDF) => {
+      import('jspdf-autotable').then((x) => {
+        const doc = new jsPDF.default('p', 'px', 'a4');
+        (doc as any).autoTable(this.selectedFields, this.entries);
+        doc.save('products.pdf');
+      });
+    });
+  }
 
-function urlDomainValidator(allowedDomains: any): any {
-  throw new Error('Function not implemented.');
-}
+  exportExcel() {
+    import('xlsx').then((xlsx) => {
+      const worksheet = xlsx.utils.json_to_sheet(this.entries);
+      const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
+      const excelBuffer: any = xlsx.write(workbook, {
+        bookType: 'xlsx',
+        type: 'array',
+      });
+      this.saveAsExcelFile(excelBuffer, 'products');
+    });
+  }
 
-function selectFieldValueValidator(allowedValues: any): any {
-  throw new Error('Function not implemented.');
-}
-
-function dateRangeValidator(minDate: any, maxDate: any): any {
-  throw new Error('Function not implemented.');
+  saveAsExcelFile(buffer: any, fileName: string): void {
+    let EXCEL_TYPE =
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+    let EXCEL_EXTENSION = '.xlsx';
+    const data: Blob = new Blob([buffer], {
+      type: EXCEL_TYPE,
+    });
+    FileSaver.saveAs(
+      data,
+      fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION
+    );
+  }
+  copyContent(val: string) {
+    const selBox = document.createElement('textarea');
+    selBox.style.position = 'fixed';
+    selBox.style.left = '0';
+    selBox.style.top = '0';
+    selBox.style.opacity = '0';
+    selBox.value = val;
+    document.body.appendChild(selBox);
+    selBox.focus();
+    selBox.select();
+    document.execCommand('copy');
+    document.body.removeChild(selBox);
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Successful',
+      detail: 'Copied ' + val,
+      life: 3000,
+    });
+  }
+  dynamicColumnChange() {
+    this.fetchEntries();
+  }
 }
