@@ -3,6 +3,9 @@
 @import "primeng/resources/primeng.css";
 @import "primeicons/primeicons.css";
 @import "primeflex/primeflex.css";
+@import "jsoneditor/dist/jsoneditor.min.css";
+
+
 @layer primeng;
 
 body {
@@ -45,4 +48,8 @@ body {
 
 .loading-icon-size {
   font-size: 5em !important;
+}
+
+.jsoneditor-poweredBy {
+  display: none !important;
 }

@@ -44,6 +44,8 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { EllipsisPipe } from './ellipsis.pipe';
+import { JsonEllipsisPipe } from './josn-ellipsis.pipe';
 
 @NgModule({
   declarations: [],
@@ -92,6 +94,8 @@ import { MultiSelectModule } from 'primeng/multiselect';
     DialogModule,
     InputTextareaModule,
     MultiSelectModule,
+    EllipsisPipe,
+    JsonEllipsisPipe,
   ],
   exports: [
     CommonModule,
@@ -138,6 +142,8 @@ import { MultiSelectModule } from 'primeng/multiselect';
     DialogModule,
     InputTextareaModule,
     MultiSelectModule,
+    EllipsisPipe,
+    JsonEllipsisPipe,
   ],
   providers: [AuthService, MessageService, ConfirmationService],
 })
