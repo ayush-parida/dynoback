@@ -44,6 +44,8 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { EllipsisPipe } from './ellipsis.pipe';
+import { JsonEllipsisPipe } from './josn-ellipsis.pipe';
 import { TabViewModule } from 'primeng/tabview';
 import { HighlightJsModule } from 'ngx-highlight-js';
 import { HighlightJsDirective } from 'ngx-highlight-js';
@@ -95,6 +97,8 @@ import { HighlightJsDirective } from 'ngx-highlight-js';
     DialogModule,
     InputTextareaModule,
     MultiSelectModule,
+    EllipsisPipe,
+    JsonEllipsisPipe,
     TabViewModule,
     HighlightJsModule,
     HighlightJsDirective,
@@ -144,6 +148,8 @@ import { HighlightJsDirective } from 'ngx-highlight-js';
     DialogModule,
     InputTextareaModule,
     MultiSelectModule,
+    EllipsisPipe,
+    JsonEllipsisPipe,
     HighlightJsModule,
   ],
   providers: [AuthService, MessageService, ConfirmationService],

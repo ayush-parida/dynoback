@@ -145,7 +145,7 @@
       "required": false,
       "presentable": false,
       "unique": false,
-      "default": "",
+      "default": "{}",
       "options": {
         "maxSize": 2000000
       }

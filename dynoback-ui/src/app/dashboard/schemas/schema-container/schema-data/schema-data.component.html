@@ -47,6 +47,17 @@
                 type="button"
                 pButton
                 pRipple
+                icon="pi pi-refresh"
+                label="Refresh"
+                class="p-button-info"
+                (click)="fetchEntries()"
+                pTooltip="Refresh"
+                tooltipPosition="bottom"
+              ></button>
+              <button
+                type="button"
+                pButton
+                pRipple
                 icon="pi pi-file"
                 (click)="dt.exportCSV()"
                 pTooltip="CSV"
@@ -73,17 +84,23 @@
                 tooltipPosition="bottom"
               ></button>
             </div>
-            <span class="p-input-icon-left w-full">
-              <i class="pi pi-copy"></i>
+            <p-inputGroup styleClass="w-full" class="w-full">
+              <button
+                type="button"
+                pButton
+                icon="pi pi-copy"
+                class="p-button-info"
+                (click)="copyContent(searchFilter)"
+              ></button>
               <input
-                pInputText
                 type="text"
-                (input)="filterGlobal()"
+                pInputText
                 placeholder="Filter..."
+                (input)="filterGlobal()"
                 [(ngModel)]="searchFilter"
                 [disabled]="true"
               />
-            </span>
+            </p-inputGroup>
           </div>
         </div>
       </ng-template>
@@ -98,12 +115,13 @@
             </div>
           </th>
           @for (col of dynamicColumns; track $index) { @if
-          (selectedFields.includes(col)) {
-
+          (selectedFields.includes(col)) { @if (col.id != FIELD_TYPE.JSON &&
+          col.id != FIELD_TYPE.EDITOR) {
           <th pSortableColumn="{{ getFieldName(col.name) }}">
             <div class="flex justify-content-between align-items-center">
-              {{ col.name
-              }}<p-sortIcon field="{{ getFieldName(col.name) }}"></p-sortIcon>
+              <span class="field-name">{{ col.name }}</span>
+
+              <p-sortIcon field="{{ getFieldName(col.name) }}"></p-sortIcon>
               <p-columnFilter
                 type="text"
                 field="{{ getFieldName(col.name) }}"
@@ -111,8 +129,16 @@
                 class="ml-auto"
               ></p-columnFilter>
             </div>
+            <!-- <div class="mt-2 w-full">({{ col.type | uppercase }})</div> -->
           </th>
-          } }
+          } @else {
+          <th>
+            <div class="flex justify-content-between align-items-center">
+              <span class="field-name">{{ col.name }}</span>
+            </div>
+            <!-- <div class="mt-2 w-full">({{ col.type | uppercase }})</div> -->
+          </th>
+          } } }
           <th pSortableColumn="created">
             <div class="flex justify-content-between align-items-center">
               Created<p-sortIcon field="created"></p-sortIcon>
@@ -133,7 +159,7 @@
           <td>
             <p-chip
               class="cursor-pointer"
-              label="{{ entry.uuid }}"
+              label="{{ entry.uuid | ellipsis : 8 }}"
               icon="pi pi-copy"
               (click)="copyContent(entry.uuid)"
             ></p-chip>
@@ -151,6 +177,9 @@
               <span *ngSwitchCase="FIELD_TYPE.DATE">{{
                 entry[getFieldName(col.name)] | date
               }}</span>
+              <span *ngSwitchCase="FIELD_TYPE.JSON">{{
+                entry[getFieldName(col.name)] | jsonEllipsis : 20
+              }}</span>
               <span *ngSwitchCase="FIELD_TYPE.BOOL">{{
                 entry[getFieldName(col.name)] ? "Yes" : "No"
               }}</span>
@@ -165,7 +194,7 @@
                 ></span
               >
               <span *ngSwitchCase="FIELD_TYPE.EDITOR">{{
-                entry[getFieldName(col.name)]
+                entry[getFieldName(col.name)] | ellipsis : 20
               }}</span>
               <span *ngSwitchCase="FIELD_TYPE.SELECT">{{
                 entry[getFieldName(col.name)]
@@ -179,22 +208,24 @@
           <td>{{ entry.created | date : "dd/MM/yyyy hh:mm a" }}</td>
           <td>{{ entry.updated | date : "dd/MM/yyyy hh:mm a" }}</td>
           <td>
-            <button
-              pButton
-              pRipple
-              label="Edit"
-              icon="pi pi-pencil"
-              class="p-button-success mr-2"
-              (click)="editEntry(entry)"
-            ></button>
-            <button
-              pButton
-              pRipple
-              label="Delete"
-              icon="pi pi-trash"
-              class="p-button-danger mr-2"
-              (click)="deleteEntry(entry)"
-            ></button>
+            <div class="flex w-full gap-2">
+              <button
+                pButton
+                pRipple
+                label="Edit"
+                icon="pi pi-pencil"
+                class="p-button-success mr-2"
+                (click)="editEntry(entry)"
+              ></button>
+              <button
+                pButton
+                pRipple
+                label="Delete"
+                icon="pi pi-trash"
+                class="p-button-danger mr-2"
+                (click)="deleteEntry(entry)"
+              ></button>
+            </div>
           </td>
         </tr>
       </ng-template>
@@ -249,13 +280,11 @@
                 class="w-full"
               />
               } @case (FIELD_TYPE.EDITOR) {
-              <textarea
-                pInputTextarea
+              <p-editor
                 id="{{ getFieldName(col.name) }}"
                 formControlName="{{ getFieldName(col.name) }}"
-                class="w-full"
-                styleClass="w-full"
-              ></textarea>
+                [style]="{ height: '320px' }"
+              ></p-editor>
               } @case (FIELD_TYPE.NUMBER) {
               <p-inputNumber
                 [id]="getFieldName(col.name)"
@@ -278,8 +307,13 @@
                 [showIcon]="true"
                 [showTime]="true"
               ></p-calendar>
-              }@case (FIELD_TYPE.JSON) { } @case (FIELD_TYPE.FILE) { } @case
-              (FIELD_TYPE.SELECT) { @if (col.options.maxSelect == 1) {
+              }@case (FIELD_TYPE.JSON) {
+              <json-editor
+                [options]="jsonEditorOptions"
+                formControlName="{{ getFieldName(col.name) }}"
+              ></json-editor>
+              } @case (FIELD_TYPE.FILE) { } @case (FIELD_TYPE.SELECT) { @if
+              (col.options.maxSelect == 1) {
               <p-dropdown
                 [id]="getFieldName(col.name)"
                 [options]="col.options.values"

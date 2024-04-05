@@ -19,11 +19,12 @@ import {
   dateRangeValidator,
   selectFieldValueValidator,
 } from '../../helpers/schema.validator';
+import { JsonEditorOptions, NgJsonEditorModule } from 'ang-jsoneditor';
 
 @Component({
   selector: 'app-schema-data',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, NgJsonEditorModule],
   templateUrl: './schema-data.component.html',
   styleUrl: './schema-data.component.scss',
 })
@@ -46,6 +47,7 @@ export class SchemaDataComponent implements OnChanges {
     sort_by: '',
     sort_order: 'asc',
   };
+  jsonEditorOptions: JsonEditorOptions = new JsonEditorOptions();
 
   FIELD_TYPE = FIELD_TYPE;
   subscriptions: Subscription = new Subscription();
@@ -61,6 +63,19 @@ export class SchemaDataComponent implements OnChanges {
     this.reset();
     this.fetchEntries();
     this.setupColumns();
+    this.setJsonEditorProps();
+  }
+  setJsonEditorProps() {
+    this.jsonEditorOptions.mode = 'code';
+    this.jsonEditorOptions.mainMenuBar = true;
+    this.jsonEditorOptions.modes = ['code', 'text', 'tree', 'view'];
+    this.jsonEditorOptions.navigationBar = true;
+    this.jsonEditorOptions.enableSort = true;
+    this.jsonEditorOptions.enableTransform = true;
+    this.jsonEditorOptions.search = true;
+    this.jsonEditorOptions.statusBar = true;
+    this.jsonEditorOptions.history = true;
+    this.jsonEditorOptions.sortObjectKeys = true;
   }
   reset() {
     this.searchFilter = '';
@@ -187,10 +202,17 @@ export class SchemaDataComponent implements OnChanges {
           break;
         // Implement additional cases as necessary, such as FILE, JSON, RELATION, etc.
       }
-      this.form.addControl(
-        this.getFieldName(col.name),
-        this.formBuilder.control(col.default || '', validators)
-      );
+      if (col.id == FIELD_TYPE.JSON) {
+        this.form.addControl(
+          this.getFieldName(col.name),
+          this.formBuilder.control(col.default ? col.default : {}, validators)
+        );
+      } else {
+        this.form.addControl(
+          this.getFieldName(col.name),
+          this.formBuilder.control(col.default || '', validators)
+        );
+      }
     }
   }
 
@@ -253,7 +275,6 @@ export class SchemaDataComponent implements OnChanges {
     this.entryDialog = true;
     this.form.patchValue(this.entry);
   }
-
   deleteEntry(entry: any) {
     this.loading = true;
     this.dataService.deleteEntry(this.schema.name, entry.uuid).subscribe({
@@ -293,10 +314,15 @@ export class SchemaDataComponent implements OnChanges {
   }
 
   saveEntry() {
-    // Assuming form validation is handled
     console.log(this.form);
+    // Assuming form validation is handled
     if (this.form.valid) {
-      const formData = this.form.value;
+      var formData = JSON.parse(JSON.stringify(this.form.value));
+      this.dynamicColumns.forEach((col) => {
+        if (col.id == FIELD_TYPE.JSON) {
+          formData[col.name] = JSON.stringify(formData[col.name]);
+        }
+      });
       this.loading = true;
       let requestObservable;
       if (this.entry?.uuid) {
