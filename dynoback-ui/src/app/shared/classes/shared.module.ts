@@ -44,6 +44,9 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { TabViewModule } from 'primeng/tabview';
+import { HighlightJsModule } from 'ngx-highlight-js';
+import { HighlightJsDirective } from 'ngx-highlight-js';
 
 @NgModule({
   declarations: [],
@@ -92,6 +95,9 @@ import { MultiSelectModule } from 'primeng/multiselect';
     DialogModule,
     InputTextareaModule,
     MultiSelectModule,
+    TabViewModule,
+    HighlightJsModule,
+    HighlightJsDirective,
   ],
   exports: [
     CommonModule,
@@ -138,6 +144,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
     DialogModule,
     InputTextareaModule,
     MultiSelectModule,
+    HighlightJsModule,
   ],
   providers: [AuthService, MessageService, ConfirmationService],
 })
