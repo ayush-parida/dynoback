@@ -8,10 +8,10 @@ def map_field_to_postgres_type(name, field):
         'email': 'TEXT',
         'url': 'TEXT',
         'date': 'TIMESTAMP WITHOUT TIME ZONE',
-        'select': 'TEXT',
+        'select': 'TEXT[]',  # Updated to always use an array
         'file': 'TEXT',
         'json': 'JSONB',
-        'relation': 'UUID'
+        'relation': 'UUID'  # Updated to always use an array
     }
 
     # Replace spaces with underscores in field names
@@ -22,10 +22,7 @@ def map_field_to_postgres_type(name, field):
     default_value = field.get('default', None)
 
     if default_value is not None:
-        default_clause = f"DEFAULT '{default_value}'"
-        default_clause = '' #removing default for now
-    else:
-        default_clause = ''
+        default_clause = ''  # removing default for now, as you've indicated
 
     if field.get('required'):
         constraints.append('NOT NULL')
@@ -45,7 +42,7 @@ def map_field_to_postgres_type(name, field):
             if options.get('noDecimal'):
                 col_type = 'INTEGER'
         if field['type'] == 'bool' and options.get('nonFalsey'):
-            default_clause = "DEFAULT TRUE"
+            constraints.append("DEFAULT TRUE")
         if field['type'] == 'date':
             if options.get('minDate'):
                 constraints.append(f"CHECK ({field_name} >= '{options['minDate']}')")
@@ -54,10 +51,9 @@ def map_field_to_postgres_type(name, field):
         if field['type'] == 'select':
             if options.get('values'):
                 values_list = ', '.join([f"'{value}'" for value in options['values']])
-                constraints.append(f"CHECK ({field_name} IN ({values_list}))")
+                constraints.append(f"CHECK ({field_name}::TEXT[] <@ ARRAY[{values_list}])")
             if options.get('nonEmpty', field.get('required')):
                 constraints.append('NOT NULL')
-
         if field['type'] == 'relation':
             related_table = options.get('relatedTableName')
             related_column = options.get('relatedColumnName', 'uuid')
@@ -66,7 +62,7 @@ def map_field_to_postgres_type(name, field):
             if options.get('nonEmpty', field.get('required')):
                 constraints.append('NOT NULL')
 
-    column_definition = f"{col_type} {' '.join(constraints)} {default_clause}".strip()
+    column_definition = f"{field_name} {col_type} {' '.join(constraints)}".strip()
     return column_definition
 
 def generate_postgres_create_table(json_schema):
@@ -112,47 +108,62 @@ def generate_postgres_alter_table_statements(old_schema, new_schema):
     # Handle removed fields
     for old_field_name in set(old_fields) - set(new_fields):
         statements.append(f"ALTER TABLE {table_name} DROP COLUMN IF EXISTS \"{old_field_name}\" CASCADE;")
-
+        
+    # Handle changes in existing fields
     for new_field_name, new_field in new_fields.items():
         new_field_name_sanitized = new_field_name.replace(' ', '_')
-        column_definition = map_field_to_postgres_type(new_field_name, new_field)
-        if new_field_name_sanitized not in old_fields:
-            statements.append(f"ALTER TABLE {table_name} ADD COLUMN \"{new_field_name_sanitized}\" {column_definition};")
-        else:
+        print("=========++>>")
+        print(new_field_name_sanitized)
+        print(old_fields)
+        print("=========++>>")
+        if new_field_name_sanitized in old_fields:
             old_field = old_fields[new_field_name_sanitized]
             old_column_definition = map_field_to_postgres_type(new_field_name, old_field)
-            if column_definition != old_column_definition:
-                col_type = column_definition.split(' ')[0]
+            new_column_definition = map_field_to_postgres_type(new_field_name, new_field)
+            # If column definition changed
+            if new_column_definition != old_column_definition:
+                col_type = new_column_definition.split(' ')[0]
                 statements.append(f"ALTER TABLE {table_name} ALTER COLUMN \"{new_field_name_sanitized}\" TYPE {col_type};")
             
             # Handling default value changes or additions
             new_default = new_field.get('options', {}).get('default')
             old_default = old_field.get('options', {}).get('default')
-            if new_default is not None:
+            if new_default is not None and new_default != old_default:
                 statements.append(f"ALTER TABLE {table_name} ALTER COLUMN \"{new_field_name_sanitized}\" SET DEFAULT '{new_default}';")
             elif old_default is not None and new_default is None:
                 statements.append(f"ALTER TABLE {table_name} ALTER COLUMN \"{new_field_name_sanitized}\" DROP DEFAULT;")
 
             # Handling removal of NOT NULL if required
-            if old_field.get('required') and not new_field.get('required'):
+            old_required = old_field.get('required', False)
+            new_required = new_field.get('required', False)
+            if old_required and not new_required:
                 statements.append(f"ALTER TABLE {table_name} ALTER COLUMN \"{new_field_name_sanitized}\" DROP NOT NULL;")
-            elif not old_field.get('required') and new_field.get('required'):
+            elif not old_required and new_required:
                 statements.append(f"ALTER TABLE {table_name} ALTER COLUMN \"{new_field_name_sanitized}\" SET NOT NULL;")
-
-            # Handling unique constraint changes
-            old_unique = old_field.get('unique', False) if old_field else False
-            new_unique = new_field.get('unique', False)
-            unique_constraint_name = f"{table_name}_{new_field_name_sanitized}_key"
-            unique_index_name = f"idx_{table_name}_{new_field_name_sanitized}_unique"
             
-            if old_unique and not new_unique:
-                # Drop the unique index if the unique constraint should be removed
-                # statements.append(f"DROP INDEX IF EXISTS \"{unique_index_name}\";")
-                statements.append(f"ALTER TABLE {table_name} DROP CONSTRAINT {unique_constraint_name};")
-            # elif not old_unique and new_unique:
-                # Create a unique index if the unique constraint should be added
-                # statements.append(f"CREATE UNIQUE INDEX \"{unique_index_name}\" ON {table_name} ({new_field_name_sanitized});")
-
+            # Handling unique constraint changes
+            old_unique = old_field.get('unique', False)
+            new_unique = new_field.get('unique', False)
+            if old_unique != new_unique:
+                unique_constraint_name = f"{table_name}_{new_field_name_sanitized}_key"
+                if new_unique:
+                    statements.append(f"ALTER TABLE {table_name} ADD CONSTRAINT {unique_constraint_name} UNIQUE (\"{new_field_name_sanitized}\");")
+                else:
+                    statements.append(f"ALTER TABLE {table_name} DROP CONSTRAINT IF EXISTS {unique_constraint_name};")
+            
+            # Handling maxSelect constraint changes
+            old_max_select = old_field.get('options', {}).get('maxSelect', 1)
+            new_max_select = new_field.get('options', {}).get('maxSelect', 1)
+            if old_max_select != new_max_select:
+                if new_max_select == 1:
+                    statements.append(f"ALTER TABLE {table_name} ALTER COLUMN \"{new_field_name_sanitized}\" SET NOT NULL;")
+                    statements.append(f"ALTER TABLE {table_name} DROP CONSTRAINT IF EXISTS {table_name}_{new_field_name_sanitized}_max_select;")
+                else:
+                    statements.append(f"ALTER TABLE {table_name} ADD CONSTRAINT {table_name}_{new_field_name_sanitized}_max_select CHECK (cardinality(\"{new_field_name_sanitized}\") <= {new_max_select});")
+        else:
+            # New field handling
+            column_definition = map_field_to_postgres_type(new_field_name, new_field)
+            statements.append(f"ALTER TABLE {table_name} ADD COLUMN {column_definition};")
     return statements
 
 def generate_postgres_drop_table_statement(table_name):

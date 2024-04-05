@@ -40,6 +40,13 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { CalendarModule } from 'primeng/calendar';
 import { EditorModule } from 'primeng/editor';
 import { ChipsModule } from 'primeng/chips';
+import { ToolbarModule } from 'primeng/toolbar';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { TabViewModule } from 'primeng/tabview';
+import { HighlightJsModule } from 'ngx-highlight-js';
+import { HighlightJsDirective } from 'ngx-highlight-js';
 
 @NgModule({
   declarations: [],
@@ -84,6 +91,13 @@ import { ChipsModule } from 'primeng/chips';
     CalendarModule,
     EditorModule,
     ChipsModule,
+    ToolbarModule,
+    DialogModule,
+    InputTextareaModule,
+    MultiSelectModule,
+    TabViewModule,
+    HighlightJsModule,
+    HighlightJsDirective,
   ],
   exports: [
     CommonModule,
@@ -126,6 +140,11 @@ import { ChipsModule } from 'primeng/chips';
     CalendarModule,
     EditorModule,
     ChipsModule,
+    ToolbarModule,
+    DialogModule,
+    InputTextareaModule,
+    MultiSelectModule,
+    HighlightJsModule,
   ],
   providers: [AuthService, MessageService, ConfirmationService],
 })

@@ -27,3 +27,25 @@ body {
 .p-component-overlay.p-datepicker-mask-scrollblocker {
   z-index: 1105 !important;
 }
+
+
+.p-inputwrapper {
+
+  .p-inputnumber,
+  .p-calendar,
+  .p-inputtext,
+  .p-multiselect {
+    width: 100% !important;
+  }
+
+  .p-dialog-content {
+    overflow: visible !important;
+  }
+}
+
+.loading-icon-size {
+  font-size: 5em !important;
+}
+.hljs {
+  padding: 1.5rem!important;
+}

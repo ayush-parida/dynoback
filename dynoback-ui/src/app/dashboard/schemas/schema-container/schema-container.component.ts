@@ -5,7 +5,7 @@ import { MessageService, ConfirmationService, MenuItem } from 'primeng/api';
 import { Subscription } from 'rxjs';
 import { Database } from '../../databases/helpers/database.interface';
 import { SchemaService } from '../helpers/schema.service';
-import { Column, SchemaType } from '../helpers/schema.interface';
+import { Column, Schema, SchemaType } from '../helpers/schema.interface';
 import { uniqueSchemaNameValidator } from '../../../shared/classes/schema-name.validator';
 import { ConfigService } from '../../../shared/services/config.service';
 import { AccordionModule } from 'primeng/accordion';
@@ -21,6 +21,8 @@ import { SelectColumnComponent } from './select-column/select-column.component';
 import { FileColumnComponent } from './file-column/file-column.component';
 import { JsonColumnComponent } from './json-column/json-column.component';
 import { RelationColumnComponent } from './relation-column/relation-column.component';
+import { SchemaDataComponent } from './schema-data/schema-data.component';
+import { TabViewModule } from 'primeng/tabview';
 
 @Component({
   selector: 'app-schema-container',
@@ -39,18 +41,36 @@ import { RelationColumnComponent } from './relation-column/relation-column.compo
     FileColumnComponent,
     JsonColumnComponent,
     RelationColumnComponent,
+    SchemaDataComponent,
+    TabViewModule,
   ],
   templateUrl: './schema-container.component.html',
   styleUrl: './schema-container.component.scss',
 })
 export class SchemaContainerComponent {
   loading: boolean = false;
-  selectedSchema: any = {};
-  schemas: any[] = [];
+  selectedSchema: Schema = {} as Schema;
+  schemas: Schema[] = [];
   schemaTypes: SchemaType[] = [];
   schemaFormSidebarVisible: boolean = false;
+  apiPreviewSidebarVisible: boolean = false;
   schemaSidebarLoading: boolean = false;
   isView: boolean = false;
+  activeIndex: number = 0;
+
+  message401: any = {
+    success: false,
+    message: 'Invalid or expired token',
+  };
+  message404: any = {
+    success: false,
+    message: 'Record not found',
+  };
+
+  deleteMessage: any = {
+    success: true,
+    message: 'Record deleted successfully',
+  };
   schemaFormGroup: FormGroup = new FormGroup({});
   connectionPoolId: string = '';
   subscriptions: Subscription = new Subscription();
@@ -63,13 +83,48 @@ export class SchemaContainerComponent {
       },
     },
     {
-      label: 'Delete',
+      label: 'Delete Schema',
       icon: 'pi pi-trash',
       command: (event) => {
         this.deleteConfirmation(event);
       },
     },
+    {
+      label: 'API Preview',
+      icon: 'pi pi-server',
+      command: () => {
+        this.addApiSidebar();
+        this.getApiProperties();
+      },
+    },
   ];
+
+  fieldTypes: any[] = [];
+  selectedColumn: Column = {} as Column;
+  fullSchema: any[] = [];
+  showColumnSelect: boolean = false;
+  activeColumnExpand: number = -1;
+  connections: any[] = [];
+  sidebarItems = ['Search/Pagination', 'Details', 'Create', 'Update', 'Delete'];
+  selectedTab: string = this.sidebarItems[0];
+  createActions: MenuItem[] = [
+    {
+      label: 'Duplicate',
+      icon: 'pi pi-plus',
+      command: () => {
+        this.duplicateColumn();
+      },
+    },
+    {
+      label: 'Delete',
+      icon: 'pi pi-times',
+      command: () => {
+        this.deleteColumn();
+      },
+    },
+  ];
+
+  FIELD_TYPE = FIELD_TYPE;
   private messageService = inject(MessageService);
   private fb = inject(FormBuilder);
   private confirmationService = inject(ConfirmationService);
@@ -85,7 +140,7 @@ export class SchemaContainerComponent {
 
   addOpen(): void {
     this.schemaFormSidebarVisible = true;
-    this.selectedSchema = {} as Database;
+    this.selectedSchema = {} as Schema;
     this.fullSchema = [];
     this.schemaFormGroup = this.initSchemaForm();
   }
@@ -128,9 +183,7 @@ export class SchemaContainerComponent {
         connectionPoolId: [null, [Validators.required]],
         softDelete: [true],
       });
-      console.log(this.selectedSchema.schema);
       formGroup.patchValue(values);
-      console.log(formGroup.value);
       return formGroup;
     } else {
       let formGroup = this.fb.group({
@@ -186,16 +239,22 @@ export class SchemaContainerComponent {
     this.schemaFormGroup.markAsUntouched();
     this.schemaFormGroup.markAsPristine();
     this.schemaFormGroup = this.initSchemaForm();
-    if (!clearSelected) this.selectedSchema = {};
+    if (!clearSelected) this.selectedSchema = {} as Schema;
   }
 
-  getSchemas(): void {
+  getSchemas(uuid?: string): void {
     this.loading = true;
     this.subscriptions.add(
       this.schemaService.getSchemas().subscribe({
         next: (data) => {
           this.loading = false;
           this.schemas = data;
+          if (uuid) {
+            this.selectedSchema = this.schemas.filter((x) => x.uuid == uuid)
+              .length
+              ? this.schemas.filter((x) => x.uuid == uuid)[0]
+              : ({} as Schema);
+          }
         },
         error: (error) => {
           this.loading = false;
@@ -228,29 +287,6 @@ export class SchemaContainerComponent {
     );
   }
 
-  fieldTypes: any[] = [];
-  selectedColumn: Column = {} as Column;
-  fullSchema: any[] = [];
-  showColumnSelect: boolean = false;
-  activeColumnExpand: number = -1;
-  connections: any[] = [];
-  createActions: MenuItem[] = [
-    {
-      label: 'Duplicate',
-      icon: 'pi pi-plus',
-      command: () => {
-        this.duplicateColumn();
-      },
-    },
-    {
-      label: 'Delete',
-      icon: 'pi pi-times',
-      command: () => {
-        this.deleteColumn();
-      },
-    },
-  ];
-  FIELD_TYPE = FIELD_TYPE;
   getColumns(): void {
     this.loading = true;
     this.subscriptions.add(
@@ -380,7 +416,8 @@ export class SchemaContainerComponent {
               detail: data.message,
             });
             this.schemaFormSidebarVisible = false;
-            this.getSchemas();
+            this.getSchemas(this.selectedSchema.uuid);
+            this.selectedSchema = {} as Schema;
           } else
             this.messageService.add({
               severity: 'error',
@@ -447,7 +484,7 @@ export class SchemaContainerComponent {
               detail: data.message,
             });
             this.schemaFormSidebarVisible = false;
-            this.selectedSchema = {};
+            this.selectedSchema = {} as Schema;
             this.getSchemas();
           } else
             this.messageService.add({
@@ -466,5 +503,139 @@ export class SchemaContainerComponent {
         },
       })
     );
+  }
+
+  getApiProperties() {
+    console.log(this.selectedSchema);
+  }
+
+  addApiSidebar(): void {
+    this.apiPreviewSidebarVisible = true;
+  }
+
+  confirmCloseApiPreview() {
+    this.apiPreviewSidebarVisible = false;
+  }
+  selectTab(item: string, index: number) {
+    this.activeIndex = index;
+    this.selectedTab = item;
+  }
+  // onTabChange(event: any) {
+  //   this.selectedTab = event.index;
+  // }
+
+  generateSampleRecord(schema: Schema): any {
+    let sampleRecord: any = {
+      // System fields
+      uuid: '123e4567-e89b-12d3-a456-426614174000', // Example UUID, generate as needed
+      created: new Date().toISOString(),
+      created_by: '6e4865f0-7b0f-44b1-b3cd-9d76863aecec', // Assuming a system user, adjust as needed
+      updated: new Date().toISOString(),
+      updated_by: '6e4865f0-7b0f-44b1-b3cd-9d76863aecec', // Assuming a system user, adjust as needed
+      is_active: true, // Assuming new records are active by default
+    };
+
+    return { ...sampleRecord, ...this.generateSampleRequest(schema) };
+  }
+  generateSampleRequest(schema: Schema) {
+    let sampleRecord: any = {};
+    schema.schema.forEach((field) => {
+      switch (
+        field.id // Using field.id to determine the type
+      ) {
+        case FIELD_TYPE.TEXT:
+        case FIELD_TYPE.EDITOR: // Assuming similar handling for TEXT and EDITOR
+          sampleRecord[field.name.replace(/\s+/g, '_')] =
+            field.id === FIELD_TYPE.TEXT
+              ? 'Sample Text'
+              : '<p>Sample HTML content</p>';
+          break;
+        case FIELD_TYPE.NUMBER:
+          const minNumber = field.options?.min || 0;
+          const maxNumber = field.options?.max || 100;
+          sampleRecord[field.name.replace(/\s+/g, '_')] =
+            Math.floor(Math.random() * (maxNumber - minNumber + 1)) + minNumber;
+          break;
+        case FIELD_TYPE.BOOL:
+          sampleRecord[field.name.replace(/\s+/g, '_')] = true;
+          break;
+        case FIELD_TYPE.EMAIL:
+          sampleRecord[field.name.replace(/\s+/g, '_')] = 'sample@gmail.com';
+          break;
+        case FIELD_TYPE.URL:
+          sampleRecord[field.name.replace(/\s+/g, '_')] =
+            'http://www.example.com';
+          break;
+        case FIELD_TYPE.DATE:
+          sampleRecord[field.name.replace(/\s+/g, '_')] =
+            new Date().toISOString();
+          break;
+        case FIELD_TYPE.SELECT:
+          // Assuming options is an array of { label: string; value: any; }
+          // Picking the first option as the sample, adjust as necessary
+          const firstOption = field.options.values
+            ? field.options.values[0]
+            : 'Option 1';
+          sampleRecord[field.name.replace(/\s+/g, '_')] = firstOption;
+          break;
+        case FIELD_TYPE.FILE:
+          // Simulating a file with a basic object, adjust according to your file handling
+          sampleRecord[field.name.replace(/\s+/g, '_')] = {
+            name: 'sample.txt',
+            url: 'http://example.com/sample.txt',
+          };
+          break;
+        case FIELD_TYPE.JSON:
+          // Providing a simple JSON object as an example
+          sampleRecord[field.name.replace(/\s+/g, '_')] = JSON.stringify({
+            key: 'value',
+          });
+          break;
+        case FIELD_TYPE.RELATION:
+          // Assuming a simple relation to another entity, represented by an ID
+          // You might want to adjust this based on how your relations are structured
+          sampleRecord[field.name.replace(/\s+/g, '_')] =
+            'relatedEntityUuid123';
+          break;
+        // Add default case or other field types if necessary
+        // Add cases for SELECT, FILE, JSON, RELATION as needed
+        default:
+          sampleRecord[field.name.replace(/\s+/g, '_')] =
+            'Unsupported field type';
+      }
+    });
+    return sampleRecord;
+  }
+  generatePaginationSampleRecord(schema: Schema) {
+    return {
+      ...{
+        pagination: {
+          current_page: 1,
+          per_page: 10,
+          total_pages: 1,
+          sort_by: 'uuid',
+          sort_order: 'ASC',
+          total: 2,
+        },
+      },
+      ...{
+        records: [
+          this.generateSampleRecord(schema),
+          this.generateSampleRecord(schema),
+        ],
+      },
+    };
+  }
+  getCreateSuccessSampleResponse(schema: Schema) {
+    return {
+      ...{ success: true, message: 'Record Created' },
+      ...{ record: this.generateSampleRecord(schema) },
+    };
+  }
+  getUpdateSuccessSampleResponse(schema: Schema) {
+    return {
+      ...{ success: true, message: 'Record Updated' },
+      ...{ record: this.generateSampleRecord(schema) },
+    };
   }
 }

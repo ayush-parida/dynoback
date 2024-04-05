@@ -4,6 +4,7 @@ import uuid
 from datetime import datetime
 from psycopg.rows import dict_row, namedtuple_row
 
+import urllib.parse
 from api.api import api_route
 from api.auth import Authentication
 def _load_json(file_path):
@@ -62,9 +63,55 @@ class DynamicDBAPI:
         query = f"SELECT * FROM {schema_name}"  # Simplified query, adjust as needed
         records = self._execute_query(schema_details['connectionPoolId'], query)
         return records
+    
+    def get_filtered_sorted_paginated_records(self, schema_name, selected_fields="*", where_clause="", where_params=[], order_by="id ASC", offset=0, limit=10):
+        """
+        Fetch records with filtering, sorting, and pagination.
+
+        :param schema_name: Name of the database schema (table).
+        :param selected_fields: Fields to be included in the response.
+        :param where_clause: SQL WHERE clause for filtering.
+        :param where_params: Parameters for the WHERE clause to prevent SQL injection.
+        :param order_by: Sorting criteria.
+        :param offset: Offset for pagination.
+        :param limit: Number of records per page.
+        :return: Tuple of (records, total_records_count)
+        """
+        schema_details = self._get_schema_details(schema_name)
+        if not schema_details:
+            return [], 0
+
+        # Construct the query
+        base_query = f"SELECT {selected_fields} FROM {schema_name}"
+        count_query = f"SELECT COUNT(*) FROM {schema_name}"
+        if where_clause:
+            base_query += f" WHERE {where_clause}"
+            count_query += f" WHERE {where_clause}"
+        query = f"{base_query} ORDER BY {order_by} OFFSET {offset} LIMIT {limit}"
+
+        # Execute the query to fetch records
+        records = self._execute_query(schema_details['connectionPoolId'], query, where_params)
+
+        # Execute the count query to get total records count (for pagination)
+        total_records = self._execute_query(schema_details['connectionPoolId'], count_query, where_params)
+        if total_records and len(total_records) > 0:
+            total_records_count = total_records[0]['count']  # Assuming the count is the first column in the first row
+        else:
+            total_records_count = 0
+
+        return json.loads(json.dumps(records, cls=CustomJSONEncoder)), total_records_count
+
 
     def create(self, schema_name, record_data):
         """Implement logic to create a new record in the given schema."""
+        if 'uuid' in record_data:
+            del record_data['uuid']
+        if 'is_active' in record_data:
+            del record_data['is_active']
+        if 'updated' in record_data:
+            del record_data['updated']
+
+        record_data['created'] = datetime.now().isoformat()
         schema_details = self._get_schema_details(schema_name)
         if not schema_details:
             return None
@@ -88,6 +135,13 @@ class DynamicDBAPI:
 
     def update(self, schema_name, record_id, update_data):
         """Update an existing record."""
+        if 'uuid' in update_data:
+            del update_data['uuid']
+        if 'is_active' in update_data:
+            del update_data['is_active']
+        if 'created' in update_data:
+            del update_data['created']
+        update_data['updated'] = datetime.now().isoformat()
         schema_details = self._get_schema_details(schema_name)
         if not schema_details:
             return None
@@ -107,7 +161,7 @@ class DynamicDBAPI:
             return None
 
         # Assuming there's an 'is_active' field to indicate soft deletion
-        query = f"UPDATE {schema_name} SET is_active = FALSE WHERE uuid = %s RETURNING *"
+        query = f"UPDATE {schema_name} SET is_active = FALSE, updated = {datetime.now()} WHERE uuid = %s RETURNING *"
         deactivated_record = self._execute_query(schema_details['connectionPoolId'], query, (record_id,), fetch='one')
         return deactivated_record
 
@@ -132,6 +186,36 @@ class CustomJSONEncoder(json.JSONEncoder):
         # For other types, use the superclass default method
         return json.JSONEncoder.default(self, obj)
 
+def construct_where_clause(filters):
+    where_clauses = []
+    params = []
+    for field, conditions in filters.items():
+        field_conditions = []
+        for condition in conditions:
+            value = condition.get("value")
+            if value is not None:
+                match_mode = condition.get("matchMode")
+
+                if match_mode == "startsWith":
+                    field_conditions.append(f"{field} LIKE %s")
+                    params.append(value + '%')
+                elif match_mode == "contains":
+                    field_conditions.append(f"{field} LIKE %s")
+                    params.append('%' + value + '%')
+                elif match_mode == "endsWith":
+                    field_conditions.append(f"{field} LIKE %s")
+                    params.append('%' + value)
+                elif match_mode == "notContains":
+                    field_conditions.append(f"{field} NOT LIKE %s")
+                    params.append('%' + value + '%')
+                # Add other matchModes as necessary
+
+        if field_conditions:
+            grouped_conditions = f" ({' OR '.join(field_conditions)}) "
+            where_clauses.append(grouped_conditions)
+
+    final_where_clause = ' AND '.join(where_clauses)
+    return final_where_clause, params
 
 def loadSchemasApi(config, authentication):
     db_api = DynamicDBAPI(config)
@@ -140,37 +224,48 @@ def loadSchemasApi(config, authentication):
         decoded_token = authentication.validate_token(headers['Authorization'])
         if not decoded_token["status"]:
             return {"status": 401, "response": {"success": False, "message": "Invalid or expired token"}}
-        
-        # Assuming you have query parameters for sorting
-        sort_by = query_params.get('sort_by', 'uuid')  # Adjust 'default_column' as needed
-        sort_order = query_params.get('sort_order', 'asc')
-        
+
+        # Basic pagination and sorting parameters
+        sort_by = query_params.get('sort_by', 'uuid')
+        sort_order = 'ASC' if query_params.get('sort_order', 'asc').lower() == 'asc' else 'DESC'
         page = int(query_params.get('page', 1))
         per_page = int(query_params.get('per_page', 10))
-        
-        # Fetch all records (Consider modifying this to actually implement filtering and sorting)
-        all_records = db_api.get_all(schema_name)
-        
-        # Apply sorting based on sort_by and sort_order
-        # This is a placeholder. Implement actual sorting based on your data structure and requirements.
-        # For example, you might sort the records based on a key if they're dictionaries.
-        
-        # Paginate records
-        start = (page - 1) * per_page
-        end = start + per_page
-        paginated_records = all_records[start:end]
-        
-        total_records = len(all_records)
-        total_pages = (total_records + per_page - 1) // per_page  # Ceiling division to account for incomplete pages
-        
-        # Serialize paginated records
-        records_data = json.loads(json.dumps(paginated_records, cls=CustomJSONEncoder))
-        
+
+        # Process complex filter parameters
+        filter_param = query_params.get('filter')
+        filters = {}
+        if filter_param:
+            filters = json.loads(urllib.parse.unquote(filter_param))
+        where_clause, where_params = construct_where_clause(filters)
+
+        # Handle fields parameter for SQL SELECT clause
+        fields_param = query_params.get('fields')
+        selected_fields = "*"
+        if fields_param:
+            fields_list = fields_param.split(',')
+            selected_fields = ", ".join([field.strip() for field in fields_list])
+
+        # Calculate offset for pagination
+        offset = (page - 1) * per_page
+
+        # Fetch filtered, sorted, and paginated records with selected fields
+        records, total_records = db_api.get_filtered_sorted_paginated_records(
+            schema_name=schema_name,
+            selected_fields=selected_fields,
+            where_clause=where_clause,
+            where_params=where_params,
+            order_by=f"{sort_by} {sort_order}",
+            offset=offset,
+            limit=per_page
+        )
+
+        total_pages = (total_records + per_page - 1) // per_page
+
         return {
             "status": 200,
             "response": {
                 "success": True,
-                "records": records_data,
+                "records": records,  # Assuming records are already properly serialized
                 "pagination": {
                     "current_page": page,
                     "per_page": per_page,
@@ -181,8 +276,7 @@ def loadSchemasApi(config, authentication):
                 }
             }
         }
-
-
+        
     def get_record_by_id(schema_name, record_id, headers):
         decoded_token = authentication.validate_token(headers['Authorization'])
         if not decoded_token["status"]:
@@ -194,22 +288,25 @@ def loadSchemasApi(config, authentication):
         else:
             return {"status": 404, "response": {"success": False, "message": "Record not found"}}
 
-    def create_record(schema_name, record_data, headers):
+    def create_record(schema_name, body, headers):
         decoded_token = authentication.validate_token(headers['Authorization'])
         if not decoded_token["status"]:
             return {"status": 401, "response": {"success": False, "message": "Invalid or expired token"}}
         
-        new_record = db_api.create(schema_name, record_data)
-        return {"status": 200, "response": json.loads(json.dumps(new_record, cls=CustomJSONEncoder))}
+        new_record = db_api.create(schema_name, body)
+        if json.loads(json.dumps(new_record, cls=CustomJSONEncoder)):
+            return {"status": 200, "response": {"success": True, "message": "Record Created", "record": json.loads(json.dumps(new_record, cls=CustomJSONEncoder))}}
+        else:
+            return {"status": 200, "response": {"success": False, "message": "Record Creation Failed"}}
 
-    def update_record(schema_name, record_id, update_data, headers):
+    def update_record(schema_name, record_id, body, headers):
         decoded_token = authentication.validate_token(headers['Authorization'])
         if not decoded_token["status"]:
             return {"status": 401, "response": {"success": False, "message": "Invalid or expired token"}}
         
-        updated_record = db_api.update(schema_name, record_id, update_data)
+        updated_record = db_api.update(schema_name, record_id, body)
         if updated_record:
-            return {"status": 200, "response": json.loads(json.dumps(updated_record, cls=CustomJSONEncoder))}
+            return {"status": 200, "response": {"success": True, "message": "Record Updated", "record": json.loads(json.dumps(updated_record, cls=CustomJSONEncoder))}}
         else:
             return {"status": 404, "response": {"success": False, "message": "Record not found"}}
 
@@ -217,12 +314,11 @@ def loadSchemasApi(config, authentication):
         decoded_token = authentication.validate_token(headers['Authorization'])
         if not decoded_token["status"]:
             return {"status": 401, "response": {"success": False, "message": "Invalid or expired token"}}
-        
         if soft_delete:
             deleted_record = db_api.soft_delete(schema_name, record_id)
         else:
             deleted_record = db_api.hard_delete(schema_name, record_id)
-
+        print(deleted_record)
         if deleted_record:
             return {"status": 200, "response": {"success": True, "message": "Record deleted successfully"}}
         else:
@@ -241,13 +337,13 @@ def loadSchemasApi(config, authentication):
             return _get_record_by_id
 
         if operation == "POST":
-            def _create_record(record_data, headers):
-                return create_record(schema_name, record_data, headers)
+            def _create_record(body, headers):
+                return create_record(schema_name, body, headers)
             return _create_record
 
         if operation == "PUT":
-            def _update_record(record_id, update_data, headers):
-                return update_record(schema_name, record_id, update_data, headers)
+            def _update_record(record_id, body, headers):
+                return update_record(schema_name, record_id, body, headers)
             return _update_record
 
         if operation == "DELETE":
@@ -260,7 +356,12 @@ def loadSchemasApi(config, authentication):
     for schema in schemas:
         for operation in schema['operations']:
             func = create_api_function(schema, operation)
-            path = f"/{schema['name']}" if operation != "GET_BY_ID" else f"/{schema['name']}/<record_id>"
+            if operation == "GET_BY_ID" or operation == 'PUT' or operation == 'DELETE':
+                # Constructing the path with '<record_id>'
+                path = f"/{schema['name']}/<record_id>"
+            else:
+                # Constructing the path without '<record_id>'
+                path = f"/{schema['name']}"
             method = "GET" if operation in ["GET_ALL", "GET_BY_ID"] else operation
             api_route(path, method)(func)
     

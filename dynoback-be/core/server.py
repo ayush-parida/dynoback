@@ -11,15 +11,15 @@ import subprocess
 
 
 
-def start_angular_app():
+def start_angular_app(config):
     # Start the Angular app; ensure the working directory is correctly set
     # subprocess.Popen(["npm", "run", "start"], cwd="../dynoback-ui")
-    subprocess.Popen("npm run start", shell=True, cwd="../dynoback-ui")
+    subprocess.Popen("ng serve --proxy-config proxy.conf.json --host="+config['angularHost']+" --port="+config['angularPort'], shell=True, cwd="../dynoback-ui")
 
 def start_server(config):
     # db_pool = init_db_pools(config['dbs'])
     # Start the Angular application before starting the HTTP server
-    start_angular_app()
+    start_angular_app(config)
     run(ip=config['ip'], port=config['port'], server_class=HTTPServer, handler_class=HTTPRequestHandler, routes=routes, config=config)
 
 def make_custom_handler(handler, routes, config):
@@ -43,6 +43,7 @@ def run(ip, port, server_class, handler_class, routes, config):
     loadDatabaseApi(config, authentication)
     loadSchemaApi(config, authentication)
     loadSchemasApi(config, authentication)
+    print(routes)
     httpd.RequestHandlerClass.routes = routes
     print(f'Starting httpd on {ip}:{port}...')
     httpd.serve_forever()

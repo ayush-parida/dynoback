@@ -1,7 +1,9 @@
 {
   "AppName": "GDP",
   "ip": "0.0.0.0",
-  "port": 4200,
+  "port": 4201,
+  "angularHost": "0.0.0.0",
+  "angularPort": "4200",
   "adminTokenExpiry": 360000,
   "schemas": "schemas.json",
   "databases": "dbs.json",

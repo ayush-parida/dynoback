@@ -40,10 +40,10 @@
           <li (click)="selectedSchema = item; getSchemaDetails()">
             <a
               pRipple
-              [ngClass]="selectedSchema?.uuid == item.uuid ? 'surface-300' : ''"
+              [ngClass]="selectedSchema.uuid == item.uuid ? 'surface-300' : ''"
               class="flex align-items-center cursor-pointer p-2 py-3 my-1 border-round text-700 surface-100 hover:surface-200 transition-duration-150 transition-colors p-ripple text-decoration-none"
             >
-              <span class="font-medium">{{ item.name }}</span>
+              <span class="font-bold text-lg">{{ item.name }}</span>
             </a>
           </li>
           } }
@@ -61,8 +61,9 @@
       </ng-template>
     </p-sidebar>
     <div class="w-full">
-      @if (selectedSchema?.uuid) {
-      <app-header [menubarItems]="menubarItems"></app-header> } @else {
+      @if (selectedSchema.uuid) {
+      <app-header [menubarItems]="menubarItems"></app-header>
+      <app-schema-data [schema]="selectedSchema"></app-schema-data> } @else {
       <div class="w-full text-center h-full flex">
         <div class="m-auto font-bold text-3xl">Select Schema Please</div>
       </div>
@@ -70,6 +71,7 @@
     </div>
   </div>
 </div>
+
 <p-sidebar
   [(visible)]="schemaFormSidebarVisible"
   [showCloseIcon]="false"
@@ -146,7 +148,8 @@
       </form>
 
       <p class="text-1xl font-bold w-full mx-2">
-        Predefined Columns: id, created, updated, is_active
+        Predefined Columns: uuid, created, updated, created_by, updated_by,
+        is_active
       </p>
       <p-divider></p-divider>
     </div>
@@ -223,7 +226,7 @@
                 [column]="column"
                 [createActions]="createActions"
                 [connectionPoolId]="connectionPoolId"
-                [schemaUuid]="selectedSchema?.uuid"
+                [schemaUuid]="selectedSchema.uuid"
                 (customIndexChangeEmit)="activeIndexChanged($index)"
               />} } }
             </p-accordion>
@@ -277,7 +280,7 @@
           icon="pi pi-times"
           [raised]="true"
         ></p-button>
-        @if (selectedSchema?.uuid) {
+        @if (selectedSchema.uuid) {
         <p-button
           (click)="submitForm()"
           severity="primary"
@@ -301,6 +304,275 @@
     </div>
   </ng-template>
 </p-sidebar>
+
+<!-- API Preview code by nitika start -->
+<p-sidebar
+  [(visible)]="apiPreviewSidebarVisible"
+  [showCloseIcon]="false"
+  [closeOnEscape]="false"
+  [position]="'right'"
+  styleClass="w-6"
+  [dismissible]="false"
+>
+  <ng-template pTemplate="content">
+    <div class="flex h-full">
+      <div
+        class="sidebar-container border-right-2 pr-4 border-200 w-3 overflow-y-auto h-full p-0 position-sticky top-0"
+      >
+        <!-- Sidebar content -->
+        <div class="sidebar">
+          <!-- Sidebar content -->
+          <div
+            class="p-grid my-1"
+            *ngFor="let item of sidebarItems; let i = index"
+          >
+            <div class="p-col">
+              <span
+                [ngClass]="
+                  i === activeIndex ? 'surface-200 border-round-md' : 'p-2 py-3'
+                "
+                class="font-bold text-lg cursor-pointer flex w-full p-2 py-3"
+                (click)="selectTab(item, i)"
+                >{{ item }}</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sidebar-content w-full overflow-y-auto">
+        <!-- Main content -->
+        <ng-container *ngIf="selectedTab === 'Search/Pagination'">
+          <div class="p-3 font-medium ml-2 text-xl">API details</div>
+          <div class="ml-4 p-3 bg-blue-100 border-round-lg font-bold">
+            <span class="surface-800 px-3 py-2 border-round-lg text-white">
+              GET
+            </span>
+
+            <span class="pl-4 text-xl font-medium"
+              >/api/<span class="font-bold">{{ selectedSchema.name }}</span
+              >/records</span
+            >
+          </div>
+
+          <p-divider></p-divider>
+          <div class="p-3 font-medium text-500 mt-3 ml-2 text-xl">
+            Responses
+          </div>
+          <p-tabView styleClass="ml-3">
+            <p-tabPanel [header]="'200'">
+              <ng-container>
+                <div class="font-medium line-height-3">
+                  <pre
+                    class="text-lg mb-3"
+                  ><textarea highlight-js [lang]="'json'" class="html">{{ generatePaginationSampleRecord(selectedSchema) | json }}</textarea></pre>
+                </div>
+              </ng-container>
+            </p-tabPanel>
+            <p-tabPanel [header]="'401'">
+              <div class="font-medium line-height-3">
+                <pre class="text-lg mb-3">
+                <code highlight-js [lang]="'json'">{{ message401 | json}}</code>
+              </pre>
+              </div>
+            </p-tabPanel>
+            <p-tabPanel [header]="'404'">
+              <div class="font-medium line-height-3">
+                <pre class="text-lg mb-3">
+                <code highlight-js [lang]="'json'">{{ message404 | json}}</code>
+              </pre>
+              </div>
+            </p-tabPanel>
+          </p-tabView>
+        </ng-container>
+
+        <ng-container *ngIf="selectedTab === 'Details'">
+          <div class="p-3 font-medium ml-2 text-xl">API details</div>
+          <div class="ml-4 p-3 bg-blue-100 border-round-lg font-bold">
+            <span class="surface-800 px-3 py-2 border-round-lg text-white">
+              GET
+            </span>
+
+            <span class="pl-4 text-xl font-medium"
+              >/api/<span class="font-bold">{{ selectedSchema.name }}</span
+              >/<span class="font-bold">:uuid</span></span
+            >
+          </div>
+
+          <p-divider></p-divider>
+          <div class="p-3 font-medium text-500 mt-3 ml-2 text-xl">
+            Responses
+          </div>
+          <p-tabView styleClass="ml-3">
+            <p-tabPanel [header]="'200'">
+              <ng-container>
+                <div class="font-medium line-height-3">
+                  <pre
+                    class="text-lg mb-3"
+                  ><textarea highlight-js [lang]="'json'" class="html">{{ generateSampleRecord(selectedSchema) | json }}</textarea></pre>
+                </div>
+              </ng-container>
+            </p-tabPanel>
+            <p-tabPanel [header]="'401'">
+              <div class="font-medium line-height-3">
+                <pre class="text-lg mb-3">
+                <code highlight-js [lang]="'json'">{{ message401 | json}}</code>
+              </pre>
+              </div>
+            </p-tabPanel>
+            <p-tabPanel [header]="'404'">
+              <div class="font-medium line-height-3">
+                <pre class="text-lg mb-3">
+                <code highlight-js [lang]="'json'">{{ message404 | json}}</code>
+              </pre>
+              </div>
+            </p-tabPanel>
+          </p-tabView>
+        </ng-container>
+
+        <ng-container *ngIf="selectedTab === 'Create'">
+          <div class="p-3 font-medium ml-2 text-xl">API details</div>
+          <div class="ml-4 p-3 bg-green-200 border-round-lg font-bold">
+            <span class="surface-800 px-3 py-2 border-round-lg text-white">
+              POST
+            </span>
+
+            <span class="pl-4 text-xl font-medium"
+              >/api/<span class="font-bold">{{ selectedSchema.name }}</span
+              >/records</span
+            >
+          </div>
+          <p-divider></p-divider>
+          <div class="p-3 font-medium text-500 mt-3 ml-2 text-xl">Request</div>
+          <div class="mx-2 px-3">
+            <ng-container>
+              <div class="font-medium line-height-3">
+                <pre
+                  class="text-lg mb-3"
+                ><textarea highlight-js [lang]="'json'" class="html">{{ generateSampleRequest(selectedSchema) | json }}</textarea></pre>
+              </div>
+            </ng-container>
+          </div>
+          <p-divider></p-divider>
+          <div class="p-3 font-medium text-500 mt-3 ml-2 text-xl">
+            Responses
+          </div>
+          <p-tabView styleClass="m-2">
+            <p-tabPanel [header]="'200'">
+              <ng-container>
+                <div class="font-medium line-height-3">
+                  <pre
+                    class="text-lg mb-3"
+                  ><textarea highlight-js [lang]="'json'" class="html">{{ getCreateSuccessSampleResponse(selectedSchema) | json }}</textarea></pre>
+                </div>
+              </ng-container>
+            </p-tabPanel>
+            <p-tabPanel [header]="'401'">
+              <div class="font-medium line-height-3">
+                <pre class="text-lg mb-3">
+                <code highlight-js [lang]="'json'">{{ message401 | json}}</code>
+              </pre>
+              </div>
+            </p-tabPanel>
+          </p-tabView>
+        </ng-container>
+
+        <ng-container *ngIf="selectedTab === 'Update'">
+          <div class="p-3 font-medium ml-2 text-xl">API details</div>
+          <div class="ml-4 p-3 bg-orange-200 border-round-lg font-bold">
+            <span class="surface-800 px-3 py-2 border-round-lg text-white">
+              PUT
+            </span>
+
+            <span class="pl-4 text-xl font-medium"
+              >/api/<span class="font-bold">{{ selectedSchema.name }}</span
+              >/<span class="font-bold">:uuid</span></span
+            >
+          </div>
+          <p-divider></p-divider>
+          <div class="p-3 font-medium text-500 mt-3 ml-2 text-xl">Request</div>
+          <div class="mx-2 px-3">
+            <ng-container>
+              <div class="font-medium line-height-3">
+                <pre
+                  class="text-lg mb-3"
+                ><textarea highlight-js [lang]="'json'" class="html">{{ generateSampleRequest(selectedSchema) | json }}</textarea></pre>
+              </div>
+            </ng-container>
+          </div>
+          <p-divider></p-divider>
+          <div class="p-3 font-medium text-500 mt-3 ml-2 text-xl">
+            Responses
+          </div>
+          <p-tabView styleClass="ml-3">
+            <p-tabPanel [header]="'200'">
+              <ng-container>
+                <div class="font-medium line-height-3">
+                  <pre
+                    class="text-lg mb-3"
+                  ><textarea highlight-js [lang]="'json'" class="html">{{ getUpdateSuccessSampleResponse(selectedSchema) | json }}</textarea></pre>
+                </div>
+              </ng-container>
+            </p-tabPanel>
+            <p-tabPanel [header]="'401'">
+              <div class="font-medium line-height-3">
+                <pre class="text-lg mb-3">
+                <code highlight-js [lang]="'json'">{{ message401 | json}}</code>
+              </pre>
+              </div>
+            </p-tabPanel>
+          </p-tabView>
+        </ng-container>
+
+        <ng-container *ngIf="selectedTab === 'Delete'">
+          <div class="p-3 font-medium ml-2 text-xl">API details</div>
+          <div class="ml-4 p-3 bg-red-200 border-round-lg font-bold">
+            <span class="surface-800 px-3 py-2 border-round-lg text-white">
+              DELETE
+            </span>
+
+            <span class="pl-4 text-xl font-medium"
+              >/api/<span class="font-bold">{{ selectedSchema.name }}</span
+              >/<span class="font-bold">:uuid</span></span
+            >
+          </div>
+          <p-divider></p-divider>
+          <div class="p-3 font-medium text-500 mt-3 ml-2 text-xl">
+            Responses
+          </div>
+          <p-tabView styleClass="ml-3">
+            <p-tabPanel [header]="'200'">
+              <div class="font-medium line-height-3">
+                <pre class="text-lg mb-3">
+                    <code highlight-js [lang]="'json'">{{ deleteMessage | json}}</code>
+                </pre>
+              </div>
+            </p-tabPanel>
+            <p-tabPanel [header]="'401'">
+              <div class="font-medium line-height-3">
+                <pre class="text-lg mb-3">
+                <code highlight-js [lang]="'json'">{{ message401 | json}}</code>
+              </pre>
+              </div>
+            </p-tabPanel>
+          </p-tabView>
+        </ng-container>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      (click)="confirmCloseApiPreview()"
+      severity="warning"
+      class="mr-2"
+      label="Close"
+      icon="pi pi-times"
+      [raised]="true"
+    ></p-button>
+  </ng-template>
+</p-sidebar>
+
+<!-- API Preview code by nitika end -->
 <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
 <app-spinner [loading]="loading" [type]="'full'" />

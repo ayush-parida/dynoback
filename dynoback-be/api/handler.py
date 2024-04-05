@@ -15,6 +15,7 @@ class HTTPRequestHandler(SimpleHTTPRequestHandler):
         # Check if the origin is one of the allowed origins
         allowed_origins = self.config['origins']
         if origin in allowed_origins:
+            print(origin)
             self.send_header('Access-Control-Allow-Origin', origin)
         else:
             # Optionally, handle the case where the origin is not allowed

@@ -40,3 +40,52 @@ export interface Option {
 export interface TableStructure {
   columns: Column[];
 }
+
+export interface SchemaOption {
+  min?: number;
+  max?: number;
+  pattern?: string;
+  convertUrls?: boolean;
+  noDecimal?: boolean;
+  exceptDomains?: string | null;
+  onlyDomains?: string;
+  maxSelect?: number;
+  values?: string[];
+}
+
+export interface SchemaField {
+  system: boolean;
+  isActive: boolean;
+  id: number;
+  name: string;
+  type: string;
+  required: boolean;
+  presentable: boolean;
+  unique: boolean;
+  default: string;
+  options: SchemaOption;
+}
+
+export interface Schema {
+  type: number;
+  name: string;
+  connectionPoolId: string;
+  schema: SchemaField[];
+  uuid: string;
+  isActive: boolean;
+  softDelete: boolean;
+  createdBy: string;
+  updatedBy: string;
+  created: string;
+  updated: string;
+  operations: string[];
+}
+
+export interface Pagination {
+  current_page: number;
+  per_page: number;
+  total_pages: number;
+  total: number;
+  sort_by: string;
+  sort_order: 'asc' | 'desc';
+}
