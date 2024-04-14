@@ -305,13 +305,13 @@
   </ng-template>
 </p-sidebar>
 
-<!-- API Preview code by nitika start -->
+<!-- API Preview start -->
 <p-sidebar
   [(visible)]="apiPreviewSidebarVisible"
   [showCloseIcon]="false"
   [closeOnEscape]="false"
   [position]="'right'"
-  styleClass="w-6"
+  styleClass="w-7"
   [dismissible]="false"
 >
   <ng-template pTemplate="content">
@@ -329,9 +329,11 @@
             <div class="p-col">
               <span
                 [ngClass]="
-                  i === activeIndex ? 'surface-200 border-round-md' : 'p-2 py-3'
+                  i === activeIndex
+                    ? 'surface-200 border-round-md'
+                    : 'p-2 mx-2 py-3'
                 "
-                class="font-bold text-lg cursor-pointer flex w-full p-2 py-3"
+                class="font-bold text-lg cursor-pointer flex w-full p-2 mx-2 py-3"
                 (click)="selectTab(item, i)"
                 >{{ item }}</span
               >
@@ -355,9 +357,7 @@
           </div>
 
           <p-divider></p-divider>
-          <div class="p-3 font-medium text-500 mt-3 ml-2 text-xl">
-            Responses
-          </div>
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text-xl">Responses</div>
           <p-tabView styleClass="ml-3">
             <p-tabPanel [header]="'200'">
               <ng-container>
@@ -399,9 +399,7 @@
           </div>
 
           <p-divider></p-divider>
-          <div class="p-3 font-medium text-500 mt-3 ml-2 text-xl">
-            Responses
-          </div>
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text-xl">Responses</div>
           <p-tabView styleClass="ml-3">
             <p-tabPanel [header]="'200'">
               <ng-container>
@@ -442,7 +440,7 @@
             >
           </div>
           <p-divider></p-divider>
-          <div class="p-3 font-medium text-500 mt-3 ml-2 text-xl">Request</div>
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text-xl">Request</div>
           <div class="mx-2 px-3">
             <ng-container>
               <div class="font-medium line-height-3">
@@ -453,9 +451,7 @@
             </ng-container>
           </div>
           <p-divider></p-divider>
-          <div class="p-3 font-medium text-500 mt-3 ml-2 text-xl">
-            Responses
-          </div>
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text-xl">Responses</div>
           <p-tabView styleClass="m-2">
             <p-tabPanel [header]="'200'">
               <ng-container>
@@ -489,7 +485,7 @@
             >
           </div>
           <p-divider></p-divider>
-          <div class="p-3 font-medium text-500 mt-3 ml-2 text-xl">Request</div>
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text-xl">Request</div>
           <div class="mx-2 px-3">
             <ng-container>
               <div class="font-medium line-height-3">
@@ -500,9 +496,7 @@
             </ng-container>
           </div>
           <p-divider></p-divider>
-          <div class="p-3 font-medium text-500 mt-3 ml-2 text-xl">
-            Responses
-          </div>
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text-xl">Responses</div>
           <p-tabView styleClass="ml-3">
             <p-tabPanel [header]="'200'">
               <ng-container>
@@ -536,9 +530,7 @@
             >
           </div>
           <p-divider></p-divider>
-          <div class="p-3 font-medium text-500 mt-3 ml-2 text-xl">
-            Responses
-          </div>
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text-xl">Responses</div>
           <p-tabView styleClass="ml-3">
             <p-tabPanel [header]="'200'">
               <div class="font-medium line-height-3">
@@ -572,7 +564,7 @@
   </ng-template>
 </p-sidebar>
 
-<!-- API Preview code by nitika end -->
+<!-- API Preview end -->
 <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
 <app-spinner [loading]="loading" [type]="'full'" />

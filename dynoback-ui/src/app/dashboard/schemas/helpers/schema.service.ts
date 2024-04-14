@@ -58,7 +58,7 @@ export class SchemaService {
       })
     );
   }
-  getSchemaDetails(uuid: string): Observable<any[]> {
+  getSchemaDetails(uuid: string): Observable<any> {
     return this.http.get<any[]>(`${this.apiUrl}/schema/${uuid}`).pipe(
       catchError((error) => {
         return this.config.handleError(error);

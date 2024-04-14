@@ -20,6 +20,7 @@ import {
   selectFieldValueValidator,
 } from '../../helpers/schema.validator';
 import { JsonEditorOptions, NgJsonEditorModule } from 'ang-jsoneditor';
+import { SchemaService } from '../../helpers/schema.service';
 
 @Component({
   selector: 'app-schema-data',
@@ -39,6 +40,7 @@ export class SchemaDataComponent implements OnChanges {
   loading: boolean = false;
   searchFilter: string = '';
   selectedFields: any[] = [];
+  relationModal: boolean = false;
   pagination: Pagination = {
     current_page: 1,
     per_page: 10,
@@ -47,6 +49,15 @@ export class SchemaDataComponent implements OnChanges {
     sort_by: '',
     sort_order: 'asc',
   };
+  relationPagination: Pagination = {
+    current_page: 1,
+    per_page: 10,
+    total: 0,
+    total_pages: 0,
+    sort_by: '',
+    sort_order: 'asc',
+  };
+  relationEntries: any[] = [];
   jsonEditorOptions: JsonEditorOptions = new JsonEditorOptions();
 
   FIELD_TYPE = FIELD_TYPE;
@@ -57,6 +68,8 @@ export class SchemaDataComponent implements OnChanges {
   private dataService = inject(DataService);
   private messageService = inject(MessageService);
   private formBuilder = inject(FormBuilder);
+  private schemaService = inject(SchemaService);
+  relationName: string = '';
 
   constructor() {}
   ngOnChanges(changes: SimpleChanges): void {
@@ -103,7 +116,7 @@ export class SchemaDataComponent implements OnChanges {
           this.selectedFields.map((x) => this.getFieldName(x.name))
         )
         .subscribe({
-          next: (data: any) => {
+          next: (data) => {
             this.loading = false;
             this.entries = data.records; // Assuming the response has the entries
             this.pagination = data.pagination; // Total number of records, for pagination
@@ -206,6 +219,11 @@ export class SchemaDataComponent implements OnChanges {
         this.form.addControl(
           this.getFieldName(col.name),
           this.formBuilder.control(col.default ? col.default : {}, validators)
+        );
+      } else if (col.id == FIELD_TYPE.RELATION) {
+        this.form.addControl(
+          this.getFieldName(col.name),
+          this.formBuilder.control(col.default || '', validators)
         );
       } else {
         this.form.addControl(
@@ -444,5 +462,45 @@ export class SchemaDataComponent implements OnChanges {
   }
   dynamicColumnChange() {
     this.fetchEntries();
+  }
+  clearRelation(name: string) {
+    this.form.patchValue({ [name]: '' });
+  }
+  openRelationModal(col: any) {
+    this.schemaService
+      .getSchemaDetails(col.options.relatedTableUuid)
+      .subscribe({
+        next: (response) => {
+          this.relationName = response.name;
+
+          this.getRelationEntries();
+        },
+        error: (error) => {},
+      });
+    this.relationModal = true;
+  }
+  getRelationEntries() {
+    const { current_page, per_page, sort_by, sort_order } =
+      this.relationPagination;
+    this.dataService
+      .getEntries(
+        this.relationName,
+        current_page,
+        per_page,
+        sort_by,
+        sort_order
+      )
+      .subscribe({
+        next: (res) => {
+          this.relationEntries = res.records;
+          this.relationPagination = res.pagination;
+        },
+        error: (err) => {},
+      });
+  }
+  onRelationPageChange(event: any) {
+    this.relationPagination.current_page = event.first / event.rows + 1;
+    this.relationPagination.per_page = event.rows;
+    this.getRelationEntries();
   }
 }

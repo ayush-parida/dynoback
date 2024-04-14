@@ -312,6 +312,87 @@
                 [options]="jsonEditorOptions"
                 formControlName="{{ getFieldName(col.name) }}"
               ></json-editor>
+              } @case (FIELD_TYPE.RELATION) {
+              <p-card>
+                <p-inputGroup>
+                  <input
+                    type="text"
+                    pInputText
+                    placeholder="Relation"
+                    disabled="true"
+                    value="{{ form.controls[getFieldName(col.name)].value }}"
+                  />
+                  <button
+                    type="button"
+                    pButton
+                    icon="pi pi-times"
+                    class="p-button-danger"
+                    pTooltip="Clear"
+                    (click)="clearRelation(getFieldName(col.name))"
+                  ></button>
+                </p-inputGroup>
+                <ng-template pTemplate="footer">
+                  <p-button
+                    label="Select Relation"
+                    (click)="openRelationModal(col)"
+                  ></p-button>
+                </ng-template>
+              </p-card>
+              <p-dialog
+                header="{{ 'Select Relation from ' + relationName }}"
+                [(visible)]="relationModal"
+                [modal]="true"
+                [style]="{ width: '50vw' }"
+                [draggable]="false"
+                [resizable]="false"
+                [maximizable]="true"
+              >
+                <div class="flex flex-wrap gap-3 mt-2">
+                  <div
+                    *ngFor="let relationEntry of relationEntries"
+                    class="field-checkbox"
+                  >
+                    <p-radioButton
+                      [inputId]="relationEntry.uuid"
+                      [value]="relationEntry.uuid"
+                      formControlName="{{ getFieldName(col.name) }}"
+                    ></p-radioButton>
+                    <label
+                      [for]="relationEntry.uuid"
+                      class="ml-2"
+                      pTooltip="{{ relationEntry | json }}"
+                      >{{ relationEntry.uuid }}</label
+                    >
+                  </div>
+                  <p-paginator
+                    (onPageChange)="onPageChange($event)"
+                    [first]="
+                      (relationPagination.current_page - 1) *
+                      relationPagination.per_page
+                    "
+                    [rows]="relationPagination.per_page"
+                    [totalRecords]="relationPagination.total"
+                    [rowsPerPageOptions]="[10, 25, 50, 100]"
+                    (onPage)="onRelationPageChange($event)"
+                    [showCurrentPageReport]="true"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                    class="w-full"
+                    styleClass="w-full"
+                  ></p-paginator>
+                </div>
+                <ng-template pTemplate="footer">
+                  <p-button
+                    icon="pi pi-check"
+                    (click)="relationModal = false"
+                    label="Confirm"
+                  ></p-button>
+                  <p-button
+                    icon="pi pi-times"
+                    (click)="relationModal = false"
+                    label="Cancel"
+                  ></p-button>
+                </ng-template>
+              </p-dialog>
               } @case (FIELD_TYPE.FILE) { } @case (FIELD_TYPE.SELECT) { @if
               (col.options.maxSelect == 1) {
               <p-dropdown

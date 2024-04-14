@@ -49,6 +49,7 @@ import { JsonEllipsisPipe } from './josn-ellipsis.pipe';
 import { TabViewModule } from 'primeng/tabview';
 import { HighlightJsModule } from 'ngx-highlight-js';
 import { HighlightJsDirective } from 'ngx-highlight-js';
+import { RadioButtonModule } from 'primeng/radiobutton';
 
 @NgModule({
   declarations: [],
@@ -102,6 +103,7 @@ import { HighlightJsDirective } from 'ngx-highlight-js';
     TabViewModule,
     HighlightJsModule,
     HighlightJsDirective,
+    RadioButtonModule,
   ],
   exports: [
     CommonModule,
@@ -151,6 +153,7 @@ import { HighlightJsDirective } from 'ngx-highlight-js';
     EllipsisPipe,
     JsonEllipsisPipe,
     HighlightJsModule,
+    RadioButtonModule,
   ],
   providers: [AuthService, MessageService, ConfirmationService],
 })

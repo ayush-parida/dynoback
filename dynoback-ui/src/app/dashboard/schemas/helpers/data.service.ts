@@ -19,7 +19,7 @@ export class DataService {
     sort_order: string,
     filter?: string, // Optional filter parameter
     fields?: string[] // Optional fields parameter
-  ): Observable<any[]> {
+  ): Observable<any> {
     let params: any = {
       page: page,
       per_page: per_page,
