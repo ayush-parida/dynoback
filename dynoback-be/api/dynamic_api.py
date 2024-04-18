@@ -350,7 +350,17 @@ def loadSchemasApi(config, authentication):
             def _delete_record(record_id, headers):
                 return delete_record(schema_name, record_id, headers, soft_delete=schema['softDelete'])
             return _delete_record
-
+    
+    def create_auth_apis(schema):
+        # shall return a array of objects of structure 
+        # [
+        #     {
+        #         path: <path>,
+        #         method: <method>,
+        #         func: <function>
+        #     }
+        # ]
+        pass
     # Dynamically create routes for each schema and operation
     schemas = _load_json(config['schemas'])['schemas']
     for schema in schemas:
@@ -367,4 +377,6 @@ def loadSchemasApi(config, authentication):
                 api_route(path, method)(func)
         elif schema['type']==2:
             # Auth APIS
-            pass
+            apis = create_auth_apis(schema)
+            for api in apis:
+                api_route(api['path'], api['method'])(api['func'])
