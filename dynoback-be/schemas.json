@@ -203,7 +203,7 @@
             "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
             "updatedBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
             "created": "2024-03-19T19:24:24.075956",
-            "updated": "2024-03-31T17:43:09.853345",
+            "updated": "2024-04-18T14:20:24.393373",
             "operations": [
                 "GET_ALL",
                 "GET_BY_ID",
@@ -317,6 +317,44 @@
             ],
             "created": "2024-03-25T22:13:17.102076",
             "updated": "2024-04-15T20:03:39.830703"
+        },
+        {
+            "type": 2,
+            "name": "users",
+            "connectionPoolId": "102b6ae0-598b-40b6-adf2-7acff30b01a3",
+            "softDelete": true,
+            "schema": [
+                {
+                    "system": false,
+                    "isActive": true,
+                    "id": 1,
+                    "name": "name",
+                    "type": "text",
+                    "required": false,
+                    "presentable": false,
+                    "unique": false,
+                    "default": "",
+                    "options": {
+                        "min": null,
+                        "max": null,
+                        "pattern": ""
+                    },
+                    "uuid": "2b53264b-b80d-4962-a2d7-ffaa5e33c4ce"
+                }
+            ],
+            "uuid": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
+            "isActive": true,
+            "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
+            "updatedBy": "",
+            "operations": [
+                "GET_ALL",
+                "GET_BY_ID",
+                "POST",
+                "PUT",
+                "DELETE"
+            ],
+            "created": "2024-04-18T14:25:56.676424",
+            "updated": "2024-04-18T14:25:56.676424"
         }
     ]
 }

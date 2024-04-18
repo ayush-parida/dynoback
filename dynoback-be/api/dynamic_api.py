@@ -360,7 +360,7 @@ def loadSchemasApi(config, authentication):
         #         func: <function>
         #     }
         # ]
-        pass
+        return []
     # Dynamically create routes for each schema and operation
     schemas = _load_json(config['schemas'])['schemas']
     for schema in schemas:
