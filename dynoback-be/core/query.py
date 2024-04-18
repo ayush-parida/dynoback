@@ -68,7 +68,7 @@ def map_field_to_postgres_type(name, field):
 def generate_postgres_create_table(json_schema):
     """Generates a PostgreSQL CREATE TABLE statement from a JSON schema, including special handling based on table type."""
     table_name = json_schema['name']
-    table_type = json_schema.get('type', 'base')  # Default to 'base' if not specified
+    table_type = json_schema.get('type', 1)  # Default to 'base' if not specified
     
     # Common columns for all tables
     columns_definitions = [
@@ -79,7 +79,7 @@ def generate_postgres_create_table(json_schema):
     ]
     
     # Additional columns for 'auth' table type
-    if table_type == 'auth':
+    if table_type == 2:
         columns_definitions.extend([
             "username TEXT UNIQUE",
             "email TEXT UNIQUE",
