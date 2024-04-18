@@ -264,22 +264,21 @@ export class SchemaDataComponent implements OnChanges {
           },
         };
       } else if (col.id == FIELD_TYPE.SELECT) {
-        if (col.options.maxSelect == 1) {
-          customEntry = {
-            ...customEntry,
-            ...{
-              [this.getFieldName(col.name)]: entry[this.getFieldName(col.name)],
-            },
-          };
-        } else {
-          customEntry = {
-            ...customEntry,
-            ...{
-              [this.getFieldName(col.name)]:
-                entry[this.getFieldName(col.name)].split(','),
-            },
-          };
-        }
+        // if (col.options.maxSelect == 1) {
+        //   customEntry = {
+        //     ...customEntry,
+        //     ...{
+        //       [this.getFieldName(col.name)]: entry[this.getFieldName(col.name)],
+        //     },
+        //   };
+        // } else {
+        customEntry = {
+          ...customEntry,
+          ...{
+            [this.getFieldName(col.name)]: entry[this.getFieldName(col.name)],
+          },
+        };
+        // }
       } else {
         customEntry = {
           ...customEntry,

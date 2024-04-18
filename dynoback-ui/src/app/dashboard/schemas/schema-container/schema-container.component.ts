@@ -576,7 +576,7 @@ export class SchemaContainerComponent {
           const firstOption = field.options.values
             ? field.options.values[0]
             : 'Option 1';
-          sampleRecord[field.name.replace(/\s+/g, '_')] = firstOption;
+          sampleRecord[field.name.replace(/\s+/g, '_')] = [firstOption];
           break;
         case FIELD_TYPE.FILE:
           // Simulating a file with a basic object, adjust according to your file handling

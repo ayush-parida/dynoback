@@ -348,22 +348,28 @@
                 [maximizable]="true"
               >
                 <div class="flex flex-wrap gap-3 mt-2">
+                  @for (relationEntry of relationEntries; track $index) {
+
                   <div
-                    *ngFor="let relationEntry of relationEntries"
                     class="field-checkbox"
+                    [ngClass]="
+                      form.controls[getFieldName(col.name)].value ==
+                      relationEntry.uuid
+                        ? 'surface-400'
+                        : ''
+                    "
                   >
                     <p-radioButton
                       [inputId]="relationEntry.uuid"
                       [value]="relationEntry.uuid"
                       formControlName="{{ getFieldName(col.name) }}"
                     ></p-radioButton>
-                    <label
-                      [for]="relationEntry.uuid"
-                      class="ml-2"
-                      pTooltip="{{ relationEntry | json }}"
-                      >{{ relationEntry.uuid }}</label
-                    >
+                    <code highlight-js [lang]="'json'">{{
+                      relationEntry | json
+                    }}</code>
                   </div>
+
+                  }
                   <p-paginator
                     (onPageChange)="onPageChange($event)"
                     [first]="
@@ -393,7 +399,8 @@
                   ></p-button>
                 </ng-template>
               </p-dialog>
-              } @case (FIELD_TYPE.FILE) { } @case (FIELD_TYPE.SELECT) { @if
+              } @case (FIELD_TYPE.FILE) { } @case (FIELD_TYPE.SELECT) {
+              <!-- @if
               (col.options.maxSelect == 1) {
               <p-dropdown
                 [id]="getFieldName(col.name)"
@@ -409,14 +416,15 @@
                   {{ item }}
                 </ng-template>
               </p-dropdown>
-              } @else {
+              } @else { -->
               <p-multiSelect
                 class="overflow-visible"
                 [options]="col.options.values"
                 formControlName="{{ getFieldName(col.name) }}"
                 selectedItemsLabel="{0} items selected"
                 [style]="{ 'min-width': '200px' }"
-                placeholder="Choose Multiple"
+                placeholder="Choose Value"
+                [selectionLimit]="col.options.maxSelect"
                 [showToggleAll]="false"
               >
                 <ng-template let-item pTemplate="selectedItem">
@@ -426,7 +434,7 @@
                   {{ item }}
                 </ng-template></p-multiSelect
               >
-              } } }
+              } }
             </div>
           </div>
         </div>

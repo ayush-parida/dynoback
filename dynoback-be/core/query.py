@@ -89,7 +89,7 @@ def generate_postgres_create_table(json_schema):
         ])
     
     for field in json_schema.get('schema', []):
-        column_definition = f"{field['name'].replace(' ', '_')} {map_field_to_postgres_type(field['name'], field)}"
+        column_definition = f" {map_field_to_postgres_type(field['name'], field)}"
         columns_definitions.append(column_definition)
     
     # Handle relations and file fields within the loop if necessary
