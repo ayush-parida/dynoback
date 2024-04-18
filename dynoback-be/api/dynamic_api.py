@@ -354,14 +354,17 @@ def loadSchemasApi(config, authentication):
     # Dynamically create routes for each schema and operation
     schemas = _load_json(config['schemas'])['schemas']
     for schema in schemas:
-        for operation in schema['operations']:
-            func = create_api_function(schema, operation)
-            if operation == "GET_BY_ID" or operation == 'PUT' or operation == 'DELETE':
-                # Constructing the path with '<record_id>'
-                path = f"/{schema['name']}/<record_id>"
-            else:
-                # Constructing the path without '<record_id>'
-                path = f"/{schema['name']}"
-            method = "GET" if operation in ["GET_ALL", "GET_BY_ID"] else operation
-            api_route(path, method)(func)
-    
+        if(schema['type']==1):
+            for operation in schema['operations']:
+                func = create_api_function(schema, operation)
+                if operation == "GET_BY_ID" or operation == 'PUT' or operation == 'DELETE':
+                    # Constructing the path with '<record_id>'
+                    path = f"/{schema['name']}/<record_id>"
+                else:
+                    # Constructing the path without '<record_id>'
+                    path = f"/{schema['name']}"
+                method = "GET" if operation in ["GET_ALL", "GET_BY_ID"] else operation
+                api_route(path, method)(func)
+        elif schema['type']==2:
+            # Auth APIS
+            pass
