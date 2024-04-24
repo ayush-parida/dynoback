@@ -1,0 +1,238 @@
+<h1>Profile component</h1>
+<h3>Admin</h3>
+
+<p-scrollPanel [style]="{ height: '75vh' }">
+  <form class="p-fluid form-layout mx-4">
+    <div class="p-grid">
+      <div class="p-field p-col-12 p-md-6">
+        <label for="email">Email Address</label>
+        <input
+          id="email"
+          type="text"
+          pInputText
+          formControlName="email"
+          placeholder="Enter email"
+        />
+        <!-- <div
+              *ngIf="adminFormGroup.get('email')?.touched && adminFormGroup.get('email')?.errors?.['uniqueEmail']"
+            >
+              This email is already taken.
+            </div> -->
+      </div>
+
+      <!-- <div class="p-field p-col-12 p-md-6">
+        <label for="password">Password</label>
+        <p-password
+          id="password"
+          formControlName="password"
+          placeholder="Enter password"
+          [toggleMask]="true"
+        ></p-password>
+      </div> -->
+    </div>
+
+    <div class="p-grid">
+      <div class="p-col-12 p-md-3">
+        <p-checkbox
+          [binary]="true"
+          formControlName="emailVerified"
+          label="Email Verified"
+        ></p-checkbox>
+      </div>
+      <div class="p-col-12 p-md-3">
+        <p-checkbox
+          [binary]="true"
+          formControlName="passwordResetDone"
+          label="Password Reset Completed"
+        ></p-checkbox>
+      </div>
+    </div>
+
+    <div class="p-field">
+      <label for="avatar">Avatar URL</label>
+      <p-dropdown
+        [options]="avatars"
+        formControlName="avatar"
+        optionLabel="name"
+        [showClear]="true"
+        placeholder="Select an Avatar"
+      >
+        <!-- <ng-template pTemplate="selectedItem">
+              <div
+                class="flex align-items-center gap-2"
+                *ngIf="
+                  adminFormGroup.get('avatar')?.touched &&
+                  adminFormGroup.get('avatar')?.value
+                "
+              >
+                <img
+                  [src]="
+                    adminFormGroup.get('avatar')?.touched &&
+                    adminFormGroup.get('avatar')?.value?.path
+                  "
+                  style="width: 32px; height: 32px; border-radius: 50%"
+                />
+                <div>
+                  {{
+                    adminFormGroup.get("avatar")?.touched &&
+                      adminFormGroup.get("avatar")?.value?.name
+                  }}
+                </div>
+              </div>
+            </ng-template> -->
+        <ng-template let-avatar pTemplate="item">
+          <div class="flex align-items-center gap-2">
+            <img
+              [src]="avatar.path"
+              style="width: 32px; height: 32px; border-radius: 50%"
+            />
+            <div>{{ avatar.name }}</div>
+          </div>
+        </ng-template>
+      </p-dropdown>
+    </div>
+
+    <!-- Access Permissions -->
+    <div formGroupName="access" class="p-mt-4">
+      <p-fieldset legend="Collections Permissions" styleClass="mt-2">
+        <div class="p-grid">
+          <div class="p-col-12 p-checkbox-group" formGroupName="collections">
+            <p-checkbox
+              [binary]="true"
+              formControlName="create"
+              label="Create"
+            ></p-checkbox>
+            <p-checkbox
+              [binary]="true"
+              formControlName="read"
+              label="Read"
+            ></p-checkbox>
+            <p-checkbox
+              [binary]="true"
+              formControlName="update"
+              label="Update"
+            ></p-checkbox>
+            <p-checkbox
+              [binary]="true"
+              formControlName="delete"
+              label="Delete"
+            ></p-checkbox>
+            <p-checkbox
+              [binary]="true"
+              formControlName="import"
+              label="Import"
+            ></p-checkbox>
+            <p-checkbox
+              [binary]="true"
+              formControlName="edit"
+              label="Edit"
+            ></p-checkbox>
+          </div>
+        </div>
+      </p-fieldset>
+
+      <p-fieldset legend="Admin Permissions" styleClass="mt-2">
+        <div class="p-grid">
+          <div class="p-col-12 p-checkbox-group" formGroupName="admins">
+            <p-checkbox
+              [binary]="true"
+              formControlName="create"
+              label="Create"
+            ></p-checkbox>
+            <p-checkbox
+              [binary]="true"
+              formControlName="read"
+              label="Read"
+            ></p-checkbox>
+            <p-checkbox
+              [binary]="true"
+              formControlName="update"
+              label="Update"
+            ></p-checkbox>
+            <p-checkbox
+              [binary]="true"
+              formControlName="delete"
+              label="Delete"
+            ></p-checkbox>
+          </div>
+        </div>
+      </p-fieldset>
+
+      <p-fieldset legend="Application Permissions" styleClass="mt-2">
+        <div class="p-grid">
+          <div class="p-col-12 p-checkbox-group" formGroupName="application">
+            <p-checkbox
+              [binary]="true"
+              formControlName="read"
+              label="Read"
+            ></p-checkbox>
+            <p-checkbox
+              [binary]="true"
+              formControlName="update"
+              label="Update"
+            ></p-checkbox>
+          </div>
+        </div>
+      </p-fieldset>
+
+      <p-fieldset legend="Other Permissions" styleClass="mt-2">
+        <div class="p-grid">
+          <div class="p-col-12 p-checkbox-group">
+            <p-checkbox
+              [binary]="true"
+              formControlName="importSchemas"
+              label="Import Schemas"
+            ></p-checkbox>
+            <p-checkbox
+              [binary]="true"
+              formControlName="exportSchemas"
+              label="Export Schemas"
+            ></p-checkbox>
+            <p-checkbox
+              [binary]="true"
+              formControlName="tokenManagement"
+              label="Token Management"
+            ></p-checkbox>
+            <p-checkbox
+              [binary]="true"
+              formControlName="mailManagement"
+              label="Mail Management"
+            ></p-checkbox>
+            <p-checkbox
+              [binary]="true"
+              formControlName="logs"
+              label="Access Logs"
+            ></p-checkbox>
+            <p-checkbox
+              [binary]="true"
+              formControlName="backupManagement"
+              label="Backup Management"
+            ></p-checkbox>
+          </div>
+        </div>
+      </p-fieldset>
+    </div>
+  </form>
+</p-scrollPanel>
+<!-- <ng-template pTemplate="footer">
+    <div class="flex">
+      <div class="ml-auto">
+        <p-button
+          (click)="confirmClose($event)"
+          severity="warning"
+          class="mr-2"
+          label="Close"
+          icon="pi pi-times"
+          [raised]="true"
+        ></p-button>
+        <p-button
+          class="p-button-text p-button-text"
+          [label]="actionUuid ? 'Update' : 'Add'"
+          severity="primary"
+          icon="pi pi-check"
+          [raised]="true"
+          (click)="submitAdmin()"
+        ></p-button>
+      </div>
+    </div>
+  </ng-template> -->

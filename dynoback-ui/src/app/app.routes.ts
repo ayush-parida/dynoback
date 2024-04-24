@@ -30,6 +30,7 @@ export const routes: Routes = [
           },
         ],
       },
+
       {
         path: '',
         loadComponent: () =>
@@ -72,6 +73,15 @@ export const routes: Routes = [
               ).then((c) => c.SchemaContainerComponent),
             canActivate: [authGuard],
             children: [],
+          },
+
+          {
+            path: 'profile',
+            loadComponent: () =>
+              import('./dashboard/settings/profile/profile.component').then(
+                (c) => c.ProfileComponent
+              ),
+            canActivate: [authGuard],
           },
         ],
       },
