@@ -64,6 +64,24 @@ class DynamicDBAPI:
         records = self._execute_query(schema_details['connectionPoolId'], query)
         return records
     
+    def get_all_kvp(self, schema_name, **kwargs):
+        """Implement logic to fetch all records for a given schema."""
+        schema_details = self._get_schema_details(schema_name)
+        if not schema_details:
+            return []
+        kvp_fields = "uuid"
+        cols = schema_details['kvp']
+        formatted = []
+        for col in cols:
+            formatted.append(col.replace(' ', '_'))
+        st = ', '
+        st_formatted = st.join(formatted)
+        if(len(st_formatted)):
+            kvp_fields = kvp_fields + ", " + st_formatted
+        query = f"SELECT {kvp_fields} FROM {schema_name}"  # Simplified query, adjust as needed
+        records = self._execute_query(schema_details['connectionPoolId'], query)
+        return records
+    
     def get_filtered_sorted_paginated_records(self, schema_name, selected_fields="*", where_clause="", where_params=[], order_by="id ASC", offset=0, limit=10):
         """
         Fetch records with filtering, sorting, and pagination.
@@ -318,11 +336,21 @@ def loadSchemasApi(config, authentication):
             deleted_record = db_api.soft_delete(schema_name, record_id)
         else:
             deleted_record = db_api.hard_delete(schema_name, record_id)
-        print(deleted_record)
         if deleted_record:
             return {"status": 200, "response": {"success": True, "message": "Record deleted successfully"}}
         else:
             return {"status": 404, "response": {"success": False, "message": "Record not found"}}
+    
+    def kvp_record(schema_name, headers):
+        decoded_token = authentication.validate_token(headers['Authorization'])
+        if not decoded_token["status"]:
+            return {"status": 401, "response": {"success": False, "message": "Invalid or expired token"}}
+        records = db_api.get_all_kvp(schema_name)
+        if len(records):
+            return {"status": 200, "response": {"success": True, "message": "Record deleted successfully"}}
+        else:
+            return {"status": 404, "response": {"success": False, "message": "Record not found"}}
+        
 
     def create_api_function(schema, operation):
         schema_name = schema['name']
@@ -350,7 +378,11 @@ def loadSchemasApi(config, authentication):
             def _delete_record(record_id, headers):
                 return delete_record(schema_name, record_id, headers, soft_delete=schema['softDelete'])
             return _delete_record
-    
+        
+        if operation == "KVP":
+            def _kvp_record(headers):
+                return kvp_record(schema_name, headers)
+            return _kvp_record
     def create_auth_apis(schema):
         # shall return a array of objects of structure 
         # [
@@ -370,6 +402,8 @@ def loadSchemasApi(config, authentication):
                 if operation == "GET_BY_ID" or operation == 'PUT' or operation == 'DELETE':
                     # Constructing the path with '<record_id>'
                     path = f"/{schema['name']}/<record_id>"
+                elif operation == "KVP":
+                    path = f"/{schema['name']}/kvp"
                 else:
                     # Constructing the path without '<record_id>'
                     path = f"/{schema['name']}"

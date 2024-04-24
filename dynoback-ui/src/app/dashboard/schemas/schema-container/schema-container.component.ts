@@ -182,6 +182,7 @@ export class SchemaContainerComponent {
         ],
         connectionPoolId: [null, [Validators.required]],
         softDelete: [true],
+        kvp: [[]],
       });
       formGroup.patchValue(values);
       return formGroup;
@@ -205,6 +206,7 @@ export class SchemaContainerComponent {
         ],
         connectionPoolId: [null, [Validators.required]],
         softDelete: [true],
+        kvp: [[]],
       });
       return formGroup;
     }

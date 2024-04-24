@@ -120,6 +120,7 @@
             "operations": [
                 "GET_ALL",
                 "GET_BY_ID",
+                "KVP",
                 "POST",
                 "PUT",
                 "DELETE"
@@ -203,13 +204,17 @@
             "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
             "updatedBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
             "created": "2024-03-19T19:24:24.075956",
-            "updated": "2024-04-18T14:20:24.393373",
+            "updated": "2024-04-24T23:47:28.610109",
             "operations": [
                 "GET_ALL",
                 "GET_BY_ID",
+                "KVP",
                 "POST",
                 "PUT",
                 "DELETE"
+            ],
+            "kvp": [
+                "field 1"
             ]
         },
         {
@@ -311,12 +316,16 @@
             "operations": [
                 "GET_ALL",
                 "GET_BY_ID",
+                "KVP",
                 "POST",
                 "PUT",
                 "DELETE"
             ],
             "created": "2024-03-25T22:13:17.102076",
-            "updated": "2024-04-15T20:03:39.830703"
+            "updated": "2024-04-24T23:28:45.644385",
+            "kvp": [
+                "name"
+            ]
         },
         {
             "type": 2,
@@ -349,6 +358,7 @@
             "operations": [
                 "GET_ALL",
                 "GET_BY_ID",
+                "KVP",
                 "POST",
                 "PUT",
                 "DELETE"
