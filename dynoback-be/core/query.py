@@ -112,10 +112,6 @@ def generate_postgres_alter_table_statements(old_schema, new_schema):
     # Handle changes in existing fields
     for new_field_name, new_field in new_fields.items():
         new_field_name_sanitized = new_field_name.replace(' ', '_')
-        print("=========++>>")
-        print(new_field_name_sanitized)
-        print(old_fields)
-        print("=========++>>")
         if new_field_name_sanitized in old_fields:
             old_field = old_fields[new_field_name_sanitized]
             old_column_definition = map_field_to_postgres_type(new_field_name, old_field)

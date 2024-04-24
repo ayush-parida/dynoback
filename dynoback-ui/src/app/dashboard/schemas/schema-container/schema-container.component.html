@@ -145,12 +145,26 @@
             </div>
           </div>
         </div>
+        <div class="mt-3">
+          <label for="kvp">KVP API fields (uuid is included by default)</label>
+          <p-multiSelect
+            id="kvp"
+            formControlName="kvp"
+            class="w-5 ml-auto mt-2"
+            styleClass="min-w-full"
+            [options]="fullSchema"
+            optionLabel="name"
+            placeholder="Select one or more Schema Columns"
+            optionValue="name"
+          ></p-multiSelect>
+        </div>
       </form>
 
       <p class="text-1xl font-bold w-full mx-2">
         Predefined Columns: uuid, created, updated, created_by, updated_by,
         is_active
       </p>
+
       <p-divider></p-divider>
     </div>
   </ng-template>
