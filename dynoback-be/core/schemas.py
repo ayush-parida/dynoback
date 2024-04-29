@@ -3,6 +3,7 @@ import json
 import uuid
 import datetime
 from core.process_schema import process_create_schema, process_edit_schema, process_delete_schema
+import jwt
 
 class SchemaManagement:
     def __init__(self,  config):
@@ -39,7 +40,197 @@ class SchemaManagement:
         body['isActive']=True
         body['createdBy'] = creator_uuid
         body['updatedBy'] = ""
-        body['operations'] = ['GET_ALL', 'GET_BY_ID', 'POST', 'PUT', 'DELETE']
+        
+        if(body['type']==1):
+            body['operations'] = [
+                { "name": "GET_ALL", "value": True, "access": 
+                    [{
+                        "name": "admin",
+                        "value": True,
+                        "access": []
+                    }]
+                },
+                { "name": "GET_BY_ID", "value": True, "access": 
+                    [{
+                        "name": "admin",
+                        "value": True,
+                        "access": []
+                    }]
+                },
+                { "name": "KVP", "value": True, "access": 
+                    [{
+                        "name": "admin",
+                        "value": True,
+                        "access": []
+                    }]
+                },
+                { "name": "POST", "value": True, "access": 
+                    [{
+                        "name": "admin",
+                        "value": True,
+                        "access": []
+                    }]
+                },
+                { "name": "PUT", "value": True, "access": 
+                    [{
+                        "name": "admin",
+                        "value": True,
+                        "access": []
+                    }]
+                },
+                { "name": "DELETE", "value": True, "access": 
+                    [{
+                        "name": "admin",
+                        "value": True,
+                        "access": []
+                    }]
+                }
+            ]
+        elif(body['type']==2):
+            body['secret_key'] = "temp_secret_key"
+            body['operations'] = [
+                { "name": "GET_ALL", "value": True, "access": 
+                    [{
+                        "name": "admin",
+                        "value": True,
+                        "access": []
+                    }]
+                },
+                { "name": "GET_BY_ID", "value": True, "access": 
+                    [{
+                        "name": "admin",
+                        "value": True,
+                        "access": []
+                    }]
+                },
+                { "name": "KVP", "value": True, "access": 
+                    [{
+                        "name": "admin",
+                        "value": True,
+                        "access": []
+                    }]
+                },
+                { "name": "POST", "value": True, "access": 
+                    [{
+                        "name": "admin",
+                        "value": True,
+                        "access": []
+                    }]
+                },
+                { "name": "PUT", "value": True, "access": 
+                    [{
+                        "name": "admin",
+                        "value": True,
+                        "access": []
+                    }]
+                },
+                { "name": "DELETE", "value": True, "access": 
+                    [{
+                        "name": "admin",
+                        "value": True,
+                        "access": []
+                    }]
+                },
+                { "name": "REGISTER", "value": True, "access": 
+                    [{
+                        "name": "admin",
+                        "value": True,
+                        "access": []
+                    }]
+                },
+                { "name": "LOGIN", "value": True, "access": 
+                    [{
+                        "name": "admin",
+                        "value": True,
+                        "access": []
+                    }]
+                },
+                { "name": "LOGOUT", "value": True, "access": 
+                    [{
+                        "name": "admin",
+                        "value": True,
+                        "access": []
+                    }]
+                },
+                { "name": "PASSWORD_RESET_REQUEST", "value": True, "access": 
+                    [{
+                        "name": "admin",
+                        "value": True,
+                        "access": []
+                    }]
+                },
+                { "name": "RESET_PASSWORD", "value": True, "access": 
+                    [{
+                        "name": "admin",
+                        "value": True,
+                        "access": []
+                    }]
+                },
+                { "name": "CHANGE_PASSWORD", "value": True, "access": 
+                    [{
+                        "name": "admin",
+                        "value": True,
+                        "access": []
+                    }]
+                },
+                { "name": "VERIFY_EMAIL", "value": True, "access": 
+                    [{
+                        "name": "admin",
+                        "value": True,
+                        "access": []
+                    }]
+                },
+                { "name": "REFRESH_TOKEN", "value": True, "access": 
+                    [{
+                        "name": "admin",
+                        "value": True,
+                        "access": []
+                    }]
+                },
+                { "name": "TWO_FACTOR", "value": True, "access": 
+                    [{
+                        "name": "admin",
+                        "value": True,
+                        "access": []
+                    }]
+                },
+                { "name": "TWO_FACTOR_VERIFY", "value": True, "access": 
+                    [{
+                        "name": "admin",
+                        "value": True,
+                        "access": []
+                    }]
+                },
+                { "name": "SESSIONS", "value": True, "access": 
+                    [{
+                        "name": "admin",
+                        "value": True,
+                        "access": []
+                    }]
+                },
+                {
+                    "name": "UNIQUE_EMAIL",
+                    "value": True,
+                    "access": [
+                        {
+                            "name": "admin",
+                            "value": True,
+                            "access": []
+                        },
+                    ]
+                },
+                {
+                    "name": "UNIQUE_USERNAME",
+                    "value": True,
+                    "access": [
+                        {
+                            "name": "admin",
+                            "value": True,
+                            "access": []
+                        },
+                    ]
+                }
+            ]
         for col in body['schema']:
             col['uuid']=str(uuid.uuid4())
         current_time = datetime.datetime.now().isoformat()
@@ -110,3 +301,20 @@ class SchemaManagement:
                 return {"status": 200, "response": {"user_exists": True}}
         return {"status": 200, "response": {"user_exists": False}}
     
+    def generate_verify_token(self, schema_id, uuid):
+        """Generate a JWT for the entry."""
+        schemas = self._read_schemas()
+        schema_exists = False
+        for schema in schemas:
+            if schema['uuid'] == schema_id:
+                schema_exists = True
+                payload = {
+                    'uuid': uuid,
+                    'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=5),
+                    'schema': schema_id
+                }
+                return {"status": 200, "response": {"token": jwt.encode(payload, schema['secret_key'], algorithm='HS256')}}
+        if schema_exists:
+            return {"status": 200, "response": {"success": True, "message": "Entry not found"}}
+        else:
+            return {"status": 404, "response": {"success": False, "message": "Schema not found"}}

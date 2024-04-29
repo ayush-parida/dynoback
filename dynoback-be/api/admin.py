@@ -161,7 +161,7 @@ def loadAdminApi(config, authentication: Authentication):
 
     @api_route('/admins', 'GET')
     def get_all_active_admins(query_params, headers):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_admin_token(headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else '')
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         # Retrieve query parameters for pagination
@@ -205,7 +205,7 @@ def loadAdminApi(config, authentication: Authentication):
 
     @api_route('/admins', 'POST')
     def add_admin_route(body, headers):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_admin_token(headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else '')
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         new_admin = body
@@ -213,7 +213,7 @@ def loadAdminApi(config, authentication: Authentication):
 
     @api_route('/admins/<admin_id>', 'PUT')  # or 'PATCH'
     def edit_admin_route(admin_id, body, headers):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_admin_token(headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else '')
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         updated_admin = body
@@ -221,21 +221,21 @@ def loadAdminApi(config, authentication: Authentication):
 
     @api_route('/admins/<admin_id>', 'DELETE')
     def delete_admin_route(admin_id, headers):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_admin_token(headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else '')
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         return admin_system.soft_delete_admin(admin_id)
 
     @api_route('/avatars', 'GET')
     def get_avatars(headers):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_admin_token(headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else '')
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         return admin_system.get_avatars()
 
     @api_route('/admins/unique-email/<email>', 'GET')
     def get_unique_email(email, headers):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_admin_token(headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else '')
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         return admin_system.get_unique_emails(email)

@@ -23,6 +23,7 @@ import { JsonColumnComponent } from './json-column/json-column.component';
 import { RelationColumnComponent } from './relation-column/relation-column.component';
 import { SchemaDataComponent } from './schema-data/schema-data.component';
 import { TabViewModule } from 'primeng/tabview';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-schema-container',
@@ -130,21 +131,32 @@ export class SchemaContainerComponent {
       },
     },
   ];
-
+  uuid: string = '';
   FIELD_TYPE = FIELD_TYPE;
   private messageService = inject(MessageService);
   private fb = inject(FormBuilder);
   private confirmationService = inject(ConfirmationService);
   private schemaService = inject(SchemaService);
   private configService = inject(ConfigService);
+  private activatedRoute = inject(ActivatedRoute);
+  private router = inject(Router);
 
   constructor() {
-    this.getSchemaTypes();
-    this.getColumns();
-    this.getConnections(true);
-    this.getSchemas();
-  }
+    this.activatedRoute.params.subscribe((params) => {
+      if (params['uuid']) {
+        this.uuid = params['uuid'];
+        this.getSchemaDetails();
+      }
 
+      this.getSchemaTypes();
+      this.getColumns();
+      this.getConnections(true);
+      this.getSchemas();
+    });
+  }
+  setActiveSchema() {
+    this.router.navigate(['/schemas/' + this.selectedSchema.uuid]);
+  }
   addOpen(): void {
     this.schemaFormSidebarVisible = true;
     this.selectedSchema = {} as Schema;
@@ -158,11 +170,12 @@ export class SchemaContainerComponent {
   getSchemaDetails() {
     this.loading = true;
     this.subscriptions.add(
-      this.schemaService.getSchemaDetails(this.selectedSchema.uuid).subscribe({
+      this.schemaService.getSchemaDetails(this.uuid).subscribe({
         next: (data: any) => {
           this.loading = false;
           this.schemaFormGroup = this.initSchemaForm(false, data);
           this.fullSchema = data.schema;
+          this.selectedSchema = data;
         },
         error: (error) => {
           this.loading = false;
