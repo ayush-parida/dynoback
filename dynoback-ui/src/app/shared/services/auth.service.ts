@@ -37,7 +37,7 @@ export class AuthService {
     localStorage.removeItem('currentUser');
     sessionStorage.removeItem('currentUser');
     this.currentUserSource.set(null);
-    this.router.navigate(['/admin/login']);
+    this.router.navigate(['/login']);
   }
 
   forgotPassword(email: string) {

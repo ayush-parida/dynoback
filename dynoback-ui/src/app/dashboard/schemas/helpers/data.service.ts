@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError } from 'rxjs';
 import { ConfigService } from '../../../shared/services/config.service';
+import { Schema } from './schema.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +13,7 @@ export class DataService {
 
   private apiUrl = this.config.apiUrl;
   getEntries(
-    schemaName: string,
+    schema: Schema,
     page: number,
     per_page: number,
     sort_by: string,
@@ -34,11 +35,17 @@ export class DataService {
 
     // If specific fields are requested, join them into a comma-separated string
     if (fields && fields.length > 0) {
-      params.fields = 'uuid,created,updated,is_active,' + fields.join(',');
+      if (schema.type == 1) {
+        params.fields = 'uuid,created,updated,is_active,' + fields.join(',');
+      } else if (schema.type == 2) {
+        params.fields =
+          'uuid,created,updated,is_active,username,email,verified,show_email,' +
+          fields.join(',');
+      }
     }
 
     return this.http
-      .get<any[]>(`${this.apiUrl}/${schemaName}`, { params })
+      .get<any[]>(`${this.apiUrl}/${schema.name}`, { params })
       .pipe(
         catchError((error) => {
           // Implement your error handling logic here
@@ -77,5 +84,13 @@ export class DataService {
           return this.config.handleError(error);
         })
       );
+  }
+
+  getEntryDetails(schemaName: string, entryUuid: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${schemaName}/${entryUuid}`).pipe(
+      catchError((error) => {
+        return this.config.handleError(error);
+      })
+    );
   }
 }

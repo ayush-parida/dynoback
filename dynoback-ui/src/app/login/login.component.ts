@@ -43,7 +43,7 @@ export class LoginComponent {
             });
           }
           // Navigate to dashboard or home page on successful login
-          this.router.navigate(['/admin']);
+          this.router.navigate(['/']);
         },
         error: (error) => {
           // Handle login error here (e.g., show error message)

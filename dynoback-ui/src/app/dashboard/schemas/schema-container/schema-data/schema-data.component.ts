@@ -5,11 +5,17 @@ import {
   SimpleChanges,
   inject,
 } from '@angular/core';
+import { Location } from '@angular/common';
 import { SharedModule } from '../../../../shared/classes/shared.module';
 import { DataService } from '../../helpers/data.service';
-import { LazyLoadEvent, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
 import { Pagination, Schema } from '../../helpers/schema.interface';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import {
+  FormGroup,
+  FormBuilder,
+  Validators,
+  FormControl,
+} from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { FIELD_TYPE } from '../../helpers/schema.enum';
 import * as FileSaver from 'file-saver';
@@ -21,6 +27,8 @@ import {
 } from '../../helpers/schema.validator';
 import { JsonEditorOptions, NgJsonEditorModule } from 'ang-jsoneditor';
 import { SchemaService } from '../../helpers/schema.service';
+import { authUniqueValidator } from '../../../../shared/classes/auth-unique.validator';
+import { ConfigService } from '../../../../shared/services/config.service';
 
 @Component({
   selector: 'app-schema-data',
@@ -69,7 +77,9 @@ export class SchemaDataComponent implements OnChanges {
   private messageService = inject(MessageService);
   private formBuilder = inject(FormBuilder);
   private schemaService = inject(SchemaService);
-  relationName: string = '';
+  private configService = inject(ConfigService);
+  private location = inject(Location);
+  relation: Schema = {} as Schema;
 
   constructor() {}
   ngOnChanges(changes: SimpleChanges): void {
@@ -107,7 +117,7 @@ export class SchemaDataComponent implements OnChanges {
     this.subscriptions.add(
       this.dataService
         .getEntries(
-          this.schema.name,
+          this.schema,
           current_page,
           per_page,
           sort_by,
@@ -231,12 +241,51 @@ export class SchemaDataComponent implements OnChanges {
           this.formBuilder.control(col.default || '', validators)
         );
       }
+
+      if (this.schema.type == 2) {
+        this.form.addControl(
+          'email',
+          new FormControl(col.default || '', {
+            validators: [Validators.required, Validators.email],
+            asyncValidators: [
+              authUniqueValidator(
+                this.configService.http,
+                this.configService.apiUrl,
+                this.schema.name,
+                'unique_email',
+                false
+              ),
+            ],
+            updateOn: 'change',
+          })
+        );
+        this.form.addControl(
+          'username',
+          new FormControl(col.default || '', {
+            validators: [Validators.required],
+            asyncValidators: [
+              authUniqueValidator(
+                this.configService.http,
+                this.configService.apiUrl,
+                this.schema.name,
+                'unique_username',
+                false
+              ),
+            ],
+            updateOn: 'change',
+          })
+        );
+        this.form.addControl('verified', new FormControl(false));
+        this.form.addControl('show_email', new FormControl(true));
+      }
     }
   }
 
   openNew() {
     this.entry = {};
     this.entryDialog = true;
+    this.form.get('verified')?.disable();
+    this.form.get('show_email')?.disable();
   }
 
   deleteSelectedEntries() {
@@ -288,9 +337,11 @@ export class SchemaDataComponent implements OnChanges {
         };
       }
     }
-    this.entry = { ...customEntry, ...{ uuid: entry.uuid } };
+    this.entry = { ...customEntry, ...entry };
     this.entryDialog = true;
     this.form.patchValue(this.entry);
+    this.form.get('verified')?.disable();
+    this.form.get('show_email')?.disable();
   }
   deleteEntry(entry: any) {
     this.loading = true;
@@ -470,7 +521,7 @@ export class SchemaDataComponent implements OnChanges {
       .getSchemaDetails(col.options.relatedTableUuid)
       .subscribe({
         next: (response) => {
-          this.relationName = response.name;
+          this.relation = response;
 
           this.getRelationEntries();
         },
@@ -482,24 +533,83 @@ export class SchemaDataComponent implements OnChanges {
     const { current_page, per_page, sort_by, sort_order } =
       this.relationPagination;
     this.dataService
-      .getEntries(
-        this.relationName,
-        current_page,
-        per_page,
-        sort_by,
-        sort_order
-      )
+      .getEntries(this.relation, current_page, per_page, sort_by, sort_order)
       .subscribe({
         next: (res) => {
           this.relationEntries = res.records;
           this.relationPagination = res.pagination;
         },
-        error: (err) => {},
+        error: (err) => {
+          this.loading = false;
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Operation Failed',
+            detail: err.error.message,
+          });
+        },
       });
   }
   onRelationPageChange(event: any) {
     this.relationPagination.current_page = event.first / event.rows + 1;
     this.relationPagination.per_page = event.rows;
     this.getRelationEntries();
+  }
+  verifyAuthEntry() {
+    this.loading = true;
+    this.schemaService
+      .getAuthToken(this.schema.uuid, this.entry.uuid)
+      .subscribe({
+        next: (res) => {
+          this.loading = false;
+          const token = res.token;
+          if (token) {
+            const path = '/verify';
+            const queryParams = `?schema=${encodeURIComponent(
+              this.schema.name
+            )}&token=${encodeURIComponent(token)}`;
+            const fullPath = this.location.prepareExternalUrl(
+              path + queryParams
+            );
+            window.open(fullPath, '_blank');
+            this.loading = true;
+            setTimeout(() => {
+              this.getEntryDetails();
+              this.loading = false;
+            }, 5000);
+          }
+        },
+        error: (err) => {
+          this.loading = false;
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Operation Failed',
+            detail: err.error.message,
+          });
+        },
+      });
+  }
+  getEntryDetails() {
+    this.loading = true;
+    this.dataService
+      .getEntryDetails(this.schema.name, this.entry.uuid)
+      .subscribe({
+        next: (data: any) => {
+          this.loading = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: data.message,
+            detail: data.message,
+          });
+          this.editEntry(this.entry);
+        },
+        error: (error) => {
+          this.loading = false;
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Operation Failed',
+            detail: error.error.message,
+          });
+        },
+      });
   }
 }

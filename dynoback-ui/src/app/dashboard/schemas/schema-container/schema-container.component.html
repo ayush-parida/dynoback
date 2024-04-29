@@ -37,7 +37,7 @@
         <ul class="list-none p-0 m-0 overflow-hidden">
           @for (item of schemas; track $index) { @if (item.connectionPoolId ==
           connectionPoolId) {
-          <li (click)="selectedSchema = item; getSchemaDetails()">
+          <li (click)="selectedSchema = item; setActiveSchema()">
             <a
               pRipple
               [ngClass]="selectedSchema.uuid == item.uuid ? 'surface-300' : ''"
@@ -161,8 +161,11 @@
       </form>
 
       <p class="text-1xl font-bold w-full mx-2">
-        Predefined Columns: uuid, created, updated, created_by, updated_by,
-        is_active
+        <u>Predefined Columns:</u> @if (selectedSchema.type == 1) { uuid,
+        created, updated, created_by, updated_by, is_active }
+        @if(selectedSchema.type == 2) { uuid, username, email, password,
+        verified, show_email, created, updated, created_by, updated_by,
+        is_active}
       </p>
 
       <p-divider></p-divider>

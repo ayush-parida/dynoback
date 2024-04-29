@@ -46,7 +46,7 @@ def loadSchemaApi(config, authentication: Authentication):
     
     @api_route('/schema/types', 'GET')
     def get_all_schema_types(headers):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_admin_token(headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else '')
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         schema_types = schemaType._read_schema_types()
@@ -56,7 +56,7 @@ def loadSchemaApi(config, authentication: Authentication):
     
     @api_route('/column/types', 'GET')
     def get_all_columns(headers):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_admin_token(headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else '')
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         columns = column._read_columns()
@@ -66,7 +66,7 @@ def loadSchemaApi(config, authentication: Authentication):
     
     @api_route('/schema', 'GET')
     def get_all_schemas(headers):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_admin_token(headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else '')
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         schemas = schema._read_schemas()
@@ -74,7 +74,7 @@ def loadSchemaApi(config, authentication: Authentication):
     
     @api_route('/schema', 'POST')
     def create_schema(body, headers):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_admin_token(headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else '')
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         new_schema = body
@@ -82,31 +82,38 @@ def loadSchemaApi(config, authentication: Authentication):
     
     @api_route('/schema/<schema_id>', 'GET')
     def get_schema_by_id(schema_id, headers):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_admin_token(headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else '')
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         return schema.get_by_id_schema(schema_id)
     
     @api_route('/schema/<schema_id>', 'PUT')
     def put_schema_by_id(schema_id, body, headers):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_admin_token(headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else '')
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         return schema.edit_schema(schema_id, body, decoded_token["decoded"]["uuid"])
     
     @api_route('/schema/<schema_id>', 'DELETE')
     def delete_schema_by_id(schema_id, headers):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_admin_token(headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else '')
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         return schema.delete_schema(schema_id)
     
-    @api_route('/schemas/unique-name/<name>', 'GET')
+    @api_route('/schema/unique-name/<name>', 'GET')
     def get_unique_name(name, headers):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_admin_token(headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else '')
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         return schema.get_unique_names(name)
+    
+    @api_route('/schema/gen-verify-token/<schema_id>/<uuid>', 'GET')
+    def generate_verify_token_by_schema(schema_id, uuid, headers):
+        decoded_token = authentication.validate_admin_token(headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else '')
+        if not decoded_token["status"]:
+            return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
+        return schema.generate_verify_token(schema_id, uuid)
     
     # @api_route('/process-schema/<uuid>', 'GET')
     # def process_schema(uuid, headers):

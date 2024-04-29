@@ -1,370 +1,1103 @@
 {
-    "schemas": [
+  "schemas": [
+    {
+      "type": 1,
+      "name": "test",
+      "connectionPoolId": "102b6ae0-598b-40b6-adf2-7acff30b01a3",
+      "schema": [
         {
-            "type": 1,
-            "name": "test",
-            "connectionPoolId": "102b6ae0-598b-40b6-adf2-7acff30b01a3",
-            "schema": [
-                {
-                    "system": false,
-                    "isActive": true,
-                    "id": 1,
-                    "name": "field 1",
-                    "type": "text",
-                    "required": true,
-                    "presentable": false,
-                    "unique": false,
-                    "default": "",
-                    "options": {
-                        "min": 2,
-                        "max": 100,
-                        "pattern": ""
-                    }
-                },
-                {
-                    "system": false,
-                    "isActive": true,
-                    "id": 2,
-                    "name": "field 2",
-                    "type": "editor",
-                    "required": true,
-                    "presentable": false,
-                    "unique": false,
-                    "default": "",
-                    "options": {
-                        "convertUrls": true
-                    },
-                    "convertUrls": true
-                },
-                {
-                    "system": false,
-                    "isActive": true,
-                    "id": 3,
-                    "name": "field 3",
-                    "type": "number",
-                    "required": true,
-                    "presentable": false,
-                    "unique": false,
-                    "default": "",
-                    "options": {
-                        "min": 20,
-                        "max": 200,
-                        "noDecimal": true
-                    }
-                },
-                {
-                    "system": false,
-                    "isActive": true,
-                    "id": 4,
-                    "name": "field 4",
-                    "type": "bool",
-                    "required": true,
-                    "presentable": false,
-                    "unique": false,
-                    "default": "",
-                    "options": {}
-                },
-                {
-                    "system": false,
-                    "isActive": true,
-                    "id": 5,
-                    "name": "field 5",
-                    "type": "email",
-                    "required": true,
-                    "presentable": false,
-                    "unique": true,
-                    "default": "",
-                    "options": {
-                        "exceptDomains": null,
-                        "onlyDomains": "gmail.com"
-                    }
-                },
-                {
-                    "system": false,
-                    "isActive": true,
-                    "id": 6,
-                    "name": "field 6",
-                    "type": "url",
-                    "required": true,
-                    "presentable": false,
-                    "unique": true,
-                    "default": "",
-                    "options": {
-                        "exceptDomains": "",
-                        "onlyDomains": "gmail.com"
-                    }
-                },
-                {
-                    "system": false,
-                    "isActive": true,
-                    "id": 7,
-                    "name": "field 7",
-                    "type": "date",
-                    "required": true,
-                    "presentable": false,
-                    "unique": false,
-                    "default": "",
-                    "options": {
-                        "min": "2024-03-03T10:38:30.000Z",
-                        "max": "2024-03-30T10:38:33.000Z"
-                    }
-                }
-            ],
-            "uuid": "1827b15f-0d21-4818-9858-261455a72908",
-            "isActive": true,
-            "softDelete": true,
-            "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
-            "updatedBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
-            "created": "2024-03-16T05:36:09.701564",
-            "updated": "2024-03-31T15:31:07.374461",
-            "operations": [
-                "GET_ALL",
-                "GET_BY_ID",
-                "KVP",
-                "POST",
-                "PUT",
-                "DELETE"
-            ]
+          "system": false,
+          "isActive": true,
+          "id": 1,
+          "name": "field 1",
+          "type": "text",
+          "required": true,
+          "presentable": false,
+          "unique": false,
+          "default": "",
+          "options": {
+            "min": 2,
+            "max": 100,
+            "pattern": ""
+          }
         },
         {
-            "type": 1,
-            "name": "test_2",
-            "connectionPoolId": "102b6ae0-598b-40b6-adf2-7acff30b01a3",
-            "schema": [
-                {
-                    "system": false,
-                    "isActive": true,
-                    "id": 1,
-                    "name": "field 1",
-                    "type": "text",
-                    "required": false,
-                    "presentable": false,
-                    "unique": false,
-                    "default": "",
-                    "options": {
-                        "min": null,
-                        "max": null,
-                        "pattern": ""
-                    }
-                },
-                {
-                    "system": false,
-                    "isActive": true,
-                    "id": 1,
-                    "name": "field 2",
-                    "type": "text",
-                    "required": false,
-                    "presentable": false,
-                    "unique": false,
-                    "default": "",
-                    "options": {
-                        "min": null,
-                        "max": null,
-                        "pattern": ""
-                    }
-                },
-                {
-                    "system": false,
-                    "isActive": true,
-                    "id": 3,
-                    "name": "field 3",
-                    "type": "number",
-                    "required": false,
-                    "presentable": false,
-                    "unique": false,
-                    "default": "",
-                    "options": {
-                        "min": null,
-                        "max": null,
-                        "noDecimal": false
-                    }
-                },
-                {
-                    "system": false,
-                    "isActive": true,
-                    "id": 11,
-                    "name": "field 4",
-                    "type": "relation",
-                    "required": false,
-                    "presentable": false,
-                    "unique": false,
-                    "default": "",
-                    "options": {
-                        "collectionId": "102b6ae0-598b-40b6-adf2-7acff30b01a3",
-                        "cascadeDelete": true,
-                        "relatedTableUuid": "1827b15f-0d21-4818-9858-261455a72908",
-                        "displayFields": null,
-                        "relatedTableName": "test"
-                    }
-                }
-            ],
-            "uuid": "961d53d9-0157-4834-851d-fdc6f53d5be5",
-            "isActive": true,
-            "softDelete": false,
-            "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
-            "updatedBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
-            "created": "2024-03-19T19:24:24.075956",
-            "updated": "2024-04-24T23:47:28.610109",
-            "operations": [
-                "GET_ALL",
-                "GET_BY_ID",
-                "KVP",
-                "POST",
-                "PUT",
-                "DELETE"
-            ],
-            "kvp": [
-                "field 1"
-            ]
+          "system": false,
+          "isActive": true,
+          "id": 2,
+          "name": "field 2",
+          "type": "editor",
+          "required": true,
+          "presentable": false,
+          "unique": false,
+          "default": "",
+          "options": {
+            "convertUrls": true
+          },
+          "convertUrls": true
         },
         {
-            "type": 1,
-            "name": "rest",
-            "connectionPoolId": "102b6ae0-598b-40b6-adf2-7acff30b01a3",
-            "softDelete": true,
-            "schema": [
-                {
-                    "system": false,
-                    "isActive": true,
-                    "id": 1,
-                    "name": "name",
-                    "type": "text",
-                    "required": true,
-                    "presentable": false,
-                    "unique": true,
-                    "default": "",
-                    "options": {
-                        "min": null,
-                        "max": null,
-                        "pattern": ""
-                    },
-                    "uuid": "5c613200-3f70-4fee-9829-efccd3cefef4"
-                },
-                {
-                    "system": false,
-                    "isActive": true,
-                    "id": 3,
-                    "name": "value",
-                    "type": "number",
-                    "required": false,
-                    "presentable": false,
-                    "unique": false,
-                    "default": "",
-                    "options": {
-                        "min": null,
-                        "max": null,
-                        "noDecimal": false
-                    },
-                    "uuid": "93a13ae2-bc49-4e4f-b2fe-b93bb4ce39d8"
-                },
-                {
-                    "system": false,
-                    "isActive": true,
-                    "id": 10,
-                    "name": "body",
-                    "type": "json",
-                    "required": false,
-                    "presentable": false,
-                    "unique": false,
-                    "default": "{}",
-                    "options": {
-                        "maxSize": 2000000
-                    }
-                },
-                {
-                    "system": false,
-                    "isActive": true,
-                    "id": 8,
-                    "name": "gender",
-                    "type": "select",
-                    "required": false,
-                    "presentable": false,
-                    "unique": false,
-                    "default": "",
-                    "options": {
-                        "maxSelect": 1,
-                        "values": [
-                            "Male",
-                            "Female",
-                            "Others"
-                        ]
-                    }
-                },
-                {
-                    "system": false,
-                    "isActive": true,
-                    "id": 11,
-                    "name": "field 5",
-                    "type": "relation",
-                    "required": false,
-                    "presentable": false,
-                    "unique": false,
-                    "default": "",
-                    "options": {
-                        "collectionId": "102b6ae0-598b-40b6-adf2-7acff30b01a3",
-                        "cascadeDelete": true,
-                        "relatedTableUuid": "961d53d9-0157-4834-851d-fdc6f53d5be5",
-                        "displayFields": null,
-                        "relatedTableName": "test_2"
-                    }
-                }
-            ],
-            "uuid": "ef1167f2-dccf-4513-afcc-f82508348af9",
-            "isActive": true,
-            "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
-            "updatedBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
-            "operations": [
-                "GET_ALL",
-                "GET_BY_ID",
-                "KVP",
-                "POST",
-                "PUT",
-                "DELETE"
-            ],
-            "created": "2024-03-25T22:13:17.102076",
-            "updated": "2024-04-24T23:28:45.644385",
-            "kvp": [
-                "name"
-            ]
+          "system": false,
+          "isActive": true,
+          "id": 3,
+          "name": "field 3",
+          "type": "number",
+          "required": true,
+          "presentable": false,
+          "unique": false,
+          "default": "",
+          "options": {
+            "min": 20,
+            "max": 200,
+            "noDecimal": true
+          }
         },
         {
-            "type": 2,
-            "name": "users",
-            "connectionPoolId": "102b6ae0-598b-40b6-adf2-7acff30b01a3",
-            "softDelete": true,
-            "schema": [
-                {
-                    "system": false,
-                    "isActive": true,
-                    "id": 1,
-                    "name": "name",
-                    "type": "text",
-                    "required": false,
-                    "presentable": false,
-                    "unique": false,
-                    "default": "",
-                    "options": {
-                        "min": null,
-                        "max": null,
-                        "pattern": ""
-                    },
-                    "uuid": "2b53264b-b80d-4962-a2d7-ffaa5e33c4ce"
-                }
-            ],
-            "uuid": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
-            "isActive": true,
-            "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
-            "updatedBy": "",
-            "operations": [
-                "GET_ALL",
-                "GET_BY_ID",
-                "KVP",
-                "POST",
-                "PUT",
-                "DELETE"
-            ],
-            "created": "2024-04-18T14:25:56.676424",
-            "updated": "2024-04-18T14:25:56.676424"
+          "system": false,
+          "isActive": true,
+          "id": 4,
+          "name": "field 4",
+          "type": "bool",
+          "required": true,
+          "presentable": false,
+          "unique": false,
+          "default": "",
+          "options": {}
+        },
+        {
+          "system": false,
+          "isActive": true,
+          "id": 5,
+          "name": "field 5",
+          "type": "email",
+          "required": true,
+          "presentable": false,
+          "unique": true,
+          "default": "",
+          "options": {
+            "exceptDomains": null,
+            "onlyDomains": "gmail.com"
+          }
+        },
+        {
+          "system": false,
+          "isActive": true,
+          "id": 6,
+          "name": "field 6",
+          "type": "url",
+          "required": true,
+          "presentable": false,
+          "unique": true,
+          "default": "",
+          "options": {
+            "exceptDomains": "",
+            "onlyDomains": "gmail.com"
+          }
+        },
+        {
+          "system": false,
+          "isActive": true,
+          "id": 7,
+          "name": "field 7",
+          "type": "date",
+          "required": true,
+          "presentable": false,
+          "unique": false,
+          "default": "",
+          "options": {
+            "min": "2024-03-03T10:38:30.000Z",
+            "max": "2024-03-30T10:38:33.000Z"
+          }
         }
-    ]
+      ],
+      "uuid": "1827b15f-0d21-4818-9858-261455a72908",
+      "isActive": true,
+      "softDelete": true,
+      "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
+      "updatedBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
+      "created": "2024-03-16T05:36:09.701564",
+      "updated": "2024-03-31T15:31:07.374461",
+      "operations": [
+        {
+          "name": "GET_ALL",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "users",
+              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "GET_BY_ID",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "users",
+              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "KVP",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "users",
+              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "POST",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "users",
+              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "PUT",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "users",
+              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "DELETE",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "users",
+              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
+              "access": []
+            }
+          ]
+        }
+      ],
+      "kvp": []
+    },
+    {
+      "type": 1,
+      "name": "test_2",
+      "connectionPoolId": "102b6ae0-598b-40b6-adf2-7acff30b01a3",
+      "schema": [
+        {
+          "system": false,
+          "isActive": true,
+          "id": 1,
+          "name": "field 1",
+          "type": "text",
+          "required": false,
+          "presentable": false,
+          "unique": false,
+          "default": "",
+          "options": {
+            "min": null,
+            "max": null,
+            "pattern": ""
+          }
+        },
+        {
+          "system": false,
+          "isActive": true,
+          "id": 1,
+          "name": "field 2",
+          "type": "text",
+          "required": false,
+          "presentable": false,
+          "unique": false,
+          "default": "",
+          "options": {
+            "min": null,
+            "max": null,
+            "pattern": ""
+          }
+        },
+        {
+          "system": false,
+          "isActive": true,
+          "id": 3,
+          "name": "field 3",
+          "type": "number",
+          "required": false,
+          "presentable": false,
+          "unique": false,
+          "default": "",
+          "options": {
+            "min": null,
+            "max": null,
+            "noDecimal": false
+          }
+        },
+        {
+          "system": false,
+          "isActive": true,
+          "id": 11,
+          "name": "field 4",
+          "type": "relation",
+          "required": false,
+          "presentable": false,
+          "unique": false,
+          "default": "",
+          "options": {
+            "collectionId": "102b6ae0-598b-40b6-adf2-7acff30b01a3",
+            "cascadeDelete": true,
+            "relatedTableUuid": "1827b15f-0d21-4818-9858-261455a72908",
+            "displayFields": null,
+            "relatedTableName": "test"
+          }
+        }
+      ],
+      "uuid": "961d53d9-0157-4834-851d-fdc6f53d5be5",
+      "isActive": true,
+      "softDelete": false,
+      "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
+      "updatedBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
+      "created": "2024-03-19T19:24:24.075956",
+      "updated": "2024-04-24T23:47:28.610109",
+      "operations": [
+        {
+          "name": "GET_ALL",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "users",
+              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "GET_BY_ID",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "users",
+              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "KVP",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "users",
+              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "POST",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "users",
+              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "PUT",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "users",
+              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "DELETE",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "users",
+              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
+              "access": []
+            }
+          ]
+        }
+      ],
+      "kvp": ["field 1"]
+    },
+    {
+      "type": 1,
+      "name": "rest",
+      "connectionPoolId": "102b6ae0-598b-40b6-adf2-7acff30b01a3",
+      "softDelete": true,
+      "schema": [
+        {
+          "system": false,
+          "isActive": true,
+          "id": 1,
+          "name": "name",
+          "type": "text",
+          "required": true,
+          "presentable": false,
+          "unique": true,
+          "default": "",
+          "options": {
+            "min": null,
+            "max": null,
+            "pattern": ""
+          },
+          "uuid": "5c613200-3f70-4fee-9829-efccd3cefef4"
+        },
+        {
+          "system": false,
+          "isActive": true,
+          "id": 3,
+          "name": "value",
+          "type": "number",
+          "required": false,
+          "presentable": false,
+          "unique": false,
+          "default": "",
+          "options": {
+            "min": null,
+            "max": null,
+            "noDecimal": false
+          },
+          "uuid": "93a13ae2-bc49-4e4f-b2fe-b93bb4ce39d8"
+        },
+        {
+          "system": false,
+          "isActive": true,
+          "id": 10,
+          "name": "body",
+          "type": "json",
+          "required": false,
+          "presentable": false,
+          "unique": false,
+          "default": "{}",
+          "options": {
+            "maxSize": 2000000
+          }
+        },
+        {
+          "system": false,
+          "isActive": true,
+          "id": 8,
+          "name": "gender",
+          "type": "select",
+          "required": false,
+          "presentable": false,
+          "unique": false,
+          "default": "",
+          "options": {
+            "maxSelect": 1,
+            "values": ["Male", "Female", "Others"]
+          }
+        },
+        {
+          "system": false,
+          "isActive": true,
+          "id": 11,
+          "name": "field 5",
+          "type": "relation",
+          "required": false,
+          "presentable": false,
+          "unique": false,
+          "default": "",
+          "options": {
+            "collectionId": "102b6ae0-598b-40b6-adf2-7acff30b01a3",
+            "cascadeDelete": true,
+            "relatedTableUuid": "961d53d9-0157-4834-851d-fdc6f53d5be5",
+            "displayFields": null,
+            "relatedTableName": "test_2"
+          }
+        }
+      ],
+      "uuid": "ef1167f2-dccf-4513-afcc-f82508348af9",
+      "isActive": true,
+      "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
+      "updatedBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
+      "operations": [
+        {
+          "name": "GET_ALL",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "users",
+              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "GET_BY_ID",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "users",
+              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "KVP",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "users",
+              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "POST",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "users",
+              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "PUT",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "users",
+              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "DELETE",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "users",
+              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
+              "access": []
+            }
+          ]
+        }
+      ],
+      "created": "2024-03-25T22:13:17.102076",
+      "updated": "2024-04-24T23:28:45.644385",
+      "kvp": ["name"]
+    },
+    {
+      "type": 2,
+      "name": "users",
+      "connectionPoolId": "102b6ae0-598b-40b6-adf2-7acff30b01a3",
+      "softDelete": true,
+      "schema": [
+        {
+          "system": false,
+          "isActive": true,
+          "id": 1,
+          "name": "name",
+          "type": "text",
+          "required": false,
+          "presentable": false,
+          "unique": false,
+          "default": "",
+          "options": {
+            "min": null,
+            "max": null,
+            "pattern": ""
+          },
+          "uuid": "2b53264b-b80d-4962-a2d7-ffaa5e33c4ce"
+        }
+      ],
+      "uuid": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
+      "isActive": true,
+      "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
+      "updatedBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
+      "operations": [
+        {
+          "name": "GET_ALL",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "GET_BY_ID",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "KVP",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "POST",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "PUT",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "DELETE",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "ME",
+          "value": false,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "REGISTER",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "LOGIN",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "anyone",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "LOGOUT",
+          "value": false,
+          "access": []
+        },
+        {
+          "name": "PASSWORD_RESET_REQUEST",
+          "value": false,
+          "access": []
+        },
+        {
+          "name": "RESET_PASSWORD",
+          "value": false,
+          "access": []
+        },
+        {
+          "name": "CHANGE_PASSWORD",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "users",
+              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "VERIFY_EMAIL_REQUEST",
+          "value": false,
+          "access": []
+        },
+        {
+          "name": "VERIFY_EMAIL",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "users",
+              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "REFRESH_TOKEN",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "users",
+              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "TWO_FACTOR",
+          "value": false,
+          "access": []
+        },
+        {
+          "name": "TWO_FACTOR_VERIFY",
+          "value": false,
+          "access": []
+        },
+        {
+          "name": "SESSIONS",
+          "value": false,
+          "access": []
+        },
+        {
+          "name": "UNIQUE_EMAIL",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "anyone",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "UNIQUE_USERNAME",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "anyone",
+              "value": true,
+              "access": []
+            }
+          ]
+        }
+      ],
+      "created": "2024-04-18T14:25:56.676424",
+      "updated": "2024-04-25T00:59:54.050449",
+      "kvp": ["name"],
+      "secret_key": "temp_secret_key",
+      "expiry": 1440
+    },
+    {
+      "type": 2,
+      "name": "managers",
+      "connectionPoolId": "102b6ae0-598b-40b6-adf2-7acff30b01a3",
+      "softDelete": true,
+      "kvp": [],
+      "schema": [
+        {
+          "system": false,
+          "isActive": true,
+          "id": 1,
+          "name": "name",
+          "type": "text",
+          "required": false,
+          "presentable": false,
+          "unique": false,
+          "default": "",
+          "options": {
+            "min": null,
+            "max": null,
+            "pattern": ""
+          },
+          "uuid": "d5ec6c79-b9df-4cc9-ae7a-bbd11ebf9bf2"
+        }
+      ],
+      "uuid": "0b4f9236-31c2-4f3f-983c-f2f002ada648",
+      "isActive": true,
+      "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
+      "updatedBy": "",
+      "secret_key": "temp_secret_key",
+      "operations": [
+        {
+          "name": "GET_ALL",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "GET_BY_ID",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "KVP",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "POST",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "PUT",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "DELETE",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "REGISTER",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "LOGIN",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "LOGOUT",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "PASSWORD_RESET_REQUEST",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "RESET_PASSWORD",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "CHANGE_PASSWORD",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "VERIFY_EMAIL",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "REFRESH_TOKEN",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "TWO_FACTOR",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "TWO_FACTOR_VERIFY",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "SESSIONS",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "UNIQUE_EMAIL",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "anyone",
+              "value": true,
+              "access": []
+            }
+          ]
+        },
+        {
+          "name": "UNIQUE_USERNAME",
+          "value": true,
+          "access": [
+            {
+              "name": "admin",
+              "value": true,
+              "access": []
+            },
+            {
+              "name": "anyone",
+              "value": true,
+              "access": []
+            }
+          ]
+        }
+      ],
+      "created": "2024-04-29T23:43:20.843770",
+      "updated": "2024-04-29T23:43:20.843770"
+    }
+  ]
 }
