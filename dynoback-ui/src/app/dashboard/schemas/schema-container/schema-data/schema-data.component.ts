@@ -66,6 +66,7 @@ export class SchemaDataComponent implements OnChanges {
     sort_order: 'asc',
   };
   relationEntries: any[] = [];
+  isEdit: boolean = false;
   jsonEditorOptions: JsonEditorOptions = new JsonEditorOptions();
 
   FIELD_TYPE = FIELD_TYPE;
@@ -84,8 +85,8 @@ export class SchemaDataComponent implements OnChanges {
   constructor() {}
   ngOnChanges(changes: SimpleChanges): void {
     this.reset();
-    this.fetchEntries();
     this.setupColumns();
+    this.fetchEntries();
     this.setJsonEditorProps();
   }
   setJsonEditorProps() {
@@ -253,7 +254,7 @@ export class SchemaDataComponent implements OnChanges {
                 this.configService.apiUrl,
                 this.schema.name,
                 'unique_email',
-                false
+                this.isEdit
               ),
             ],
             updateOn: 'change',
@@ -269,12 +270,20 @@ export class SchemaDataComponent implements OnChanges {
                 this.configService.apiUrl,
                 this.schema.name,
                 'unique_username',
-                false
+                this.isEdit
               ),
             ],
             updateOn: 'change',
           })
         );
+        if (!this.isEdit) {
+          this.form.addControl(
+            'password',
+            new FormControl(col.default || '', {
+              validators: [Validators.required, Validators.minLength(6)],
+            })
+          );
+        }
         this.form.addControl('verified', new FormControl(false));
         this.form.addControl('show_email', new FormControl(true));
       }
@@ -282,6 +291,8 @@ export class SchemaDataComponent implements OnChanges {
   }
 
   openNew() {
+    this.isEdit = false;
+    this.setupColumns();
     this.entry = {};
     this.entryDialog = true;
     this.form.get('verified')?.disable();
@@ -302,6 +313,7 @@ export class SchemaDataComponent implements OnChanges {
 
   editEntry(entry: any) {
     var customEntry = {};
+    this.isEdit = true;
     for (const col of this.dynamicColumns) {
       if (col.id == FIELD_TYPE.DATE) {
         customEntry = {
@@ -339,9 +351,11 @@ export class SchemaDataComponent implements OnChanges {
     }
     this.entry = { ...customEntry, ...entry };
     this.entryDialog = true;
+    this.setupColumns();
     this.form.patchValue(this.entry);
     this.form.get('verified')?.disable();
     this.form.get('show_email')?.disable();
+    this.form.get('email')?.disable();
   }
   deleteEntry(entry: any) {
     this.loading = true;
@@ -383,6 +397,7 @@ export class SchemaDataComponent implements OnChanges {
 
   saveEntry() {
     console.log(this.form);
+    console.log(this.form.valid);
     // Assuming form validation is handled
     if (this.form.valid) {
       var formData = JSON.parse(JSON.stringify(this.form.value));

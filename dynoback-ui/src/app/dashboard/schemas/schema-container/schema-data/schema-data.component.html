@@ -347,6 +347,7 @@
                 type="text"
                 formControlName="email"
                 class="w-full"
+                [ngClass]="form.get('email')?.touched && form.get('email')?.errors?.['unique'] ? 'ng-invalid ng-dirty': ''"
               />
               <div
                 *ngIf="form.get('email')?.touched && form.get('email')?.errors?.['unique']"
@@ -355,6 +356,26 @@
               </div>
             </div>
           </div>
+          @if (!isEdit) {
+          <div class="col-6">
+            <div class="flex flex-column w-full">
+              <label for="password" class="font-bold"> password</label>
+              <p-password
+                formControlName="password"
+                class="w-full"
+                styleClass="w-full"
+                [toggleMask]="true"
+                [ngClass]="form.get('password')?.touched && form.get('password')?.errors?.['minlength'] ? 'ng-invalid ng-dirty': ''"
+              ></p-password>
+              <div
+                *ngIf="form.get('password')?.touched && form.get('password')?.errors?.['minlength']"
+              >
+                Min length of 6 is required.
+              </div>
+            </div>
+          </div>
+          }
+
           <div class="col-6">
             <div class="flex flex-column w-full">
               <label for="username" class="font-bold"> username</label>
@@ -364,6 +385,7 @@
                 type="text"
                 formControlName="username"
                 class="w-full"
+                [ngClass]="form.get('username')?.touched && form.get('username')?.errors?.['unique'] ? 'ng-invalid ng-dirty': ''"
               />
               <div
                 *ngIf="form.get('username')?.touched && form.get('username')?.errors?.['unique']"
