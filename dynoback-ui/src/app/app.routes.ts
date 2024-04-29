@@ -4,13 +4,18 @@ import { authGuard } from './shared/auth.guard';
 export const routes: Routes = [
   // { path: '', redirectTo: '/login', pathMatch: 'full' },
   {
-    path: 'admin',
+    path: '',
     component: AppComponent,
     children: [
       {
         path: 'login',
         loadComponent: () =>
           import('./login/login.component').then((c) => c.LoginComponent),
+      },
+      {
+        path: 'verify',
+        loadComponent: () =>
+          import('./verify/verify.component').then((c) => c.VerifyComponent),
       },
       {
         path: 'databases',
@@ -30,6 +35,7 @@ export const routes: Routes = [
           },
         ],
       },
+
       {
         path: '',
         loadComponent: () =>
@@ -73,8 +79,27 @@ export const routes: Routes = [
             canActivate: [authGuard],
             children: [],
           },
+
+          {
+            path: 'profile',
+            loadComponent: () =>
+              import('./dashboard/settings/profile/profile.component').then(
+                (c) => c.ProfileComponent
+              ),
+            canActivate: [authGuard],
+          },
+          {
+            path: 'schemas/:uuid',
+            loadComponent: () =>
+              import(
+                './dashboard/schemas/schema-container/schema-container.component'
+              ).then((c) => c.SchemaContainerComponent),
+            canActivate: [authGuard],
+            children: [],
+          },
         ],
       },
     ],
   },
+  { path: 'verify', component: AppComponent },
 ];

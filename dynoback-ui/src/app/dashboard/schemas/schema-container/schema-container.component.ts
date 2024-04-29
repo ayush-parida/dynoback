@@ -23,6 +23,7 @@ import { JsonColumnComponent } from './json-column/json-column.component';
 import { RelationColumnComponent } from './relation-column/relation-column.component';
 import { SchemaDataComponent } from './schema-data/schema-data.component';
 import { TabViewModule } from 'primeng/tabview';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-schema-container',
@@ -57,6 +58,7 @@ export class SchemaContainerComponent {
   schemaSidebarLoading: boolean = false;
   isView: boolean = false;
   activeIndex: number = 0;
+  activeIndexTypeTwo: number = -1;
 
   message401: any = {
     success: false,
@@ -105,8 +107,45 @@ export class SchemaContainerComponent {
   showColumnSelect: boolean = false;
   activeColumnExpand: number = -1;
   connections: any[] = [];
-  sidebarItems = ['Search/Pagination', 'Details', 'Create', 'Update', 'Delete'];
+  sidebarItems = [
+    'Search/Pagination',
+    'Details',
+    'Create',
+    'Update',
+    'Delete',
+    'KVP',
+  ];
+
+  schemaTypeTwoItems = [
+    'Login',
+    'Change Password',
+    'Verify Email',
+    'Refresh Token',
+    'Unique Email',
+    'Umique /username',
+  ];
+
+  loginJson = {
+    username: 'sample@email.com',
+    password: 'samplePaasword',
+  };
+
+  changePasswordJson = {
+    record_id: '123e4567-e89b-12d3-a456-426614174000',
+    old_password: 'sampleOldPassword',
+    new_password: 'sampleNewPassword',
+  };
+
+  uniqueEmailJson = {
+    value: 'example@email.com',
+  };
+
+  uniqueUsernameJson = {
+    value: 'example',
+  };
+
   selectedTab: string = this.sidebarItems[0];
+  selectedTabTypeTwo: string = this.schemaTypeTwoItems[0];
   createActions: MenuItem[] = [
     {
       label: 'Duplicate',
@@ -123,21 +162,32 @@ export class SchemaContainerComponent {
       },
     },
   ];
-
+  uuid: string = '';
   FIELD_TYPE = FIELD_TYPE;
   private messageService = inject(MessageService);
   private fb = inject(FormBuilder);
   private confirmationService = inject(ConfirmationService);
   private schemaService = inject(SchemaService);
   private configService = inject(ConfigService);
+  private activatedRoute = inject(ActivatedRoute);
+  private router = inject(Router);
 
   constructor() {
-    this.getSchemaTypes();
-    this.getColumns();
-    this.getConnections(true);
-    this.getSchemas();
-  }
+    this.activatedRoute.params.subscribe((params) => {
+      if (params['uuid']) {
+        this.uuid = params['uuid'];
+        this.getSchemaDetails();
+      }
 
+      this.getSchemaTypes();
+      this.getColumns();
+      this.getConnections(true);
+      this.getSchemas();
+    });
+  }
+  setActiveSchema() {
+    this.router.navigate(['/schemas/' + this.selectedSchema.uuid]);
+  }
   addOpen(): void {
     this.schemaFormSidebarVisible = true;
     this.selectedSchema = {} as Schema;
@@ -151,11 +201,12 @@ export class SchemaContainerComponent {
   getSchemaDetails() {
     this.loading = true;
     this.subscriptions.add(
-      this.schemaService.getSchemaDetails(this.selectedSchema.uuid).subscribe({
+      this.schemaService.getSchemaDetails(this.uuid).subscribe({
         next: (data: any) => {
           this.loading = false;
           this.schemaFormGroup = this.initSchemaForm(false, data);
           this.fullSchema = data.schema;
+          this.selectedSchema = data;
         },
         error: (error) => {
           this.loading = false;
@@ -182,6 +233,7 @@ export class SchemaContainerComponent {
         ],
         connectionPoolId: [null, [Validators.required]],
         softDelete: [true],
+        kvp: [[]],
       });
       formGroup.patchValue(values);
       return formGroup;
@@ -205,6 +257,7 @@ export class SchemaContainerComponent {
         ],
         connectionPoolId: [null, [Validators.required]],
         softDelete: [true],
+        kvp: [[]],
       });
       return formGroup;
     }
@@ -515,10 +568,23 @@ export class SchemaContainerComponent {
 
   confirmCloseApiPreview() {
     this.apiPreviewSidebarVisible = false;
+    this.activeIndex = 0;
+    this.activeIndexTypeTwo = -1;
+    this.selectedTabTypeTwo = '';
+    this.selectedTab = 'Search/Pagination';
   }
   selectTab(item: string, index: number) {
     this.activeIndex = index;
     this.selectedTab = item;
+    this.selectedTabTypeTwo = '';
+    this.activeIndexTypeTwo = -1;
+  }
+
+  selectTabTypeTwo(item: string, index: number) {
+    this.activeIndexTypeTwo = index;
+    this.selectedTabTypeTwo = item;
+    this.selectedTab = '';
+    this.activeIndex = -1;
   }
   // onTabChange(event: any) {
   //   this.selectedTab = event.index;
@@ -576,7 +642,7 @@ export class SchemaContainerComponent {
           const firstOption = field.options.values
             ? field.options.values[0]
             : 'Option 1';
-          sampleRecord[field.name.replace(/\s+/g, '_')] = firstOption;
+          sampleRecord[field.name.replace(/\s+/g, '_')] = [firstOption];
           break;
         case FIELD_TYPE.FILE:
           // Simulating a file with a basic object, adjust according to your file handling

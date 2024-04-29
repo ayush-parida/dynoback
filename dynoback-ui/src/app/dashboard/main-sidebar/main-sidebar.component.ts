@@ -15,17 +15,17 @@ export class MainSidebarComponent {
     {
       label: 'Databases',
       icon: 'pi-database',
-      route: ['/admin/databases'],
+      route: ['/databases'],
     },
     {
       label: 'Schemas',
       icon: 'pi-table',
-      route: ['/admin/schemas'],
+      route: ['/schemas'],
     },
     {
       label: 'Settings',
       icon: 'pi-cog',
-      route: ['/admin/settings'],
+      route: ['/settings'],
     },
   ];
   logout() {

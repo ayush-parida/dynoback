@@ -37,7 +37,7 @@
         <ul class="list-none p-0 m-0 overflow-hidden">
           @for (item of schemas; track $index) { @if (item.connectionPoolId ==
           connectionPoolId) {
-          <li (click)="selectedSchema = item; getSchemaDetails()">
+          <li (click)="selectedSchema = item; setActiveSchema()">
             <a
               pRipple
               [ngClass]="selectedSchema.uuid == item.uuid ? 'surface-300' : ''"
@@ -145,12 +145,29 @@
             </div>
           </div>
         </div>
+        <div class="mt-3">
+          <label for="kvp">KVP API fields (uuid is included by default)</label>
+          <p-multiSelect
+            id="kvp"
+            formControlName="kvp"
+            class="w-5 ml-auto mt-2"
+            styleClass="min-w-full"
+            [options]="fullSchema"
+            optionLabel="name"
+            placeholder="Select one or more Schema Columns"
+            optionValue="name"
+          ></p-multiSelect>
+        </div>
       </form>
 
       <p class="text-1xl font-bold w-full mx-2">
-        Predefined Columns: uuid, created, updated, created_by, updated_by,
-        is_active
+        <u>Predefined Columns:</u> @if (selectedSchema.type == 1) { uuid,
+        created, updated, created_by, updated_by, is_active }
+        @if(selectedSchema.type == 2) { uuid, username, email, password,
+        verified, show_email, created, updated, created_by, updated_by,
+        is_active}
       </p>
+
       <p-divider></p-divider>
     </div>
   </ng-template>
@@ -305,13 +322,13 @@
   </ng-template>
 </p-sidebar>
 
-<!-- API Preview code by nitika start -->
+<!-- API Preview start -->
 <p-sidebar
   [(visible)]="apiPreviewSidebarVisible"
   [showCloseIcon]="false"
   [closeOnEscape]="false"
   [position]="'right'"
-  styleClass="w-6"
+  styleClass="w-7"
   [dismissible]="false"
 >
   <ng-template pTemplate="content">
@@ -329,55 +346,79 @@
             <div class="p-col">
               <span
                 [ngClass]="
-                  i === activeIndex ? 'surface-200 border-round-md' : 'p-2 py-3'
+                  i === activeIndex
+                    ? 'surface-200 border-round-md'
+                    : 'p-2 mx-2 py-3'
                 "
-                class="font-bold text-lg cursor-pointer flex w-full p-2 py-3"
+                class="font-bold text-base cursor-pointer flex w-full p-2 mx-2 py-3"
                 (click)="selectTab(item, i)"
                 >{{ item }}</span
               >
             </div>
           </div>
+          @if(selectedSchema.type == 2){
+          <p-divider></p-divider>
+          <div
+            class="p-grid my-1"
+            *ngFor="let item of schemaTypeTwoItems; let k = index"
+          >
+            <div class="p-col">
+              <span
+                [ngClass]="
+                  k === activeIndexTypeTwo
+                    ? 'surface-200 border-round-md'
+                    : 'p-2 mx-2 py-3'
+                "
+                class="font-bold text-base cursor-pointer flex w-full p-2 mx-2 py-3"
+                (click)="selectTabTypeTwo(item, k)"
+                >{{ item }}</span
+              >
+            </div>
+          </div>
+          }
         </div>
       </div>
       <div class="sidebar-content w-full overflow-y-auto">
         <!-- Main content -->
         <ng-container *ngIf="selectedTab === 'Search/Pagination'">
-          <div class="p-3 font-medium ml-2 text-xl">API details</div>
+          <div class="p-3 font-medium ml-2 text">
+            API details - Search/Pagination
+          </div>
           <div class="ml-4 p-3 bg-blue-100 border-round-lg font-bold">
-            <span class="surface-800 px-3 py-2 border-round-lg text-white">
+            <span
+              class="surface-800 px-3 py-2 border-round-lg text-white text-base"
+            >
               GET
             </span>
 
-            <span class="pl-4 text-xl font-medium"
-              >/api/<span class="font-bold">{{ selectedSchema.name }}</span
-              >/records</span
+            <span class="pl-4 text font-medium"
+              >/api/<span class="font-bold">{{
+                selectedSchema.name
+              }}</span></span
             >
           </div>
-
           <p-divider></p-divider>
-          <div class="p-3 font-medium text-500 mt-3 ml-2 text-xl">
-            Responses
-          </div>
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text">Responses</div>
           <p-tabView styleClass="ml-3">
             <p-tabPanel [header]="'200'">
               <ng-container>
                 <div class="font-medium line-height-3">
                   <pre
-                    class="text-lg mb-3"
+                    class="text-base mb-3"
                   ><textarea highlight-js [lang]="'json'" class="html">{{ generatePaginationSampleRecord(selectedSchema) | json }}</textarea></pre>
                 </div>
               </ng-container>
             </p-tabPanel>
             <p-tabPanel [header]="'401'">
               <div class="font-medium line-height-3">
-                <pre class="text-lg mb-3">
+                <pre class="text-base mb-3">
                 <code highlight-js [lang]="'json'">{{ message401 | json}}</code>
               </pre>
               </div>
             </p-tabPanel>
             <p-tabPanel [header]="'404'">
               <div class="font-medium line-height-3">
-                <pre class="text-lg mb-3">
+                <pre class="text-base mb-3">
                 <code highlight-js [lang]="'json'">{{ message404 | json}}</code>
               </pre>
               </div>
@@ -386,42 +427,42 @@
         </ng-container>
 
         <ng-container *ngIf="selectedTab === 'Details'">
-          <div class="p-3 font-medium ml-2 text-xl">API details</div>
+          <div class="p-3 font-medium ml-2 text">API details - Details</div>
           <div class="ml-4 p-3 bg-blue-100 border-round-lg font-bold">
-            <span class="surface-800 px-3 py-2 border-round-lg text-white">
+            <span
+              class="surface-800 px-3 py-2 border-round-lg text-white text-base"
+            >
               GET
             </span>
 
-            <span class="pl-4 text-xl font-medium"
+            <span class="pl-4 text font-medium"
               >/api/<span class="font-bold">{{ selectedSchema.name }}</span
               >/<span class="font-bold">:uuid</span></span
             >
           </div>
 
           <p-divider></p-divider>
-          <div class="p-3 font-medium text-500 mt-3 ml-2 text-xl">
-            Responses
-          </div>
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text">Responses</div>
           <p-tabView styleClass="ml-3">
             <p-tabPanel [header]="'200'">
               <ng-container>
                 <div class="font-medium line-height-3">
                   <pre
-                    class="text-lg mb-3"
+                    class="text-base mb-3"
                   ><textarea highlight-js [lang]="'json'" class="html">{{ generateSampleRecord(selectedSchema) | json }}</textarea></pre>
                 </div>
               </ng-container>
             </p-tabPanel>
             <p-tabPanel [header]="'401'">
               <div class="font-medium line-height-3">
-                <pre class="text-lg mb-3">
+                <pre class="text-base mb-3">
                 <code highlight-js [lang]="'json'">{{ message401 | json}}</code>
               </pre>
               </div>
             </p-tabPanel>
             <p-tabPanel [header]="'404'">
               <div class="font-medium line-height-3">
-                <pre class="text-lg mb-3">
+                <pre class="text-base mb-3">
                 <code highlight-js [lang]="'json'">{{ message404 | json}}</code>
               </pre>
               </div>
@@ -430,30 +471,32 @@
         </ng-container>
 
         <ng-container *ngIf="selectedTab === 'Create'">
-          <div class="p-3 font-medium ml-2 text-xl">API details</div>
+          <div class="p-3 font-medium ml-2 text">API details - Create</div>
           <div class="ml-4 p-3 bg-green-200 border-round-lg font-bold">
-            <span class="surface-800 px-3 py-2 border-round-lg text-white">
+            <span
+              class="surface-800 px-3 py-2 border-round-lg text-white text-base"
+            >
               POST
             </span>
 
-            <span class="pl-4 text-xl font-medium"
+            <span class="pl-4 text font-medium"
               >/api/<span class="font-bold">{{ selectedSchema.name }}</span
               >/records</span
             >
           </div>
           <p-divider></p-divider>
-          <div class="p-3 font-medium text-500 mt-3 ml-2 text-xl">Request</div>
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text">Request</div>
           <div class="mx-2 px-3">
             <ng-container>
               <div class="font-medium line-height-3">
                 <pre
-                  class="text-lg mb-3"
+                  class="text mb-3"
                 ><textarea highlight-js [lang]="'json'" class="html">{{ generateSampleRequest(selectedSchema) | json }}</textarea></pre>
               </div>
             </ng-container>
           </div>
           <p-divider></p-divider>
-          <div class="p-3 font-medium text-500 mt-3 ml-2 text-xl">
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text-base">
             Responses
           </div>
           <p-tabView styleClass="m-2">
@@ -461,14 +504,14 @@
               <ng-container>
                 <div class="font-medium line-height-3">
                   <pre
-                    class="text-lg mb-3"
+                    class="text-base mb-3"
                   ><textarea highlight-js [lang]="'json'" class="html">{{ getCreateSuccessSampleResponse(selectedSchema) | json }}</textarea></pre>
                 </div>
               </ng-container>
             </p-tabPanel>
             <p-tabPanel [header]="'401'">
               <div class="font-medium line-height-3">
-                <pre class="text-lg mb-3">
+                <pre class="text-base mb-3">
                 <code highlight-js [lang]="'json'">{{ message401 | json}}</code>
               </pre>
               </div>
@@ -477,30 +520,32 @@
         </ng-container>
 
         <ng-container *ngIf="selectedTab === 'Update'">
-          <div class="p-3 font-medium ml-2 text-xl">API details</div>
+          <div class="p-3 font-medium ml-2 text">API details - Update</div>
           <div class="ml-4 p-3 bg-orange-200 border-round-lg font-bold">
-            <span class="surface-800 px-3 py-2 border-round-lg text-white">
+            <span
+              class="surface-800 px-3 py-2 border-round-lg text-white text-base"
+            >
               PUT
             </span>
 
-            <span class="pl-4 text-xl font-medium"
+            <span class="pl-4 text font-medium"
               >/api/<span class="font-bold">{{ selectedSchema.name }}</span
               >/<span class="font-bold">:uuid</span></span
             >
           </div>
           <p-divider></p-divider>
-          <div class="p-3 font-medium text-500 mt-3 ml-2 text-xl">Request</div>
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text">Request</div>
           <div class="mx-2 px-3">
             <ng-container>
               <div class="font-medium line-height-3">
                 <pre
-                  class="text-lg mb-3"
+                  class="text mb-3"
                 ><textarea highlight-js [lang]="'json'" class="html">{{ generateSampleRequest(selectedSchema) | json }}</textarea></pre>
               </div>
             </ng-container>
           </div>
           <p-divider></p-divider>
-          <div class="p-3 font-medium text-500 mt-3 ml-2 text-xl">
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text-base">
             Responses
           </div>
           <p-tabView styleClass="ml-3">
@@ -508,14 +553,14 @@
               <ng-container>
                 <div class="font-medium line-height-3">
                   <pre
-                    class="text-lg mb-3"
+                    class="text-base mb-3"
                   ><textarea highlight-js [lang]="'json'" class="html">{{ getUpdateSuccessSampleResponse(selectedSchema) | json }}</textarea></pre>
                 </div>
               </ng-container>
             </p-tabPanel>
             <p-tabPanel [header]="'401'">
               <div class="font-medium line-height-3">
-                <pre class="text-lg mb-3">
+                <pre class="text-base mb-3">
                 <code highlight-js [lang]="'json'">{{ message401 | json}}</code>
               </pre>
               </div>
@@ -524,32 +569,356 @@
         </ng-container>
 
         <ng-container *ngIf="selectedTab === 'Delete'">
-          <div class="p-3 font-medium ml-2 text-xl">API details</div>
+          <div class="p-3 font-medium ml-2 text">API details - Delete</div>
           <div class="ml-4 p-3 bg-red-200 border-round-lg font-bold">
-            <span class="surface-800 px-3 py-2 border-round-lg text-white">
+            <span
+              class="surface-800 px-3 py-2 border-round-lg text-white text-base"
+            >
               DELETE
             </span>
 
-            <span class="pl-4 text-xl font-medium"
+            <span class="pl-4 text font-medium"
               >/api/<span class="font-bold">{{ selectedSchema.name }}</span
               >/<span class="font-bold">:uuid</span></span
             >
           </div>
           <p-divider></p-divider>
-          <div class="p-3 font-medium text-500 mt-3 ml-2 text-xl">
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text-base">
             Responses
           </div>
           <p-tabView styleClass="ml-3">
             <p-tabPanel [header]="'200'">
               <div class="font-medium line-height-3">
-                <pre class="text-lg mb-3">
+                <pre class="text-base mb-3">
                     <code highlight-js [lang]="'json'">{{ deleteMessage | json}}</code>
                 </pre>
               </div>
             </p-tabPanel>
             <p-tabPanel [header]="'401'">
               <div class="font-medium line-height-3">
-                <pre class="text-lg mb-3">
+                <pre class="text-base mb-3">
+                <code highlight-js [lang]="'json'">{{ message401 | json}}</code>
+              </pre>
+              </div>
+            </p-tabPanel>
+          </p-tabView>
+        </ng-container>
+
+        <ng-container *ngIf="selectedTab === 'KVP'">
+          <div class="p-3 font-medium ml-2 text">
+            API details - Key Value pair
+          </div>
+          <div class="ml-4 p-3 bg-blue-100 border-round-lg font-bold">
+            <span
+              class="surface-800 px-3 py-2 border-round-lg text-white text-base"
+            >
+              GET
+            </span>
+
+            <span class="pl-4 text font-medium"
+              >/api/<span class="font-bold">{{ selectedSchema.name }}</span
+              >/kvp</span
+            >
+          </div>
+
+          <p-divider></p-divider>
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text">Responses</div>
+          <p-tabView styleClass="ml-3">
+            <p-tabPanel [header]="'200'">
+              <ng-container>
+                <div class="font-medium line-height-3">
+                  <pre
+                    class="text-base mb-3"
+                  ><textarea highlight-js [lang]="'json'" class="html">{{ generatePaginationSampleRecord(selectedSchema) | json }}</textarea></pre>
+                </div>
+              </ng-container>
+            </p-tabPanel>
+            <p-tabPanel [header]="'401'">
+              <div class="font-medium line-height-3">
+                <pre class="text-base mb-3">
+                <code highlight-js [lang]="'json'">{{ message401 | json}}</code>
+              </pre>
+              </div>
+            </p-tabPanel>
+            <p-tabPanel [header]="'404'">
+              <div class="font-medium line-height-3">
+                <pre class="text-base mb-3">
+                <code highlight-js [lang]="'json'">{{ message404 | json}}</code>
+              </pre>
+              </div>
+            </p-tabPanel>
+          </p-tabView>
+        </ng-container>
+
+        <ng-container *ngIf="selectedTabTypeTwo === 'Login'">
+          <div class="p-3 font-medium ml-2 text">API details - Login</div>
+          <div class="ml-4 p-3 bg-green-200 border-round-lg font-bold">
+            <span
+              class="surface-800 px-3 py-2 border-round-lg text-white text-base"
+            >
+              POST
+            </span>
+            <span class="pl-4 text font-medium"
+              >/api/<span class="font-bold">{{ selectedSchema.name }}</span
+              >/login</span
+            >
+          </div>
+          <p-divider></p-divider>
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text">Request</div>
+          <div class="mx-2 px-3">
+            <ng-container>
+              <div class="font-medium line-height-3">
+                <pre
+                  class="text mb-3"
+                ><textarea highlight-js [lang]="'json'" class="html">{{ loginJson | json }}</textarea></pre>
+              </div>
+            </ng-container>
+          </div>
+          <p-divider></p-divider>
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text-base">
+            Responses
+          </div>
+          <p-tabView styleClass="m-2">
+            <p-tabPanel [header]="'200'">
+              <ng-container>
+                <div class="font-medium line-height-3">
+                  <pre
+                    class="text-base mb-3"
+                  ><textarea highlight-js [lang]="'json'" class="html">{{ getCreateSuccessSampleResponse(selectedSchema) | json }}</textarea></pre>
+                </div>
+              </ng-container>
+            </p-tabPanel>
+            <p-tabPanel [header]="'401'">
+              <div class="font-medium line-height-3">
+                <pre class="text-base mb-3">
+                <code highlight-js [lang]="'json'">{{ message401 | json}}</code>
+              </pre>
+              </div>
+            </p-tabPanel>
+          </p-tabView>
+        </ng-container>
+
+        <ng-container *ngIf="selectedTabTypeTwo === 'Change Password'">
+          <div class="p-3 font-medium ml-2 text">
+            API details - Change Password
+          </div>
+          <div class="ml-4 p-3 bg-green-200 border-round-lg font-bold">
+            <span
+              class="surface-800 px-3 py-2 border-round-lg text-white text-base"
+            >
+              POST
+            </span>
+            <span class="pl-4 text font-medium"
+              >/api/<span class="font-bold">{{ selectedSchema.name }}</span
+              >/change_password</span
+            >
+          </div>
+          <p-divider></p-divider>
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text">Request</div>
+          <div class="mx-2 px-3">
+            <ng-container>
+              <div class="font-medium line-height-3">
+                <pre
+                  class="text mb-3"
+                ><textarea highlight-js [lang]="'json'" class="html">{{ changePasswordJson | json }}</textarea></pre>
+              </div>
+            </ng-container>
+          </div>
+          <p-divider></p-divider>
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text-base">
+            Responses
+          </div>
+          <p-tabView styleClass="m-2">
+            <p-tabPanel [header]="'200'">
+              <ng-container>
+                <div class="font-medium line-height-3">
+                  <pre
+                    class="text-base mb-3"
+                  ><textarea highlight-js [lang]="'json'" class="html">{{ getCreateSuccessSampleResponse(selectedSchema) | json }}</textarea></pre>
+                </div>
+              </ng-container>
+            </p-tabPanel>
+            <p-tabPanel [header]="'401'">
+              <div class="font-medium line-height-3">
+                <pre class="text-base mb-3">
+                <code highlight-js [lang]="'json'">{{ message401 | json}}</code>
+              </pre>
+              </div>
+            </p-tabPanel>
+          </p-tabView>
+        </ng-container>
+
+        <ng-container *ngIf="selectedTabTypeTwo === 'Verify Email'">
+          <div class="p-3 font-medium ml-2 text">
+            API details - Verify Email
+          </div>
+          <div class="ml-4 p-3 bg-green-200 border-round-lg font-bold">
+            <span
+              class="surface-800 px-3 py-2 border-round-lg text-white text-base"
+            >
+              POST
+            </span>
+            <span class="pl-4 text font-medium"
+              >/api/<span class="font-bold">{{ selectedSchema.name }}</span
+              >/verify_email</span
+            >
+          </div>
+          <p-divider></p-divider>
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text">Request</div>
+          <div class="mx-2 px-3">
+            <ng-container>
+              <div class="font-medium line-height-3">
+                <pre
+                  class="text mb-3"
+                ><textarea highlight-js [lang]="'json'" class="html">{{ {} | json }}</textarea></pre>
+              </div>
+            </ng-container>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="selectedTabTypeTwo === 'Refresh Token'">
+          <div class="p-3 font-medium ml-2 text">
+            API details - Refresh Token
+          </div>
+          <div class="ml-4 p-3 bg-green-200 border-round-lg font-bold">
+            <span
+              class="surface-800 px-3 py-2 border-round-lg text-white text-base"
+            >
+              POST
+            </span>
+            <span class="pl-4 text font-medium"
+              >/api/<span class="font-bold">{{ selectedSchema.name }}</span
+              >/refresh_token</span
+            >
+          </div>
+          <p-divider></p-divider>
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text">Request</div>
+          <div class="mx-2 px-3">
+            <ng-container>
+              <div class="font-medium line-height-3">
+                <pre
+                  class="text mb-3"
+                ><textarea highlight-js [lang]="'json'" class="html">{{ {} | json }}</textarea></pre>
+              </div>
+            </ng-container>
+          </div>
+          <p-divider></p-divider>
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text-base">
+            Responses
+          </div>
+          <p-tabView styleClass="m-2">
+            <p-tabPanel [header]="'200'">
+              <ng-container>
+                <div class="font-medium line-height-3">
+                  <pre
+                    class="text-base mb-3"
+                  ><textarea highlight-js [lang]="'json'" class="html">{{ getCreateSuccessSampleResponse(selectedSchema) | json }}</textarea></pre>
+                </div>
+              </ng-container>
+            </p-tabPanel>
+            <p-tabPanel [header]="'401'">
+              <div class="font-medium line-height-3">
+                <pre class="text-base mb-3">
+                <code highlight-js [lang]="'json'">{{ message401 | json}}</code>
+              </pre>
+              </div>
+            </p-tabPanel>
+          </p-tabView>
+        </ng-container>
+
+        <ng-container *ngIf="selectedTabTypeTwo === 'Unique Email'">
+          <div class="p-3 font-medium ml-2 text">
+            API details - Unique Email
+          </div>
+          <div class="ml-4 p-3 bg-green-200 border-round-lg font-bold">
+            <span
+              class="surface-800 px-3 py-2 border-round-lg text-white text-base"
+            >
+              POST
+            </span>
+            <span class="pl-4 text font-medium"
+              >/api/<span class="font-bold">{{ selectedSchema.name }}</span
+              >/check/unique_email</span
+            >
+          </div>
+          <p-divider></p-divider>
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text">Request</div>
+          <div class="mx-2 px-3">
+            <ng-container>
+              <div class="font-medium line-height-3">
+                <pre
+                  class="text mb-3"
+                ><textarea highlight-js [lang]="'json'" class="html">{{ uniqueEmailJson | json }}</textarea></pre>
+              </div>
+            </ng-container>
+          </div>
+          <p-divider></p-divider>
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text-base">
+            Responses
+          </div>
+          <p-tabView styleClass="m-2">
+            <p-tabPanel [header]="'200'">
+              <ng-container>
+                <div class="font-medium line-height-3">
+                  <pre
+                    class="text-base mb-3"
+                  ><textarea highlight-js [lang]="'json'" class="html">{{ getCreateSuccessSampleResponse(selectedSchema) | json }}</textarea></pre>
+                </div>
+              </ng-container>
+            </p-tabPanel>
+            <p-tabPanel [header]="'401'">
+              <div class="font-medium line-height-3">
+                <pre class="text-base mb-3">
+                <code highlight-js [lang]="'json'">{{ message401 | json}}</code>
+              </pre>
+              </div>
+            </p-tabPanel>
+          </p-tabView>
+        </ng-container>
+
+        <ng-container *ngIf="selectedTabTypeTwo === 'Umique /username'">
+          <div class="p-3 font-medium ml-2 text">
+            API details - Umique /username
+          </div>
+          <div class="ml-4 p-3 bg-green-200 border-round-lg font-bold">
+            <span
+              class="surface-800 px-3 py-2 border-round-lg text-white text-base"
+            >
+              POST
+            </span>
+            <span class="pl-4 text font-medium"
+              >/api/<span class="font-bold">{{ selectedSchema.name }}</span
+              >/check/unique_username</span
+            >
+          </div>
+          <p-divider></p-divider>
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text">Request</div>
+          <div class="mx-2 px-3">
+            <ng-container>
+              <div class="font-medium line-height-3">
+                <pre
+                  class="text mb-3"
+                ><textarea highlight-js [lang]="'json'" class="html">{{ uniqueUsernameJson | json }}</textarea></pre>
+              </div>
+            </ng-container>
+          </div>
+          <p-divider></p-divider>
+          <div class="p-3 font-bold text-500 mt-3 ml-2 text-base">
+            Responses
+          </div>
+          <p-tabView styleClass="m-2">
+            <p-tabPanel [header]="'200'">
+              <ng-container>
+                <div class="font-medium line-height-3">
+                  <pre
+                    class="text-base mb-3"
+                  ><textarea highlight-js [lang]="'json'" class="html">{{ getCreateSuccessSampleResponse(selectedSchema) | json }}</textarea></pre>
+                </div>
+              </ng-container>
+            </p-tabPanel>
+            <p-tabPanel [header]="'401'">
+              <div class="font-medium line-height-3">
+                <pre class="text-base mb-3">
                 <code highlight-js [lang]="'json'">{{ message401 | json}}</code>
               </pre>
               </div>
@@ -572,7 +941,7 @@
   </ng-template>
 </p-sidebar>
 
-<!-- API Preview code by nitika end -->
+<!-- API Preview end -->
 <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
 <app-spinner [loading]="loading" [type]="'full'" />

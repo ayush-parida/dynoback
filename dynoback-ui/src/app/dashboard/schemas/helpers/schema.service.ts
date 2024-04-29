@@ -58,7 +58,7 @@ export class SchemaService {
       })
     );
   }
-  getSchemaDetails(uuid: string): Observable<any[]> {
+  getSchemaDetails(uuid: string): Observable<any> {
     return this.http.get<any[]>(`${this.apiUrl}/schema/${uuid}`).pipe(
       catchError((error) => {
         return this.config.handleError(error);
@@ -78,5 +78,16 @@ export class SchemaService {
         return this.config.handleError(error);
       })
     );
+  }
+  getAuthToken(schema_uuid: string, entry_uuid: string): Observable<any> {
+    return this.http
+      .get<any>(
+        `${this.apiUrl}/schema/gen-verify-token/${schema_uuid}/${entry_uuid}`
+      )
+      .pipe(
+        catchError((error) => {
+          return this.config.handleError(error);
+        })
+      );
   }
 }

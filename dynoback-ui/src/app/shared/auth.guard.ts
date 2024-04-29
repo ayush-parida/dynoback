@@ -13,7 +13,7 @@ export const authGuard: CanActivateFn = (route, state) => {
     // Optionally, validate token's integrity or expiration here
     return true;
   } else {
-    router.navigate(['/admin/login'], {
+    router.navigate(['/login'], {
       queryParams: { returnUrl: state.url },
     });
     return false;

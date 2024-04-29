@@ -3,15 +3,16 @@ import psycopg
 import uuid
 from datetime import datetime
 from psycopg.rows import dict_row, namedtuple_row
-
+import bcrypt
 import urllib.parse
 from api.api import api_route
 from api.auth import Authentication
+import jwt
 def _load_json(file_path):
         with open(file_path, 'r') as file:
             return json.load(file)
         
-class DynamicDBAPI:
+class Dynamic_DB_API:
     def __init__(self, config):
         self.dbs_config = _load_json(config['databases'])
         self.schemas = _load_json(config['schemas'])['schemas']
@@ -61,6 +62,24 @@ class DynamicDBAPI:
             return []
 
         query = f"SELECT * FROM {schema_name}"  # Simplified query, adjust as needed
+        records = self._execute_query(schema_details['connectionPoolId'], query)
+        return records
+    
+    def get_all_kvp(self, schema_name, **kwargs):
+        """Implement logic to fetch all records for a given schema."""
+        schema_details = self._get_schema_details(schema_name)
+        if not schema_details:
+            return []
+        kvp_fields = "uuid"
+        cols = schema_details['kvp']
+        formatted = []
+        for col in cols:
+            formatted.append(col.replace(' ', '_'))
+        st = ', '
+        st_formatted = st.join(formatted)
+        if(len(st_formatted)):
+            kvp_fields = kvp_fields + ", " + st_formatted
+        query = f"SELECT {kvp_fields} FROM {schema_name}"  # Simplified query, adjust as needed
         records = self._execute_query(schema_details['connectionPoolId'], query)
         return records
     
@@ -132,6 +151,15 @@ class DynamicDBAPI:
 
         query = f"SELECT * FROM {schema_name} WHERE uuid = %s"
         return self._execute_query(schema_details['connectionPoolId'], query, (record_id,), fetch='one')
+    
+    def get_by_key(self, schema_name, key, value):
+        """Fetch a single record by its ID."""
+        schema_details = self._get_schema_details(schema_name)
+        if not schema_details:
+            return None
+
+        query = f"SELECT * FROM {schema_name} WHERE {key} = %s"
+        return self._execute_query(schema_details['connectionPoolId'], query, (value,), fetch='one')
 
     def update(self, schema_name, record_id, update_data):
         """Update an existing record."""
@@ -174,6 +202,21 @@ class DynamicDBAPI:
         query = f"DELETE FROM {schema_name} WHERE uuid = %s RETURNING *"
         deleted_record = self._execute_query(schema_details['connectionPoolId'], query, (record_id,), fetch='one')
         return deleted_record
+    
+    def verify_schema(self, schema_name, decoded):
+        schema_details = self._get_schema_details(schema_name)
+        if not schema_details:
+            return None
+        if(decoded['schema'] == schema_details['uuid'] and int(datetime.utcnow().timestamp())<decoded['exp']):
+            update_data = {"verified": True}
+            set_clause = ', '.join([f"{key} = %s" for key in update_data.keys()])
+            query = f"UPDATE {schema_name} SET {set_clause} WHERE uuid = %s RETURNING *"
+            params = list(update_data.values()) + [decoded['uuid']]
+            updated_record = self._execute_query(schema_details['connectionPoolId'], query, params, fetch='one')
+            return updated_record
+        else:
+            return False
+    
 
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -218,12 +261,24 @@ def construct_where_clause(filters):
     return final_where_clause, params
 
 def loadSchemasApi(config, authentication):
-    db_api = DynamicDBAPI(config)
+    db_api = Dynamic_DB_API(config)
 
-    def get_all_records(schema_name, query_params, headers):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+    def get_all_records(operation_name, schema_name, query_params, headers):
+        token = headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else ''
+
+        # Validate the token using the refined method which handles 'anyone', 'admin', etc.
+        decoded_token = authentication.validate_token(schema_name, token, operation_name)
+
+        # Check if the token is valid based on the status returned from validate_token
         if not decoded_token["status"]:
-            return {"status": 401, "response": {"success": False, "message": "Invalid or expired token"}}
+            # Token is invalid or expired, return a 401 Unauthorized response
+            return {
+                "status": 401,
+                "response": {
+                    "success": False,
+                    "message": decoded_token.get("error", "Invalid or expired token")
+                }
+            }
 
         # Basic pagination and sorting parameters
         sort_by = query_params.get('sort_by', 'uuid')
@@ -277,10 +332,22 @@ def loadSchemasApi(config, authentication):
             }
         }
         
-    def get_record_by_id(schema_name, record_id, headers):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+    def get_record_by_id(operation_name, schema_name, record_id, headers):
+        token = headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else ''
+
+        # Validate the token using the refined method which handles 'anyone', 'admin', etc.
+        decoded_token = authentication.validate_token(schema_name, token, operation_name)
+
+        # Check if the token is valid based on the status returned from validate_token
         if not decoded_token["status"]:
-            return {"status": 401, "response": {"success": False, "message": "Invalid or expired token"}}
+            # Token is invalid or expired, return a 401 Unauthorized response
+            return {
+                "status": 401,
+                "response": {
+                    "success": False,
+                    "message": decoded_token.get("error", "Invalid or expired token")
+                }
+            }
         
         record = db_api.get_by_id(schema_name, record_id)
         if record:
@@ -288,10 +355,22 @@ def loadSchemasApi(config, authentication):
         else:
             return {"status": 404, "response": {"success": False, "message": "Record not found"}}
 
-    def create_record(schema_name, body, headers):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+    def create_record(operation_name, schema_name, body, headers):
+        token = headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else ''
+
+        # Validate the token using the refined method which handles 'anyone', 'admin', etc.
+        decoded_token = authentication.validate_token(schema_name, token, operation_name)
+
+        # Check if the token is valid based on the status returned from validate_token
         if not decoded_token["status"]:
-            return {"status": 401, "response": {"success": False, "message": "Invalid or expired token"}}
+            # Token is invalid or expired, return a 401 Unauthorized response
+            return {
+                "status": 401,
+                "response": {
+                    "success": False,
+                    "message": decoded_token.get("error", "Invalid or expired token")
+                }
+            }
         
         new_record = db_api.create(schema_name, body)
         if json.loads(json.dumps(new_record, cls=CustomJSONEncoder)):
@@ -299,10 +378,22 @@ def loadSchemasApi(config, authentication):
         else:
             return {"status": 200, "response": {"success": False, "message": "Record Creation Failed"}}
 
-    def update_record(schema_name, record_id, body, headers):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+    def update_record(operation_name, schema_name, record_id, body, headers):
+        token = headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else ''
+
+        # Validate the token using the refined method which handles 'anyone', 'admin', etc.
+        decoded_token = authentication.validate_token(schema_name, token, operation_name)
+
+        # Check if the token is valid based on the status returned from validate_token
         if not decoded_token["status"]:
-            return {"status": 401, "response": {"success": False, "message": "Invalid or expired token"}}
+            # Token is invalid or expired, return a 401 Unauthorized response
+            return {
+                "status": 401,
+                "response": {
+                    "success": False,
+                    "message": decoded_token.get("error", "Invalid or expired token")
+                }
+            }
         
         updated_record = db_api.update(schema_name, record_id, body)
         if updated_record:
@@ -310,98 +401,410 @@ def loadSchemasApi(config, authentication):
         else:
             return {"status": 404, "response": {"success": False, "message": "Record not found"}}
 
-    def delete_record(schema_name, record_id, headers, soft_delete=True):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+    def delete_record(operation_name, schema_name, record_id, headers, soft_delete=True):
+        token = headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else ''
+
+        # Validate the token using the refined method which handles 'anyone', 'admin', etc.
+        decoded_token = authentication.validate_token(schema_name, token, operation_name)
+
+        # Check if the token is valid based on the status returned from validate_token
         if not decoded_token["status"]:
-            return {"status": 401, "response": {"success": False, "message": "Invalid or expired token"}}
+            # Token is invalid or expired, return a 401 Unauthorized response
+            return {
+                "status": 401,
+                "response": {
+                    "success": False,
+                    "message": decoded_token.get("error", "Invalid or expired token")
+                }
+            }
         if soft_delete:
             deleted_record = db_api.soft_delete(schema_name, record_id)
         else:
             deleted_record = db_api.hard_delete(schema_name, record_id)
-        print(deleted_record)
         if deleted_record:
             return {"status": 200, "response": {"success": True, "message": "Record deleted successfully"}}
         else:
             return {"status": 404, "response": {"success": False, "message": "Record not found"}}
+    
+    def kvp_record(operation_name, schema_name, headers):
+        token = headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else ''
+
+        # Validate the token using the refined method which handles 'anyone', 'admin', etc.
+        decoded_token = authentication.validate_token(schema_name, token, operation_name)
+
+        # Check if the token is valid based on the status returned from validate_token
+        if not decoded_token["status"]:
+            # Token is invalid or expired, return a 401 Unauthorized response
+            return {
+                "status": 401,
+                "response": {
+                    "success": False,
+                    "message": decoded_token.get("error", "Invalid or expired token")
+                }
+            }
+        records = db_api.get_all_kvp(schema_name)
+        if len(records):
+            return {"status": 200, "response": {"success": True, "message": "Record deleted successfully"}}
+        else:
+            return {"status": 404, "response": {"success": False, "message": "Record not found"}}
+        
+    def register_user(operation_name, schema_name, body, headers):
+        token = headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else ''
+
+        # Validate the token using the refined method which handles 'anyone', 'admin', etc.
+        decoded_token = authentication.validate_token(schema_name, token, operation_name)
+
+        # Check if the token is valid based on the status returned from validate_token
+        if not decoded_token["status"]:
+            # Token is invalid or expired, return a 401 Unauthorized response
+            return {
+                "status": 401,
+                "response": {
+                    "success": False,
+                    "message": decoded_token.get("error", "Invalid or expired token")
+                }
+            }
+        """Register a new user by adding their details into the specified schema after validating the token."""
+        
+        # Hash the password before storing it
+        hashed_password = bcrypt.hashpw(body['password'].encode('utf-8'), bcrypt.gensalt())
+        body['password'] = hashed_password
+        
+        # Create a new record in the database
+        new_user_record = db_api.create(schema_name, body)
+        if new_user_record:
+            return {"status": 200, "response": json.loads(json.dumps(new_user_record, cls=CustomJSONEncoder))}
+        else:
+            return {"status": 404, "response": {"success": False, "message": "Failed to create user"}}
+
+    def login_user(operation_name, schema_name, schema_uuid, secret_key, expiry, body, headers):
+        token = headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else ''
+
+        # Validate the token using the refined method which handles 'anyone', 'admin', etc.
+        decoded_token = authentication.validate_token(schema_name, token, operation_name)
+
+        # Check if the token is valid based on the status returned from validate_token
+        if not decoded_token["status"]:
+            # Token is invalid or expired, return a 401 Unauthorized response
+            return {
+                "status": 401,
+                "response": {
+                    "success": False,
+                    "message": decoded_token.get("error", "Invalid or expired token")
+                }
+            }
+        """Authenticate a user by checking their credentials and return a token upon success."""
+        user_record = db_api.get_filtered_sorted_paginated_records(schema_name, where_clause="username = %s", where_params=[body['username']], limit=1)
+        if user_record[0] and bcrypt.checkpw(body['password'].encode('utf-8'), user_record[0][0]['password'].encode('utf-8')):
+            # Generate a JWT token
+            token = _generate_jwt(user_record[0][0]['uuid'], secret_key, expiry, schema_uuid)
+            return {
+                "status": 200,
+                "response": {
+                    "success": True,
+                    "message": "Login successful",
+                    "token": token
+                }
+            }
+        return {
+            "status": 401,
+            "response": {
+                "success": False,
+                "message": "Invalid username or password"
+            }
+        }
+
+    def _generate_jwt(operation_name, uuid, secret_key, expiry, schema_uuid):
+        """Generate a JWT for the user."""
+        payload = {
+            'uuid': uuid,
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=expiry),
+            'schema': schema_uuid
+        }
+        return jwt.encode(payload, secret_key, algorithm='HS256')
+    
+    def change_password(operation_name, schema_name, body, headers):
+        token = headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else ''
+
+        # Validate the token using the refined method which handles 'anyone', 'admin', etc.
+        decoded_token = authentication.validate_token(schema_name, token, operation_name)
+
+        # Check if the token is valid based on the status returned from validate_token
+        if not decoded_token["status"]:
+            # Token is invalid or expired, return a 401 Unauthorized response
+            return {
+                "status": 401,
+                "response": {
+                    "success": False,
+                    "message": decoded_token.get("error", "Invalid or expired token")
+                }
+            }
+        """Change the password for a user, if the old password is correct after validating the token."""
+
+        # Fetch the user's current record to verify the old password
+        user_record = db_api.get_by_id(schema_name, body['record_id'])
+        if user_record and bcrypt.checkpw(body['old_password'].encode('utf-8'), user_record['password'].encode('utf-8')):
+            hashed_new_password = bcrypt.hashpw(body['new_password'].encode('utf-8'), bcrypt.gensalt())
+            update_result = db_api.update(schema_name, body['record_id'], {'password': hashed_new_password})
+            if update_result:
+                return {"status": 200, "response": json.loads(json.dumps(update_result, cls=CustomJSONEncoder))}
+            else:
+                return {"status": 404, "response": {"success": False, "message": "Failed to update password"}}
+        else:
+            return {"status": 404, "response": {"success": False, "message": "Incorrect old password or user not found"}}
+
+    def refresh_token(operation_name, schema_name, schema_uuid, secret_key, expiry, headers):
+        token = headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else ''
+
+        # Validate the token using the refined method which handles 'anyone', 'admin', etc.
+        decoded_token = authentication.validate_token(schema_name, token, operation_name)
+
+        # Check if the token is valid based on the status returned from validate_token
+        if not decoded_token["status"]:
+            # Token is invalid or expired, return a 401 Unauthorized response
+            return {
+                "status": 401,
+                "response": {
+                    "success": False,
+                    "message": decoded_token.get("error", "Invalid or expired token")
+                }
+            }
+        """Generate a new token for the user after validating the current token."""
+        decoded_token = authentication.validate_token(headers['Authorization'])
+        if not decoded_token["status"]:
+            return {
+                "status": 401,
+                "response": {
+                    "success": False,
+                    "message": "Invalid or expired token"
+                }
+            }
+
+        # Generate a new JWT token with new expiry
+        new_token = _generate_jwt(decoded_token['uuid'], secret_key, expiry, schema_uuid)
+        update_result = db_api.update(schema_name, decoded_token['uuid'], {'token': new_token})
+        if update_result:
+            return {
+                "status": 200,
+                "response": {
+                    "success": True,
+                    "token": new_token,
+                    "message": "Token refreshed successfully"
+                }
+            }
+        else:
+            return {
+                "status": 404,
+                "response": {
+                    "success": False,
+                    "message": "Failed to update user token"
+                }
+            }
+    
+    def verify_email(operation_name, schema_name, headers):
+        token = headers.get('authorization', '').split(' ')[1] if 'authorization' in headers and headers['authorization'].startswith('Bearer ') else ''
+        # Validate the token using the refined method which handles 'anyone', 'admin', etc.
+        decoded_token = authentication.validate_token(schema_name, token, operation_name)
+        # Check if the token is valid based on the status returned from validate_token
+        if not decoded_token["status"]:
+            # Token is invalid or expired, return a 401 Unauthorized response
+            return {
+                "status": 401,
+                "response": {
+                    "success": False,
+                    "message": decoded_token.get("error", "Invalid or expired token")
+                }
+            }
+        verify_record = db_api.verify_schema(schema_name, decoded_token['decoded'])
+        if verify_record:
+            return {
+                "status": 200,
+                "response": {
+                    "success": True,
+                    "message": "Verified successfully"
+                }
+            }
+        else:
+            return {"status": 404, "response": {"success": False, "message": "Invalid or Expired Token"}}
+            
+    def unique_key_validator(operation_name, schema_name, headers, key, value):
+        token = headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else ''
+
+        # Validate the token using the refined method which handles 'anyone', 'admin', etc.
+        decoded_token = authentication.validate_token(schema_name, token, operation_name)
+
+        # Check if the token is valid based on the status returned from validate_token
+        if not decoded_token["status"]:
+            # Token is invalid or expired, return a 401 Unauthorized response
+            return {
+                "status": 401,
+                "response": {
+                    "success": False,
+                    "message": decoded_token.get("error", "Invalid or expired token")
+                }
+            }
+        
+        record = db_api.get_by_key(schema_name, key, value)
+        if record:
+            return {"status": 200, "response": {"exists": True}}
+        else:
+            return {"status": 404, "response": {"exists": False}}
 
     def create_api_function(schema, operation):
         schema_name = schema['name']
-        if operation == "GET_ALL":
+        if operation["name"] == "GET_ALL":
             def _get_all_records(query_params, headers):
-                return get_all_records(schema_name ,query_params, headers)
+                return get_all_records(operation["name"], schema_name ,query_params, headers)
             return _get_all_records
 
-        if operation == "GET_BY_ID":
+        if operation["name"] == "GET_BY_ID":
             def _get_record_by_id(record_id, headers):
-                return get_record_by_id(schema_name, record_id, headers)
+                return get_record_by_id(operation["name"], schema_name, record_id, headers)
             return _get_record_by_id
 
-        if operation == "POST":
+        if operation["name"] == "POST":
             def _create_record(body, headers):
-                return create_record(schema_name, body, headers)
+                return create_record(operation["name"], schema_name, body, headers)
             return _create_record
 
-        if operation == "PUT":
+        if operation["name"] == "PUT":
             def _update_record(record_id, body, headers):
-                return update_record(schema_name, record_id, body, headers)
+                return update_record(operation["name"], schema_name, record_id, body, headers)
             return _update_record
 
-        if operation == "DELETE":
+        if operation["name"] == "DELETE":
             def _delete_record(record_id, headers):
-                return delete_record(schema_name, record_id, headers, soft_delete=schema['softDelete'])
+                return delete_record(operation["name"], schema_name, record_id, headers, soft_delete=schema['softDelete'])
             return _delete_record
+        
+        if operation["name"] == "KVP":
+            def _kvp_record(headers):
+                return kvp_record(operation["name"], schema_name, headers)
+            return _kvp_record
+        
+        # if operation["name"] == "ME":
+        #     def _me_record(record_id, headers):
+        #         return me_record(operation["name"], schema_name, headers)
+        #     return _me_record
+        
+        if operation["name"] == "REGISTER":
+            def _register_user(body, headers):
+                return register_user(operation["name"], schema_name, body, headers)
+            return _register_user
 
+        if operation["name"] == "LOGIN":
+            def _login_user(body, headers):
+                return login_user(operation["name"], schema_name, schema['uuid'], schema['secret_key'], schema['expiry'], body, headers)
+            return _login_user
+
+        # if operation["name"] == "LOGOUT":
+        #     def _logout_user(session_id, headers):
+        #         return logout_user(operation["name"], schema_name, session_id, headers)
+        #     return _logout_user
+
+        # if operation["name"] == "PASSWORD_RESET_REQUEST":
+        #     def _password_reset_request(email, headers):
+        #         return password_reset_request(operation["name"], schema_name, email, headers)
+        #     return _password_reset_request
+
+        # if operation["name"] == "RESET_PASSWORD":
+        #     def _reset_password(token, new_password, headers):
+        #         return reset_password(operation["name"], schema_name, token, new_password, headers)
+        #     return _reset_password
+
+        if operation["name"] == "CHANGE_PASSWORD":
+            def _change_password(body, headers):
+                return change_password(operation["name"], schema_name, body, headers)
+            return _change_password
+
+        # if operation["name"] == "VERIFY_EMAIL_REQUEST":
+        #     def _verify_email_request(token, headers):
+        #         return verify_email_request(operation["name"], schema_name, token, headers)
+        #     return _verify_email_request
+        
+        if operation["name"] == "VERIFY_EMAIL":
+            def _verify_email(body, headers):
+                return verify_email(operation["name"], schema_name, headers)
+            return _verify_email
+
+        if operation["name"] == "REFRESH_TOKEN":
+            def _refresh_token(body, headers):
+                return refresh_token(operation["name"], schema_name, schema['uuid'], schema['secret_key'], schema['expiry'], headers)
+            return _refresh_token
+
+        # if operation["name"] == "TWO_FACTOR":
+        #     def _setup_two_factor(user_id, headers):
+        #         return setup_two_factor(operation["name"], schema_name, user_id, headers)
+        #     return _setup_two_factor
+
+        # if operation["name"] == "TWO_FACTOR_VERIFY":
+        #     def _verify_two_factor(user_id, headers):
+        #         return verify_two_factor(operation["name"], schema_name, user_id, headers)
+        #     return _verify_two_factor
+
+        # if operation["name"] == "SESSIONS":
+        #     def _get_sessions(user_id, headers):
+        #         return get_sessions(operation["name"], schema_name, user_id, headers)
+        #     return _get_sessions
+        
+        if operation["name"] == "UNIQUE_EMAIL":
+            def _unique_email(body, headers):
+                return unique_key_validator(operation["name"], schema_name, headers, 'email', body['value'])
+            return _unique_email
+        
+        if operation["name"] == "UNIQUE_USERNAME":
+            def _unique_username(body, headers):
+                return unique_key_validator(operation["name"], schema_name, headers, 'username', body['value'])
+            return _unique_username
     # Dynamically create routes for each schema and operation
     schemas = _load_json(config['schemas'])['schemas']
     for schema in schemas:
-        for operation in schema['operations']:
-            func = create_api_function(schema, operation)
-            if operation == "GET_BY_ID" or operation == 'PUT' or operation == 'DELETE':
-                # Constructing the path with '<record_id>'
-                path = f"/{schema['name']}/<record_id>"
-            else:
-                # Constructing the path without '<record_id>'
-                path = f"/{schema['name']}"
-            method = "GET" if operation in ["GET_ALL", "GET_BY_ID"] else operation
-            api_route(path, method)(func)
-    
-    
-# def loadSchemasApi(config, authentication: Authentication):
-#     db_api = DynamicDBAPI(config)
+        if(schema['type']==1):
+            for operation in schema['operations']:
+                if(operation["value"]):
+                    func = create_api_function(schema, operation)
+                    if operation["name"] == "GET_BY_ID" or operation["name"] == 'PUT' or operation["name"] == 'DELETE':
+                        # Constructing the path with '<record_id>'
+                        path = f"/{schema['name']}/<record_id>"
+                    elif operation["name"] == "KVP":
+                        path = f"/{schema['name']}/kvp"
+                    else:
+                        # Constructing the path without '<record_id>'
+                        path = f"/{schema['name']}"
+                    method = "GET" if operation["name"] in ["GET_ALL", "GET_BY_ID"] else operation["name"]
+                    api_route(path, method)(func)
+        elif schema['type']==2:
+            for operation in schema['operations']:
+                if operation["value"]:
+                    func = create_api_function(schema, operation)
+                    # Determine the API path based on the operation
+                    base_url = f"/{schema['name']}"
 
-#     def wrap_call(func):
-#         def call(*args, **kwargs):
-#             headers = kwargs.get('headers')
-#             decoded_token = authentication.validate_token(headers['Authorization'])
-#             if not decoded_token:
-#                 return {"status": 401, "response": {"success": False, "message": "Invalid or expired token"}}
-#             return func(*args, **kwargs)
-#         return call
+                    if operation["name"] in ["GET_BY_ID", "PUT", "DELETE"]:
+                        # Operations that require a record ID in the URL path
+                        path = f"{base_url}/<record_id>"
+                    elif operation["name"] == "KVP":
+                        # Special path for key-value pair operation
+                        path = f"{base_url}/kvp"
+                    elif operation["name"] in ["ME", "REGISTER", "LOGIN", "LOGOUT", "PASSWORD_RESET_REQUEST", "RESET_PASSWORD", "CHANGE_PASSWORD", "VERIFY_EMAIL_REQUEST", "VERIFY_EMAIL", "REFRESH_TOKEN", "TWO_FACTOR", "TWO_FACTOR_VERIFY"]:
+                        # These operations require a specific action in the URL path
+                        path = f"{base_url}/{operation['name'].lower()}"
+                    elif operation["name"] in ["UNIQUE_EMAIL", "UNIQUE_USERNAME"]:
+                        # Unique check operations might require specific paths
+                        path = f"{base_url}/check/{operation['name'].lower()}"
+                    else:
+                        # Generic path for operations not requiring specific URL parameters
+                        path = base_url
 
-#     def dynamic_api_route(path, method, operation_func):
-#         @api_route(path, method)
-#         def wrapped_func(*args, **kwargs):
-#             return wrap_call(operation_func)(*args, **kwargs)
-
-#     operations = {
-#         'GET_ALL': (lambda schema_name: lambda query_params, headers: db_api.get_all(schema_name, **query_params)),
-#         'GET_BY_ID': (lambda schema_name: lambda record_id, headers: db_api.get_by_id(schema_name, record_id)),
-#         'POST': (lambda schema_name: lambda record_data, headers: db_api.create(schema_name, record_data)),
-#         'PUT': (lambda schema_name: lambda record_id, update_data, headers: db_api.update(schema_name, record_id, update_data)),
-#         'DELETE': (lambda schema_name: lambda record_id, headers: db_api.soft_delete(schema_name, record_id)),
-#     }
-
-#     for schema in db_api.schemas:
-#         schema_name = schema['name']
-#         for op_name, op_func_generator in operations.items():
-#             op_func = op_func_generator(schema_name)
-#             if op_name == 'GET_ALL':
-#                 dynamic_api_route(f'/{schema_name}', 'GET', op_func)
-#             elif op_name == 'GET_BY_ID':
-#                 dynamic_api_route(f'/{schema_name}/<record_id>', 'GET', op_func)
-#             elif op_name == 'POST':
-#                 dynamic_api_route(f'/{schema_name}', 'POST', op_func)
-#             elif op_name == 'PUT':
-#                 dynamic_api_route(f'/{schema_name}/<record_id>', 'PUT', op_func)
-#             elif op_name == 'DELETE':
-#                 dynamic_api_route(f'/{schema_name}/<record_id>', 'DELETE', op_func)
+                    # Determine the HTTP method based on the operation name
+                    if operation["name"] in ["GET_ALL", "GET_BY_ID", "KVP", "ME", "SESSIONS"]:
+                        method = "GET"
+                    elif operation["name"] in ["POST", "REGISTER", "LOGIN", "LOGOUT", "PASSWORD_RESET_REQUEST", "RESET_PASSWORD", "CHANGE_PASSWORD", "VERIFY_EMAIL_REQUEST", "VERIFY_EMAIL", "REFRESH_TOKEN", "TWO_FACTOR", "TWO_FACTOR_VERIFY", "UNIQUE_EMAIL", "UNIQUE_USERNAME"]:
+                        method = "POST"
+                    elif operation["name"] == "PUT":
+                        method = "PUT"
+                    elif operation["name"] == "DELETE":
+                        method = "DELETE"
+                    
+                    # Register the API route with the web framework
+                    api_route(path, method)(func)

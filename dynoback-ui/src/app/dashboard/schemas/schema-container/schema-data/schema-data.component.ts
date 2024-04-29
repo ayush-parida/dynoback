@@ -5,11 +5,17 @@ import {
   SimpleChanges,
   inject,
 } from '@angular/core';
+import { Location } from '@angular/common';
 import { SharedModule } from '../../../../shared/classes/shared.module';
 import { DataService } from '../../helpers/data.service';
-import { LazyLoadEvent, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
 import { Pagination, Schema } from '../../helpers/schema.interface';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import {
+  FormGroup,
+  FormBuilder,
+  Validators,
+  FormControl,
+} from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { FIELD_TYPE } from '../../helpers/schema.enum';
 import * as FileSaver from 'file-saver';
@@ -20,6 +26,9 @@ import {
   selectFieldValueValidator,
 } from '../../helpers/schema.validator';
 import { JsonEditorOptions, NgJsonEditorModule } from 'ang-jsoneditor';
+import { SchemaService } from '../../helpers/schema.service';
+import { authUniqueValidator } from '../../../../shared/classes/auth-unique.validator';
+import { ConfigService } from '../../../../shared/services/config.service';
 
 @Component({
   selector: 'app-schema-data',
@@ -39,6 +48,7 @@ export class SchemaDataComponent implements OnChanges {
   loading: boolean = false;
   searchFilter: string = '';
   selectedFields: any[] = [];
+  relationModal: boolean = false;
   pagination: Pagination = {
     current_page: 1,
     per_page: 10,
@@ -47,6 +57,16 @@ export class SchemaDataComponent implements OnChanges {
     sort_by: '',
     sort_order: 'asc',
   };
+  relationPagination: Pagination = {
+    current_page: 1,
+    per_page: 10,
+    total: 0,
+    total_pages: 0,
+    sort_by: '',
+    sort_order: 'asc',
+  };
+  relationEntries: any[] = [];
+  isEdit: boolean = false;
   jsonEditorOptions: JsonEditorOptions = new JsonEditorOptions();
 
   FIELD_TYPE = FIELD_TYPE;
@@ -57,12 +77,16 @@ export class SchemaDataComponent implements OnChanges {
   private dataService = inject(DataService);
   private messageService = inject(MessageService);
   private formBuilder = inject(FormBuilder);
+  private schemaService = inject(SchemaService);
+  private configService = inject(ConfigService);
+  private location = inject(Location);
+  relation: Schema = {} as Schema;
 
   constructor() {}
   ngOnChanges(changes: SimpleChanges): void {
     this.reset();
-    this.fetchEntries();
     this.setupColumns();
+    this.fetchEntries();
     this.setJsonEditorProps();
   }
   setJsonEditorProps() {
@@ -94,7 +118,7 @@ export class SchemaDataComponent implements OnChanges {
     this.subscriptions.add(
       this.dataService
         .getEntries(
-          this.schema.name,
+          this.schema,
           current_page,
           per_page,
           sort_by,
@@ -103,7 +127,7 @@ export class SchemaDataComponent implements OnChanges {
           this.selectedFields.map((x) => this.getFieldName(x.name))
         )
         .subscribe({
-          next: (data: any) => {
+          next: (data) => {
             this.loading = false;
             this.entries = data.records; // Assuming the response has the entries
             this.pagination = data.pagination; // Total number of records, for pagination
@@ -207,18 +231,72 @@ export class SchemaDataComponent implements OnChanges {
           this.getFieldName(col.name),
           this.formBuilder.control(col.default ? col.default : {}, validators)
         );
+      } else if (col.id == FIELD_TYPE.RELATION) {
+        this.form.addControl(
+          this.getFieldName(col.name),
+          this.formBuilder.control(col.default || '', validators)
+        );
       } else {
         this.form.addControl(
           this.getFieldName(col.name),
           this.formBuilder.control(col.default || '', validators)
         );
       }
+
+      if (this.schema.type == 2) {
+        this.form.addControl(
+          'email',
+          new FormControl(col.default || '', {
+            validators: [Validators.required, Validators.email],
+            asyncValidators: [
+              authUniqueValidator(
+                this.configService.http,
+                this.configService.apiUrl,
+                this.schema.name,
+                'unique_email',
+                this.isEdit
+              ),
+            ],
+            updateOn: 'change',
+          })
+        );
+        this.form.addControl(
+          'username',
+          new FormControl(col.default || '', {
+            validators: [Validators.required],
+            asyncValidators: [
+              authUniqueValidator(
+                this.configService.http,
+                this.configService.apiUrl,
+                this.schema.name,
+                'unique_username',
+                this.isEdit
+              ),
+            ],
+            updateOn: 'change',
+          })
+        );
+        if (!this.isEdit) {
+          this.form.addControl(
+            'password',
+            new FormControl(col.default || '', {
+              validators: [Validators.required, Validators.minLength(6)],
+            })
+          );
+        }
+        this.form.addControl('verified', new FormControl(false));
+        this.form.addControl('show_email', new FormControl(true));
+      }
     }
   }
 
   openNew() {
+    this.isEdit = false;
+    this.setupColumns();
     this.entry = {};
     this.entryDialog = true;
+    this.form.get('verified')?.disable();
+    this.form.get('show_email')?.disable();
   }
 
   deleteSelectedEntries() {
@@ -235,6 +313,7 @@ export class SchemaDataComponent implements OnChanges {
 
   editEntry(entry: any) {
     var customEntry = {};
+    this.isEdit = true;
     for (const col of this.dynamicColumns) {
       if (col.id == FIELD_TYPE.DATE) {
         customEntry = {
@@ -246,22 +325,21 @@ export class SchemaDataComponent implements OnChanges {
           },
         };
       } else if (col.id == FIELD_TYPE.SELECT) {
-        if (col.options.maxSelect == 1) {
-          customEntry = {
-            ...customEntry,
-            ...{
-              [this.getFieldName(col.name)]: entry[this.getFieldName(col.name)],
-            },
-          };
-        } else {
-          customEntry = {
-            ...customEntry,
-            ...{
-              [this.getFieldName(col.name)]:
-                entry[this.getFieldName(col.name)].split(','),
-            },
-          };
-        }
+        // if (col.options.maxSelect == 1) {
+        //   customEntry = {
+        //     ...customEntry,
+        //     ...{
+        //       [this.getFieldName(col.name)]: entry[this.getFieldName(col.name)],
+        //     },
+        //   };
+        // } else {
+        customEntry = {
+          ...customEntry,
+          ...{
+            [this.getFieldName(col.name)]: entry[this.getFieldName(col.name)],
+          },
+        };
+        // }
       } else {
         customEntry = {
           ...customEntry,
@@ -271,9 +349,15 @@ export class SchemaDataComponent implements OnChanges {
         };
       }
     }
-    this.entry = { ...customEntry, ...{ uuid: entry.uuid } };
+    this.entry = { ...customEntry, ...entry };
     this.entryDialog = true;
+    this.setupColumns();
+    console.log(this.entry);
+    console.log(this.form.value);
     this.form.patchValue(this.entry);
+    this.form.get('verified')?.disable();
+    this.form.get('show_email')?.disable();
+    this.form.get('email')?.disable();
   }
   deleteEntry(entry: any) {
     this.loading = true;
@@ -315,6 +399,7 @@ export class SchemaDataComponent implements OnChanges {
 
   saveEntry() {
     console.log(this.form);
+    console.log(this.form.valid);
     // Assuming form validation is handled
     if (this.form.valid) {
       var formData = JSON.parse(JSON.stringify(this.form.value));
@@ -444,5 +529,106 @@ export class SchemaDataComponent implements OnChanges {
   }
   dynamicColumnChange() {
     this.fetchEntries();
+  }
+  clearRelation(name: string) {
+    this.form.patchValue({ [name]: '' });
+  }
+  openRelationModal(col: any) {
+    this.schemaService
+      .getSchemaDetails(col.options.relatedTableUuid)
+      .subscribe({
+        next: (response) => {
+          this.relation = response;
+
+          this.getRelationEntries();
+        },
+        error: (error) => {},
+      });
+    this.relationModal = true;
+  }
+  getRelationEntries() {
+    const { current_page, per_page, sort_by, sort_order } =
+      this.relationPagination;
+    this.dataService
+      .getEntries(this.relation, current_page, per_page, sort_by, sort_order)
+      .subscribe({
+        next: (res) => {
+          this.relationEntries = res.records;
+          this.relationPagination = res.pagination;
+        },
+        error: (err) => {
+          this.loading = false;
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Operation Failed',
+            detail: err.error.message,
+          });
+        },
+      });
+  }
+  onRelationPageChange(event: any) {
+    this.relationPagination.current_page = event.first / event.rows + 1;
+    this.relationPagination.per_page = event.rows;
+    this.getRelationEntries();
+  }
+  verifyAuthEntry() {
+    this.loading = true;
+    this.schemaService
+      .getAuthToken(this.schema.uuid, this.entry.uuid)
+      .subscribe({
+        next: (res) => {
+          this.loading = false;
+          const token = res.token;
+          if (token) {
+            const path = '/verify';
+            const queryParams = `?schema=${encodeURIComponent(
+              this.schema.name
+            )}&token=${encodeURIComponent(token)}`;
+            const fullPath = this.location.prepareExternalUrl(
+              path + queryParams
+            );
+            window.open(fullPath, '_blank');
+            this.loading = true;
+            this.entryDialog = false;
+            this.form.reset();
+            setTimeout(() => {
+              this.fetchEntries();
+              this.loading = false;
+            }, 5000);
+          }
+        },
+        error: (err) => {
+          this.loading = false;
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Operation Failed',
+            detail: err.error.message,
+          });
+        },
+      });
+  }
+  getEntryDetails() {
+    this.loading = true;
+    this.dataService
+      .getEntryDetails(this.schema.name, this.entry.uuid)
+      .subscribe({
+        next: (data: any) => {
+          this.loading = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: data.message,
+            detail: data.message,
+          });
+          this.editEntry(this.entry);
+        },
+        error: (error) => {
+          this.loading = false;
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Operation Failed',
+            detail: error.error.message,
+          });
+        },
+      });
   }
 }

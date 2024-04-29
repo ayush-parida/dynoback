@@ -143,7 +143,7 @@ def loadDatabaseApi(config, authentication: Authentication):
     
     @api_route('/databases', 'GET')
     def get_all_active_databases(query_params, headers):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_admin_token(headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else '')
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         page = int(query_params.get('page', 1)) 
@@ -182,7 +182,7 @@ def loadDatabaseApi(config, authentication: Authentication):
         
     @api_route('/databases', 'POST')
     def add_database_route(body, headers):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_admin_token(headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else '')
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         new_database = body
@@ -190,7 +190,7 @@ def loadDatabaseApi(config, authentication: Authentication):
 
     @api_route('/databases/<database_id>', 'PUT')  # or 'PATCH'
     def edit_database_route(database_id, body, headers):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_admin_token(headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else '')
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         updated_database = body
@@ -198,7 +198,7 @@ def loadDatabaseApi(config, authentication: Authentication):
 
     @api_route('/databases/<database_id>', 'DELETE')
     def delete_database_route(database_id, headers):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_admin_token(headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else '')
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         return database.soft_delete_db(database_id)
@@ -209,21 +209,21 @@ def loadDatabaseApi(config, authentication: Authentication):
     
     @api_route('/databases/<database_id>', 'GET')  # or 'PATCH'
     def get_database_route(database_id, headers):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_admin_token(headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else '')
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         return database.get_by_id_db(database_id)
     
     @api_route('/database/connection-test/<database_id>', 'GET')
     def test_database_connection(database_id, headers):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_admin_token(headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else '')
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         return database.test_db_connection(database_id)
     
     @api_route('/database/new-connection-test', 'POST')  # or 'PATCH'
     def edit_database_route(body, headers):
-        decoded_token = authentication.validate_token(headers['Authorization'])
+        decoded_token = authentication.validate_admin_token(headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else '')
         if not decoded_token["status"]:
             return {"status": 401, "response":{"success": False, "message": "Invalid or expired token"}}
         return database.test_new_db_connection(body)

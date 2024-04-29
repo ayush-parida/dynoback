@@ -68,7 +68,7 @@ def map_field_to_postgres_type(name, field):
 def generate_postgres_create_table(json_schema):
     """Generates a PostgreSQL CREATE TABLE statement from a JSON schema, including special handling based on table type."""
     table_name = json_schema['name']
-    table_type = json_schema.get('type', 'base')  # Default to 'base' if not specified
+    table_type = json_schema.get('type', 1)  # Default to 'base' if not specified
     
     # Common columns for all tables
     columns_definitions = [
@@ -79,7 +79,7 @@ def generate_postgres_create_table(json_schema):
     ]
     
     # Additional columns for 'auth' table type
-    if table_type == 'auth':
+    if table_type == 2:
         columns_definitions.extend([
             "username TEXT UNIQUE",
             "email TEXT UNIQUE",
@@ -89,7 +89,7 @@ def generate_postgres_create_table(json_schema):
         ])
     
     for field in json_schema.get('schema', []):
-        column_definition = f"{field['name'].replace(' ', '_')} {map_field_to_postgres_type(field['name'], field)}"
+        column_definition = f" {map_field_to_postgres_type(field['name'], field)}"
         columns_definitions.append(column_definition)
     
     # Handle relations and file fields within the loop if necessary
@@ -112,10 +112,6 @@ def generate_postgres_alter_table_statements(old_schema, new_schema):
     # Handle changes in existing fields
     for new_field_name, new_field in new_fields.items():
         new_field_name_sanitized = new_field_name.replace(' ', '_')
-        print("=========++>>")
-        print(new_field_name_sanitized)
-        print(old_fields)
-        print("=========++>>")
         if new_field_name_sanitized in old_fields:
             old_field = old_fields[new_field_name_sanitized]
             old_column_definition = map_field_to_postgres_type(new_field_name, old_field)

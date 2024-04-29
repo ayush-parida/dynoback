@@ -14,11 +14,11 @@ export class SettingsContainerComponent {
   items: any[] = [
     {
       label: 'Application',
-      route: ['/admin/settings'],
+      route: ['/settings'],
     },
     {
       label: 'Admin Management',
-      route: ['/admin/settings/admins'],
+      route: ['/settings/admins'],
     },
   ];
 }
