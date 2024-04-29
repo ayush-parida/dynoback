@@ -58,6 +58,7 @@ export class SchemaContainerComponent {
   schemaSidebarLoading: boolean = false;
   isView: boolean = false;
   activeIndex: number = 0;
+  activeIndexTypeTwo: number = -1;
 
   message401: any = {
     success: false,
@@ -114,7 +115,37 @@ export class SchemaContainerComponent {
     'Delete',
     'KVP',
   ];
+
+  schemaTypeTwoItems = [
+    'Login',
+    'Change Password',
+    'Verify Email',
+    'Refresh Token',
+    'Unique Email',
+    'Umique /username',
+  ];
+
+  loginJson = {
+    username: 'sample@email.com',
+    password: 'samplePaasword',
+  };
+
+  changePasswordJson = {
+    record_id: '123e4567-e89b-12d3-a456-426614174000',
+    old_password: 'sampleOldPassword',
+    new_password: 'sampleNewPassword',
+  };
+
+  uniqueEmailJson = {
+    value: 'example@email.com',
+  };
+
+  uniqueUsernameJson = {
+    value: 'example',
+  };
+
   selectedTab: string = this.sidebarItems[0];
+  selectedTabTypeTwo: string = this.schemaTypeTwoItems[0];
   createActions: MenuItem[] = [
     {
       label: 'Duplicate',
@@ -537,10 +568,23 @@ export class SchemaContainerComponent {
 
   confirmCloseApiPreview() {
     this.apiPreviewSidebarVisible = false;
+    this.activeIndex = 0;
+    this.activeIndexTypeTwo = -1;
+    this.selectedTabTypeTwo = '';
+    this.selectedTab = 'Search/Pagination';
   }
   selectTab(item: string, index: number) {
     this.activeIndex = index;
     this.selectedTab = item;
+    this.selectedTabTypeTwo = '';
+    this.activeIndexTypeTwo = -1;
+  }
+
+  selectTabTypeTwo(item: string, index: number) {
+    this.activeIndexTypeTwo = index;
+    this.selectedTabTypeTwo = item;
+    this.selectedTab = '';
+    this.activeIndex = -1;
   }
   // onTabChange(event: any) {
   //   this.selectedTab = event.index;
