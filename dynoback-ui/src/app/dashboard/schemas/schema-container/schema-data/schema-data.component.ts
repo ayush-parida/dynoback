@@ -352,6 +352,8 @@ export class SchemaDataComponent implements OnChanges {
     this.entry = { ...customEntry, ...entry };
     this.entryDialog = true;
     this.setupColumns();
+    console.log(this.entry);
+    console.log(this.form.value);
     this.form.patchValue(this.entry);
     this.form.get('verified')?.disable();
     this.form.get('show_email')?.disable();
@@ -587,8 +589,10 @@ export class SchemaDataComponent implements OnChanges {
             );
             window.open(fullPath, '_blank');
             this.loading = true;
+            this.entryDialog = false;
+            this.form.reset();
             setTimeout(() => {
-              this.getEntryDetails();
+              this.fetchEntries();
               this.loading = false;
             }, 5000);
           }
