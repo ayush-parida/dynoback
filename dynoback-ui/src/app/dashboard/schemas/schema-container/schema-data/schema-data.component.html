@@ -347,29 +347,34 @@
                 [resizable]="false"
                 [maximizable]="true"
               >
-                <div class="flex flex-wrap gap-3 mt-2">
+                <div class="flex flex-wrap mt-2">
                   @for (relationEntry of relationEntries; track $index) {
 
                   <div
-                    class="field-checkbox"
+                    class="field-checkbox w-full"
                     [ngClass]="
                       form.controls[getFieldName(col.name)].value ==
                       relationEntry.uuid
-                        ? 'surface-400'
+                        ? 'bg-blue-200'
                         : ''
                     "
                   >
                     <p-radioButton
+                      styleClass="mx-2"
                       [inputId]="relationEntry.uuid"
                       [value]="relationEntry.uuid"
                       formControlName="{{ getFieldName(col.name) }}"
                     ></p-radioButton>
-                    <code highlight-js [lang]="'json'">{{
-                      relationEntry | json
-                    }}</code>
+                    <label [for]="relationEntry.uuid" class="w-full">
+                      <code highlight-js [lang]="'json'">{{
+                        relationEntry | json
+                      }}</code>
+                    </label>
                   </div>
 
                   }
+                </div>
+                <ng-template pTemplate="footer">
                   <p-paginator
                     (onPageChange)="onPageChange($event)"
                     [first]="
@@ -385,8 +390,6 @@
                     class="w-full"
                     styleClass="w-full"
                   ></p-paginator>
-                </div>
-                <ng-template pTemplate="footer">
                   <p-button
                     icon="pi pi-check"
                     (click)="relationModal = false"

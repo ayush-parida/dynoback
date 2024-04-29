@@ -105,7 +105,14 @@ export class SchemaContainerComponent {
   showColumnSelect: boolean = false;
   activeColumnExpand: number = -1;
   connections: any[] = [];
-  sidebarItems = ['Search/Pagination', 'Details', 'Create', 'Update', 'Delete'];
+  sidebarItems = [
+    'Search/Pagination',
+    'Details',
+    'Create',
+    'Update',
+    'Delete',
+    'KVP',
+  ];
   selectedTab: string = this.sidebarItems[0];
   createActions: MenuItem[] = [
     {
