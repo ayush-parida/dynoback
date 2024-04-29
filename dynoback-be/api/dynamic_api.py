@@ -207,13 +207,10 @@ class Dynamic_DB_API:
         schema_details = self._get_schema_details(schema_name)
         if not schema_details:
             return None
-        if(decoded['schema'] == schema_details['uuid'] and datetime.datetime.utcnow()<datetime.datetime.fromisoformat(decoded['exp'])):
-            query = f"SELECT * FROM {schema_name} WHERE uuid = %s"
-            self._execute_query(schema_details['connectionPoolId'], query, (decoded['uuid']), fetch='one')
+        if(decoded['schema'] == schema_details['uuid'] and int(datetime.utcnow().timestamp())<decoded['exp']):
             update_data = {"verified": True}
             set_clause = ', '.join([f"{key} = %s" for key in update_data.keys()])
             query = f"UPDATE {schema_name} SET {set_clause} WHERE uuid = %s RETURNING *"
-
             params = list(update_data.values()) + [decoded['uuid']]
             updated_record = self._execute_query(schema_details['connectionPoolId'], query, params, fetch='one')
             return updated_record
@@ -605,11 +602,9 @@ def loadSchemasApi(config, authentication):
             }
     
     def verify_email(operation_name, schema_name, headers):
-        token = headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else ''
-
+        token = headers.get('authorization', '').split(' ')[1] if 'authorization' in headers and headers['authorization'].startswith('Bearer ') else ''
         # Validate the token using the refined method which handles 'anyone', 'admin', etc.
         decoded_token = authentication.validate_token(schema_name, token, operation_name)
-
         # Check if the token is valid based on the status returned from validate_token
         if not decoded_token["status"]:
             # Token is invalid or expired, return a 401 Unauthorized response
@@ -620,9 +615,9 @@ def loadSchemasApi(config, authentication):
                     "message": decoded_token.get("error", "Invalid or expired token")
                 }
             }
-        verify_record = db_api.verify_schema(schema_name, decoded_token)
+        verify_record = db_api.verify_schema(schema_name, decoded_token['decoded'])
         if verify_record:
-            {
+            return {
                 "status": 200,
                 "response": {
                     "success": True,
@@ -630,7 +625,7 @@ def loadSchemasApi(config, authentication):
                 }
             }
         else:
-            {"status": 404, "response": {"success": False, "message": "Invalid or Expired Token"}}
+            return {"status": 404, "response": {"success": False, "message": "Invalid or Expired Token"}}
             
     def unique_key_validator(operation_name, schema_name, headers, key, value):
         token = headers.get('Authorization', '').split(' ')[1] if 'Authorization' in headers and headers['Authorization'].startswith('Bearer ') else ''
@@ -728,12 +723,12 @@ def loadSchemasApi(config, authentication):
         #     return _verify_email_request
         
         if operation["name"] == "VERIFY_EMAIL":
-            def _verify_email(headers):
+            def _verify_email(body, headers):
                 return verify_email(operation["name"], schema_name, headers)
             return _verify_email
 
         if operation["name"] == "REFRESH_TOKEN":
-            def _refresh_token(headers):
+            def _refresh_token(body, headers):
                 return refresh_token(operation["name"], schema_name, schema['uuid'], schema['secret_key'], schema['expiry'], headers)
             return _refresh_token
 

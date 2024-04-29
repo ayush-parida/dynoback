@@ -87,7 +87,16 @@ class Authentication:
                     if access_rule['name'] == 'anyone' and access_rule['value'] is True:
                         # No authentication required
                         return {"status": True, "decoded": {}}
-
+                    if access_rule['name'] == "users" and len(access_rule['value']):
+                        check = {"status": False, "error": "Schema not found"}
+                        for schema_uuid in access_rule['value']:
+                            schema_ref = self._get_schema_details(schema_uuid)
+                            if schema_ref:
+                                validation = self.validate_auth_token(schema_ref, token)
+                                print(validation)
+                                if(validation['status']):
+                                    check = validation
+                        return check
                     if isinstance(access_rule['value'], bool) and access_rule['value'] is True:
                         if access_rule['name'] == 'admin':
                             # Validate admin token

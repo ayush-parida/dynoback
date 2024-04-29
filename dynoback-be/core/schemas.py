@@ -46,43 +46,37 @@ class SchemaManagement:
                 { "name": "GET_ALL", "value": True, "access": 
                     [{
                         "name": "admin",
-                        "value": True,
-                        "access": []
+                        "value": True
                     }]
                 },
                 { "name": "GET_BY_ID", "value": True, "access": 
                     [{
                         "name": "admin",
-                        "value": True,
-                        "access": []
+                        "value": True
                     }]
                 },
                 { "name": "KVP", "value": True, "access": 
                     [{
                         "name": "admin",
-                        "value": True,
-                        "access": []
+                        "value": True
                     }]
                 },
                 { "name": "POST", "value": True, "access": 
                     [{
                         "name": "admin",
-                        "value": True,
-                        "access": []
+                        "value": True
                     }]
                 },
                 { "name": "PUT", "value": True, "access": 
                     [{
                         "name": "admin",
-                        "value": True,
-                        "access": []
+                        "value": True
                     }]
                 },
                 { "name": "DELETE", "value": True, "access": 
                     [{
                         "name": "admin",
-                        "value": True,
-                        "access": []
+                        "value": True
                     }]
                 }
             ]
@@ -92,120 +86,103 @@ class SchemaManagement:
                 { "name": "GET_ALL", "value": True, "access": 
                     [{
                         "name": "admin",
-                        "value": True,
-                        "access": []
+                        "value": True
                     }]
                 },
                 { "name": "GET_BY_ID", "value": True, "access": 
                     [{
                         "name": "admin",
-                        "value": True,
-                        "access": []
+                        "value": True
                     }]
                 },
                 { "name": "KVP", "value": True, "access": 
                     [{
                         "name": "admin",
-                        "value": True,
-                        "access": []
+                        "value": True
                     }]
                 },
                 { "name": "POST", "value": True, "access": 
                     [{
                         "name": "admin",
-                        "value": True,
-                        "access": []
+                        "value": True
                     }]
                 },
                 { "name": "PUT", "value": True, "access": 
                     [{
                         "name": "admin",
-                        "value": True,
-                        "access": []
+                        "value": True
                     }]
                 },
                 { "name": "DELETE", "value": True, "access": 
                     [{
                         "name": "admin",
-                        "value": True,
-                        "access": []
+                        "value": True
                     }]
                 },
                 { "name": "REGISTER", "value": True, "access": 
                     [{
                         "name": "admin",
-                        "value": True,
-                        "access": []
+                        "value": True
                     }]
                 },
                 { "name": "LOGIN", "value": True, "access": 
                     [{
                         "name": "admin",
-                        "value": True,
-                        "access": []
+                        "value": True
                     }]
                 },
                 { "name": "LOGOUT", "value": True, "access": 
                     [{
                         "name": "admin",
-                        "value": True,
-                        "access": []
+                        "value": True
                     }]
                 },
                 { "name": "PASSWORD_RESET_REQUEST", "value": True, "access": 
                     [{
                         "name": "admin",
-                        "value": True,
-                        "access": []
+                        "value": True
                     }]
                 },
                 { "name": "RESET_PASSWORD", "value": True, "access": 
                     [{
                         "name": "admin",
-                        "value": True,
-                        "access": []
+                        "value": True
                     }]
                 },
                 { "name": "CHANGE_PASSWORD", "value": True, "access": 
                     [{
                         "name": "admin",
-                        "value": True,
-                        "access": []
+                        "value": True
                     }]
                 },
                 { "name": "VERIFY_EMAIL", "value": True, "access": 
                     [{
                         "name": "admin",
-                        "value": True,
-                        "access": []
+                        "value": True
                     }]
                 },
                 { "name": "REFRESH_TOKEN", "value": True, "access": 
                     [{
                         "name": "admin",
-                        "value": True,
-                        "access": []
+                        "value": True
                     }]
                 },
                 { "name": "TWO_FACTOR", "value": True, "access": 
                     [{
                         "name": "admin",
-                        "value": True,
-                        "access": []
+                        "value": True
                     }]
                 },
                 { "name": "TWO_FACTOR_VERIFY", "value": True, "access": 
                     [{
                         "name": "admin",
-                        "value": True,
-                        "access": []
+                        "value": True
                     }]
                 },
                 { "name": "SESSIONS", "value": True, "access": 
                     [{
                         "name": "admin",
-                        "value": True,
-                        "access": []
+                        "value": True
                     }]
                 },
                 {

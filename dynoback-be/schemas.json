@@ -124,13 +124,11 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "users",
-              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
-              "access": []
+              "value": ["fab248ed-7a0c-4a80-9a01-301ef7911ebb"]
             }
           ]
         },
@@ -140,13 +138,11 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "users",
-              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
-              "access": []
+              "value": ["fab248ed-7a0c-4a80-9a01-301ef7911ebb"]
             }
           ]
         },
@@ -156,13 +152,11 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "users",
-              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
-              "access": []
+              "value": ["fab248ed-7a0c-4a80-9a01-301ef7911ebb"]
             }
           ]
         },
@@ -172,13 +166,11 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "users",
-              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
-              "access": []
+              "value": ["fab248ed-7a0c-4a80-9a01-301ef7911ebb"]
             }
           ]
         },
@@ -188,13 +180,11 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "users",
-              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
-              "access": []
+              "value": ["fab248ed-7a0c-4a80-9a01-301ef7911ebb"]
             }
           ]
         },
@@ -204,13 +194,11 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "users",
-              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
-              "access": []
+              "value": ["fab248ed-7a0c-4a80-9a01-301ef7911ebb"]
             }
           ]
         }
@@ -303,13 +291,11 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "users",
-              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
-              "access": []
+              "value": ["fab248ed-7a0c-4a80-9a01-301ef7911ebb"]
             }
           ]
         },
@@ -319,13 +305,11 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "users",
-              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
-              "access": []
+              "value": ["fab248ed-7a0c-4a80-9a01-301ef7911ebb"]
             }
           ]
         },
@@ -335,13 +319,11 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "users",
-              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
-              "access": []
+              "value": ["fab248ed-7a0c-4a80-9a01-301ef7911ebb"]
             }
           ]
         },
@@ -351,13 +333,11 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "users",
-              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
-              "access": []
+              "value": ["fab248ed-7a0c-4a80-9a01-301ef7911ebb"]
             }
           ]
         },
@@ -367,13 +347,11 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "users",
-              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
-              "access": []
+              "value": ["fab248ed-7a0c-4a80-9a01-301ef7911ebb"]
             }
           ]
         },
@@ -383,13 +361,11 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "users",
-              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
-              "access": []
+              "value": ["fab248ed-7a0c-4a80-9a01-301ef7911ebb"]
             }
           ]
         }
@@ -495,13 +471,11 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "users",
-              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
-              "access": []
+              "value": ["fab248ed-7a0c-4a80-9a01-301ef7911ebb"]
             }
           ]
         },
@@ -511,13 +485,11 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "users",
-              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
-              "access": []
+              "value": ["fab248ed-7a0c-4a80-9a01-301ef7911ebb"]
             }
           ]
         },
@@ -527,13 +499,11 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "users",
-              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
-              "access": []
+              "value": ["fab248ed-7a0c-4a80-9a01-301ef7911ebb"]
             }
           ]
         },
@@ -543,13 +513,11 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "users",
-              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
-              "access": []
+              "value": ["fab248ed-7a0c-4a80-9a01-301ef7911ebb"]
             }
           ]
         },
@@ -559,13 +527,11 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "users",
-              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
-              "access": []
+              "value": ["fab248ed-7a0c-4a80-9a01-301ef7911ebb"]
             }
           ]
         },
@@ -575,13 +541,11 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "users",
-              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
-              "access": []
+              "value": ["fab248ed-7a0c-4a80-9a01-301ef7911ebb"]
             }
           ]
         }
@@ -625,8 +589,7 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -636,8 +599,7 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -647,8 +609,7 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -658,8 +619,7 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -669,8 +629,7 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -680,8 +639,7 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -691,8 +649,7 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -702,8 +659,7 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -713,30 +669,43 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "anyone",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
         {
           "name": "LOGOUT",
           "value": false,
-          "access": []
+          "access": [
+            {
+              "name": "admin",
+              "value": true
+            }
+          ]
         },
         {
           "name": "PASSWORD_RESET_REQUEST",
           "value": false,
-          "access": []
+          "access": [
+            {
+              "name": "admin",
+              "value": true
+            }
+          ]
         },
         {
           "name": "RESET_PASSWORD",
           "value": false,
-          "access": []
+          "access": [
+            {
+              "name": "admin",
+              "value": true
+            }
+          ]
         },
         {
           "name": "CHANGE_PASSWORD",
@@ -744,20 +713,23 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "users",
-              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
-              "access": []
+              "value": ["fab248ed-7a0c-4a80-9a01-301ef7911ebb"]
             }
           ]
         },
         {
           "name": "VERIFY_EMAIL_REQUEST",
           "value": false,
-          "access": []
+          "access": [
+            {
+              "name": "admin",
+              "value": true
+            }
+          ]
         },
         {
           "name": "VERIFY_EMAIL",
@@ -765,13 +737,11 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "users",
-              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
-              "access": []
+              "value": ["fab248ed-7a0c-4a80-9a01-301ef7911ebb"]
             }
           ]
         },
@@ -781,30 +751,43 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "users",
-              "value": "fab248ed-7a0c-4a80-9a01-301ef7911ebb",
-              "access": []
+              "value": ["fab248ed-7a0c-4a80-9a01-301ef7911ebb"]
             }
           ]
         },
         {
           "name": "TWO_FACTOR",
           "value": false,
-          "access": []
+          "access": [
+            {
+              "name": "admin",
+              "value": true
+            }
+          ]
         },
         {
           "name": "TWO_FACTOR_VERIFY",
           "value": false,
-          "access": []
+          "access": [
+            {
+              "name": "admin",
+              "value": true
+            }
+          ]
         },
         {
           "name": "SESSIONS",
           "value": false,
-          "access": []
+          "access": [
+            {
+              "name": "admin",
+              "value": true
+            }
+          ]
         },
         {
           "name": "UNIQUE_EMAIL",
@@ -812,13 +795,11 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "anyone",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -828,13 +809,11 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "anyone",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         }
@@ -850,7 +829,7 @@
       "name": "managers",
       "connectionPoolId": "102b6ae0-598b-40b6-adf2-7acff30b01a3",
       "softDelete": true,
-      "kvp": [],
+      "kvp": ["name"],
       "schema": [
         {
           "system": false,
@@ -873,8 +852,8 @@
       "uuid": "0b4f9236-31c2-4f3f-983c-f2f002ada648",
       "isActive": true,
       "createdBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
-      "updatedBy": "",
-      "secret_key": "temp_secret_key",
+      "updatedBy": "102b6ae0-598b-40b6-adf2-7acff30b01a2",
+      "secret_key": "temp_secret_key2",
       "operations": [
         {
           "name": "GET_ALL",
@@ -882,8 +861,7 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -893,8 +871,7 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -904,8 +881,7 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -915,8 +891,7 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -926,8 +901,7 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -937,8 +911,7 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -948,8 +921,7 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -959,8 +931,7 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -970,8 +941,7 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -981,8 +951,7 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -992,8 +961,7 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -1003,8 +971,7 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -1014,8 +981,11 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
+            },
+            {
+              "name": "users",
+              "value": ["0b4f9236-31c2-4f3f-983c-f2f002ada648"]
             }
           ]
         },
@@ -1025,8 +995,7 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -1036,8 +1005,7 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -1047,8 +1015,7 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -1058,8 +1025,7 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -1069,13 +1035,11 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "anyone",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         },
@@ -1085,19 +1049,17 @@
           "access": [
             {
               "name": "admin",
-              "value": true,
-              "access": []
+              "value": true
             },
             {
               "name": "anyone",
-              "value": true,
-              "access": []
+              "value": true
             }
           ]
         }
       ],
       "created": "2024-04-29T23:43:20.843770",
-      "updated": "2024-04-29T23:43:20.843770"
+      "updated": "2024-04-30T00:05:30.718986"
     }
   ]
 }

@@ -14,7 +14,6 @@ export class VerifyComponent {
   private route = inject(ActivatedRoute);
   constructor() {
     this.route.queryParams.subscribe((params) => {
-      console.log(params);
       const token = params['token'];
       const schemaName = params['schema'];
       if (!token || !schemaName) {
@@ -31,25 +30,17 @@ export class VerifyComponent {
         };
 
         fetch(url, options)
-          .then((response) => {
-            if (!response.ok) {
-              this.message = 'Verification Failed. This tab can be closed.';
-              setTimeout(function () {
-                // window.close();
-              }, 5000);
-              throw new Error('Network response was not ok');
-            }
-          })
-          .then((data) => {
-            this.message = 'Verified Successfully. This tab can be closed.';
+          .then(async (response) => {
+            let res = await response.json();
+            this.message = res.message;
+            this.message += '<br>This Tab will close automatically!';
             setTimeout(function () {
-              // window.close();
+              window.close();
             }, 5000);
           })
           .catch((error) => {
-            this.message = 'Verification Failed. This tab can be closed.';
             setTimeout(function () {
-              // window.close();
+              window.close();
             }, 5000);
           });
       }
