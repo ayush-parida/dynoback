@@ -232,7 +232,7 @@ class CustomJSONEncoder(json.JSONEncoder):
 
 def construct_where_clause(filters):
     where_clauses = ["is_active = True"]
-    params = [""]
+    params = []
     for field, conditions in filters.items():
         field_conditions = []
         for condition in conditions:
