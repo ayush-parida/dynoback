@@ -58,7 +58,6 @@ export class DatabasesContainerComponent {
     );
   }
   confirmClose(event: any) {
-    console.log(event);
     this.confirmationService.confirm({
       target: event.target as EventTarget,
       message: 'Are you sure that you want to close?',

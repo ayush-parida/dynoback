@@ -106,9 +106,9 @@
       </ng-template>
       <ng-template pTemplate="header">
         <tr>
-          <th style="width: 4rem">
+          <!-- <th style="width: 4rem">
             <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-          </th>
+          </th> -->
           <th pSortableColumn="uuid">
             <div class="flex justify-content-between align-items-center">
               UUID<p-sortIcon field="uuid"></p-sortIcon>
@@ -188,7 +188,7 @@
 
       <ng-template pTemplate="body" let-rowEntry>
         <tr>
-          <td><p-tableCheckbox [value]="rowEntry"></p-tableCheckbox></td>
+          <!-- <td><p-tableCheckbox [value]="rowEntry"></p-tableCheckbox></td> -->
           <td>
             <p-chip
               class="cursor-pointer"
