@@ -18,6 +18,7 @@ import { Subscription } from 'rxjs';
   selector: 'app-database-details',
   standalone: true,
   imports: [SharedModule],
+  providers: [ConfirmationService],
   templateUrl: './database-details.component.html',
   styleUrl: './database-details.component.scss',
 })
@@ -110,13 +111,13 @@ export class DatabaseDetailsComponent implements OnChanges {
       acceptButtonStyleClass: 'p-button-danger p-button-text',
       rejectButtonStyleClass: 'p-button-text p-button-text',
       accept: () => {
-        this.deleteDatabase();
+        // this.deleteDatabase();
       },
       reject: () => {
         this.messageService.add({
           severity: 'info',
           summary: 'Action Canceled',
-          detail: 'User not deleted',
+          detail: 'Connection not deleted',
           life: 3000,
         });
       },

@@ -189,7 +189,8 @@ class Dynamic_DB_API:
             return None
 
         # Assuming there's an 'is_active' field to indicate soft deletion
-        query = f"UPDATE {schema_name} SET is_active = FALSE, updated = {datetime.now()} WHERE uuid = %s RETURNING *"
+        query = f"UPDATE {schema_name} SET is_active = FALSE, updated = now() WHERE uuid = %s RETURNING *"
+        print(query)
         deactivated_record = self._execute_query(schema_details['connectionPoolId'], query, (record_id,), fetch='one')
         return deactivated_record
 
@@ -230,8 +231,8 @@ class CustomJSONEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 def construct_where_clause(filters):
-    where_clauses = []
-    params = []
+    where_clauses = ["is_active = True"]
+    params = [""]
     for field, conditions in filters.items():
         field_conditions = []
         for condition in conditions:

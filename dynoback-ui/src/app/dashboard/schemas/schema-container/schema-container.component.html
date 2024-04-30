@@ -161,11 +161,11 @@
       </form>
 
       <p class="text-1xl font-bold w-full mx-2">
-        <u>Predefined Columns:</u> @if (selectedSchema.type == 1) { uuid,
-        created, updated, created_by, updated_by, is_active }
-        @if(selectedSchema.type == 2) { uuid, username, email, password,
-        verified, show_email, created, updated, created_by, updated_by,
-        is_active}
+        <u>Predefined Columns:</u> @if (schemaFormGroup.get('type')?.value == 1)
+        { uuid, created, updated, created_by, updated_by, is_active }
+        @if(schemaFormGroup.get('type')?.value == 2) { uuid, username, email,
+        password, verified, show_email, created, updated, created_by,
+        updated_by, is_active}
       </p>
 
       <p-divider></p-divider>
