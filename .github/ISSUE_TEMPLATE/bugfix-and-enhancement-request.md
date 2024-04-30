@@ -1,8 +1,8 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
-title: "[FEAT]"
-labels: enhancement, good first issue
+name: Bugfix and Enhancement Request
+about: Describe this issue template's purpose here.
+title: "[ADD]"
+labels: bug, enhancement
 assignees: ''
 
 ---
