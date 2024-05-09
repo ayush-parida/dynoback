@@ -1,0 +1,14 @@
+
+
+.card-content {
+  width: 80rem;
+}
+
+:host ::ng-deep {
+.p-chips .p-chips-multiple-container{
+  padding: 1.2rem 0.75rem !important;
+}
+.p-inputnumber-input {
+  padding: 1.5rem !important
+}
+}

@@ -50,6 +50,7 @@ import { TabViewModule } from 'primeng/tabview';
 import { HighlightJsModule } from 'ngx-highlight-js';
 import { HighlightJsDirective } from 'ngx-highlight-js';
 import { RadioButtonModule } from 'primeng/radiobutton';
+import { KeyFilterModule } from 'primeng/keyfilter';
 
 @NgModule({
   declarations: [],
@@ -154,6 +155,7 @@ import { RadioButtonModule } from 'primeng/radiobutton';
     JsonEllipsisPipe,
     HighlightJsModule,
     RadioButtonModule,
+    KeyFilterModule,
   ],
   providers: [AuthService, MessageService, ConfirmationService],
 })

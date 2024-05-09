@@ -61,6 +61,14 @@ export const routes: Routes = [
             canActivate: [authGuard],
             children: [
               {
+                path: '',
+                loadComponent: () =>
+                  import(
+                    './dashboard/settings/application-settings/application-settings.component'
+                  ).then((c) => c.ApplicationSettingsComponent),
+                canActivate: [authGuard],
+              },
+              {
                 path: 'admins',
                 loadComponent: () =>
                   import(

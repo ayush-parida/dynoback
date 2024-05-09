@@ -1,0 +1,60 @@
+<p-card header="Application Settings" styleClass="w-full h-full">
+  <div class="p-7">
+    <div class="grid">
+      <div class="col-6">
+        <span class="p-float-label my-5">
+          <input
+            pInputText
+            id="appname"
+            placeholder="appname"
+            class="w-full p-4"
+            [(ngModel)]="appName"
+          />
+          <label for="appname">AppName</label>
+        </span>
+      </div>
+      <div class="col-6">
+        <span class="p-float-label my-5">
+          <p-inputNumber
+            [(ngModel)]="adminTokenExpiry"
+            styleClass="w-full"
+            class="w-full"
+            inputId="adminTokenExpiry"
+          >
+          </p-inputNumber>
+
+          <label for="adminTokenExpiry">AdminTokenExpiry</label>
+        </span>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="col-6">
+        <span class="p-float-label my-3">
+          <input
+            pInputText
+            placeholder="IP"
+            class="w-full p-4"
+            [(ngModel)]="ip"
+          />
+          <label for="ip">IP</label>
+        </span>
+      </div>
+      <div class="col-6">
+        <span class="p-float-label my-3">
+          <!-- <p-chips styleClass="w-full" class="w-full"></p-chips> -->
+          <p-chips [(ngModel)]="origin">
+            <ng-template let-item pTemplate="item">
+              {{ item }}
+            </ng-template>
+          </p-chips>
+          <label for="origins">origins</label>
+        </span>
+      </div>
+    </div>
+    <div class="grid my-5">
+      <div class="col-12 flex align-items-end justify-content-end">
+        <p-button label="Update" icon="pi pi-check"></p-button>
+      </div>
+    </div>
+  </div>
+</p-card>
